@@ -22,7 +22,7 @@ import {isNonEmptyString} from '@sindresorhus/is';
 import {IMention, Mention} from '@wireapp/protocol-messaging';
 
 import {QualifiedId} from '../apiClient/user/qualifiedId';
-import {PROTO_MESSAGE_TYPE} from '../repositories/cryptography/ProtoMessageType';
+import {PROTO_MESSAGE_TYPE} from '../repositories/cryptography/protoMessageType';
 import {matchQualifiedIds} from '../util/qualifiedId';
 import {isUUID} from '../util/validationUtil';
 

@@ -22,7 +22,7 @@ import {useEffect, type FunctionComponent} from 'react';
 import {Page} from './page';
 import {styles} from './success.styles';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {replaceBrowserLocation} from '../../navigation/browserLocation';
 import {useApplicationContext} from '../../page/rootProvider';
 import {SuccessShield} from '../../uiKit/images/successShield';

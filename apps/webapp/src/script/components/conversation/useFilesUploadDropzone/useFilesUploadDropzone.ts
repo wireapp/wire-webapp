@@ -28,10 +28,10 @@ import {validateFiles, ValidationResult} from './fileValidation/fileValidation';
 import {showFileDropzoneErrorModal} from './showFileDropzoneErrorModal/showFileDropzoneErrorModal';
 import {transformAcceptedFiles} from './transformAcceptedFiles/transformAcceptedFiles';
 
-import {Config} from '../../../Config';
+import {Config} from '../../../config';
 import type {RootContextValue} from '../../../page/rootProvider';
 import {CellsRepository} from '../../../repositories/cells/cellsRepository';
-import {Conversation} from '../../../repositories/entity/Conversation';
+import {Conversation} from '../../../repositories/entity/conversation';
 import {getLogger} from '../../../util/logger';
 import {FileWithPreview, useFileUploadState} from '../useFilesUploadState/useFilesUploadState';
 import {buildCellsUploadPath} from '../utils/buildCellsUploadPath';

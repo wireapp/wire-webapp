@@ -33,7 +33,7 @@ import {CalendarIcon} from '../../../uiKit/dataDisplay/icon/calendarIcon';
 import {CloseIcon} from '../../../uiKit/dataDisplay/icon/closeIcon';
 import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';
 import {handleEscDown} from '../../../util/keyboardUtil';
-import {ModalComponent} from '../../Modals/ModalComponent';
+import {ModalComponent} from '../../modals/modalComponent';
 import {
   bodyStyles,
   closeButtonStyles,

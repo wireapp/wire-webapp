@@ -23,12 +23,12 @@ import {GuestOptions} from './components/guestOptions';
 import {ServicesOptions} from './components/servicesOptions';
 
 import {FadingScrollbar} from '../../../components/fadingScrollbar';
-import {PrimaryModal} from '../../../components/Modals/PrimaryModal';
-import {toggleFeature} from '../../../repositories/conversation/ConversationAccessPermission';
-import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
-import {Conversation} from '../../../repositories/entity/Conversation';
-import {TeamRepository} from '../../../repositories/team/TeamRepository';
-import {TeamState} from '../../../repositories/team/TeamState';
+import {PrimaryModal} from '../../../components/modals/primaryModal';
+import {toggleFeature} from '../../../repositories/conversation/conversationAccessPermission';
+import {ConversationRepository} from '../../../repositories/conversation/conversationRepository';
+import {Conversation} from '../../../repositories/entity/conversation';
+import {TeamRepository} from '../../../repositories/team/teamRepository';
+import {TeamState} from '../../../repositories/team/teamState';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {useApplicationContext} from '../../rootProvider';
 import {PanelHeader} from '../panelHeader';

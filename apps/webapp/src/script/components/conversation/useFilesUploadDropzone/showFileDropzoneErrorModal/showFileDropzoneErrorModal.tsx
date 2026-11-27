@@ -25,7 +25,7 @@ import {fileNameStyles, itemStyles, listStyles} from './showFileDropzoneErrorMod
 
 import type {Translate} from '../../../../util/localizerUtil';
 import {getFileExtension} from '../../../../util/util';
-import {PrimaryModal} from '../../../Modals/PrimaryModal';
+import {PrimaryModal} from '../../../modals/primaryModal';
 import {FileTypeIcon} from '../../common/fileTypeIcon/fileTypeIcon';
 
 interface ShowFileDropzoneErrorModalParams {

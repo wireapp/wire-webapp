@@ -21,7 +21,7 @@ import {EventEmitter} from 'events';
 
 import {Cookie} from './cookie';
 
-import {Runtime} from '../../commons/util/Runtime';
+import {Runtime} from '../../commons/util/runtime';
 
 const maximumCookieStoreListeners = 20;
 

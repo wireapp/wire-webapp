@@ -25,10 +25,10 @@ import {useManualMigrationStore} from './useManualMigrationStore';
 
 import {type FeatureMLSMigration} from '../../apiClient/team/feature/featureList.schema';
 import {CONVERSATION_PROTOCOL, FEATURE_STATUS} from '../../apiClient/team/feature/featureList.types';
-import type {ConversationRepository} from '../../repositories/conversation/ConversationRepository';
-import {isMixedConversation, isMLSConversation} from '../../repositories/conversation/ConversationSelectors';
-import type {Conversation} from '../../repositories/entity/Conversation';
-import type {User} from '../../repositories/entity/User';
+import type {ConversationRepository} from '../../repositories/conversation/conversationRepository';
+import {isMixedConversation, isMLSConversation} from '../../repositories/conversation/conversationSelectors';
+import type {Conversation} from '../../repositories/entity/conversation';
+import type {User} from '../../repositories/entity/user';
 
 export const canManuallyMigrateConversation = (
   conversation: Conversation,

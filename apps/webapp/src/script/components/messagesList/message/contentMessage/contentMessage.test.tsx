@@ -20,14 +20,14 @@
 import {render, waitFor} from '@testing-library/react';
 import ko from 'knockout';
 
-import {Conversation} from '../../../../repositories/entity/Conversation';
+import {Conversation} from '../../../../repositories/entity/conversation';
 import {ContentMessage} from '../../../../repositories/entity/message/contentMessage';
 import {FileAsset as MessageFileAsset} from '../../../../repositories/entity/message/fileAsset';
 import {AssetRemoteData} from '../../../../repositories/assets/assetRemoteData';
 import {AssetTransferState} from '../../../../repositories/assets/assetTransferState';
 import {LinkPreview} from '../../../../repositories/entity/message/linkPreview';
 import {Text} from '../../../../repositories/entity/message/text';
-import {User} from '../../../../repositories/entity/User';
+import {User} from '../../../../repositories/entity/user';
 import {QuoteEntity} from '../../../../message/quoteEntity';
 import {
   createRootContextValueForTest,

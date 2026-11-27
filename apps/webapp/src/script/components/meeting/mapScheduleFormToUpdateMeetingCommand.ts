@@ -28,7 +28,7 @@ import type {
 import type {UpdateMeetingCommand} from './shared/types/meetingCommandTypes';
 
 import type {QualifiedId} from '../../apiClient/user/qualifiedId';
-import type {User} from '../../repositories/entity/User';
+import type {User} from '../../repositories/entity/user';
 
 export type MapScheduleFormToUpdateMeetingCommandParams = {
   formState: ScheduleMeetingFormState;

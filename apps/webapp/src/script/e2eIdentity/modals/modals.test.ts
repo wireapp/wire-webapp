@@ -19,7 +19,7 @@
 
 import assert from 'node:assert';
 
-import {PrimaryModal} from '../../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../../components/modals/primaryModal';
 import {translate} from '../../util/localizerUtil';
 
 import {getModalOptions, ModalType} from './modals';

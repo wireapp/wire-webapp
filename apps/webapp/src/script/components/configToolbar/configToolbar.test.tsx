@@ -22,8 +22,8 @@ import {
   createRootProviderWrapperForTest,
 } from '../../page/testSupport/rootContextTestSupport';
 import {translateForTest} from '../../util/test/translateForTest';
-import {ConversationState} from '../../repositories/conversation/ConversationState';
-import {Conversation} from '../../repositories/entity/Conversation';
+import {ConversationState} from '../../repositories/conversation/conversationState';
+import {Conversation} from '../../repositories/entity/conversation';
 
 import {sendCallLogsFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
 

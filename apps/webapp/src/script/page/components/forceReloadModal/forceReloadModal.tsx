@@ -21,7 +21,7 @@ import {FunctionComponent, useEffect} from 'react';
 
 import {Maybe} from 'true-myth';
 
-import {PrimaryModal} from '../../../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../../../components/modals/primaryModal';
 import {TIME_IN_MILLIS} from '../../../util/timeUtil';
 import {useApplicationContext} from '../../rootProvider';
 

@@ -22,13 +22,13 @@ import {useState, type FunctionComponent} from 'react';
 import {fireEvent, render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import {User} from '../../../repositories/entity/User';
-import type {Conversation} from '../../../repositories/entity/Conversation';
-import type {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
+import {User} from '../../../repositories/entity/user';
+import type {Conversation} from '../../../repositories/entity/conversation';
+import type {ConversationRepository} from '../../../repositories/conversation/conversationRepository';
 import type {SearchRepository} from '../../../repositories/search/searchRepository';
-import type {TeamRepository} from '../../../repositories/team/TeamRepository';
-import type {TeamState} from '../../../repositories/team/TeamState';
-import type {ConversationState} from '../../../repositories/conversation/ConversationState';
+import type {TeamRepository} from '../../../repositories/team/teamRepository';
+import type {TeamState} from '../../../repositories/team/teamState';
+import type {ConversationState} from '../../../repositories/conversation/conversationState';
 import {
   createExecutingFireAndForgetInvokerForTest,
   createRootContextValueForTest,

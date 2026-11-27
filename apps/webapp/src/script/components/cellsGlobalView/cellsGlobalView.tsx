@@ -34,7 +34,7 @@ import {useSearchCellsNodes} from './useSearchCellsNodes/useSearchCellsNodes';
 
 import {useApplicationContext} from '../../page/rootProvider';
 import {CellsRepository} from '../../repositories/cells/cellsRepository';
-import {ConversationRepository} from '../../repositories/conversation/ConversationRepository';
+import {ConversationRepository} from '../../repositories/conversation/conversationRepository';
 import {UserRepository} from '../../repositories/user/userRepository';
 import {UserState} from '../../repositories/user/userState';
 import {Button, ButtonVariant} from '../../uiKit/inputs/button/button';

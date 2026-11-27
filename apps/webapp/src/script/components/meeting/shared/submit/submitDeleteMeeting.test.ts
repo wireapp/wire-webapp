@@ -22,8 +22,8 @@ import {task} from 'true-myth';
 import {meetingSubmitErrors} from '../../meetingSubmitErrors';
 import type {MeetingInstance} from '../../types/meetingInstance';
 import type {MeetingSeries} from '../../types/meetingSeries';
-import {PrimaryModal} from '../../../Modals/PrimaryModal';
-import {User} from '../../../../repositories/entity/User';
+import {PrimaryModal} from '../../../modals/primaryModal';
+import {User} from '../../../../repositories/entity/user';
 import {translateForTest} from '../../../../util/test/translateForTest';
 
 import {

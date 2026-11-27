@@ -21,7 +21,7 @@ import {isNullOrUndefined} from '@sindresorhus/is';
 
 import {CONVERSATION_TYPE} from '../../../../apiClient/conversation/conversation';
 import {ConversationRecord} from '../../../storage';
-import {BackUpConversation} from '../CPB.library';
+import {BackUpConversation} from '../cpb.library';
 
 const isGroupConversation = (name: string): boolean => {
   return name.length > 0;

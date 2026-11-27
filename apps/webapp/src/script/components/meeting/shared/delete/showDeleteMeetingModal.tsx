@@ -26,7 +26,7 @@ import {
 
 import {TrashIcon} from '../../../../uiKit/dataDisplay/icon/trashIcon';
 import type {Translate, TranslationKey} from '../../../../util/localizerUtil';
-import {PrimaryModal} from '../../../Modals/PrimaryModal';
+import {PrimaryModal} from '../../../modals/primaryModal';
 
 export type DeleteMeetingModalMode = 'forAll' | 'forMe';
 

@@ -1,0 +1,82 @@
+/*
+ * Wire
+ * Copyright (C) 2024 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import type {FormEvent, FunctionComponent} from 'react';
+
+import {Config} from '../../../../config';
+import {Form} from '../../../../uiKit/inputs/form/form';
+import type {Translate} from '../../../../util/localizerUtil';
+import {PasswordFields} from '../../../passwordFields/passwordFields';
+import {PasswordGeneratorButton} from '../../../passwordGeneratorButton';
+
+interface GuestLinkPasswordFormProps {
+  readonly translate: Translate;
+  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
+  onGeneratePassword: (password: string) => void;
+  passwordValue: string;
+  passwordValueRef: React.RefObject<HTMLInputElement | null>;
+  onPasswordValueChange: (value: string) => void;
+  isPasswordInputMarkInvalid: boolean;
+  passwordConfirmationError?: React.ReactNode;
+  passwordConfirmationValue: string;
+  onPasswordConfirmationChange: (value: string) => void;
+  isPasswordConfirmationMarkInvalid: boolean;
+}
+
+export const GuestLinkPasswordForm: FunctionComponent<GuestLinkPasswordFormProps> = ({
+  translate,
+  onSubmit,
+  onGeneratePassword,
+  passwordValue,
+  passwordValueRef,
+  onPasswordValueChange,
+  isPasswordInputMarkInvalid,
+  passwordConfirmationError,
+  passwordConfirmationValue,
+  onPasswordConfirmationChange,
+  isPasswordConfirmationMarkInvalid,
+}: GuestLinkPasswordFormProps) => {
+  return (
+    <>
+      <PasswordGeneratorButton
+        translate={translate}
+        passwordLength={Config.getConfig().MINIMUM_PASSWORD_LENGTH}
+        onGeneratePassword={onGeneratePassword}
+      />
+      <Form
+        name="guest-password-link-form"
+        data-uie-name="guest-password-link-form"
+        onSubmit={onSubmit}
+        autoComplete="off"
+      >
+        <PasswordFields
+          translate={translate}
+          passwordValue={passwordValue}
+          passwordValueRef={passwordValueRef}
+          onPasswordValueChange={onPasswordValueChange}
+          isPasswordInputMarkInvalid={isPasswordInputMarkInvalid}
+          passwordConfirmationError={passwordConfirmationError}
+          passwordConfirmationValue={passwordConfirmationValue}
+          onPasswordConfirmationChange={onPasswordConfirmationChange}
+          isPasswordConfirmationMarkInvalid={isPasswordConfirmationMarkInvalid}
+        />
+      </Form>
+    </>
+  );
+};

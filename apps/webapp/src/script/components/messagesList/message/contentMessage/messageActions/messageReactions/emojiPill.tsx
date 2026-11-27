@@ -36,7 +36,7 @@ import {
 } from './messageReactions.styles';
 
 import type {QualifiedId} from '../../../../../../apiClient/user/qualifiedId';
-import type {User} from '../../../../../../repositories/entity/User';
+import type {User} from '../../../../../../repositories/entity/user';
 import {Tooltip} from '../../../../../../uiKit/dataDisplay/tooltip/tooltip';
 import {getEmojiTitleFromEmojiUnicode} from '../../../../../../util/emojiUtil';
 import {isTabKey} from '../../../../../../util/keyboardUtil';

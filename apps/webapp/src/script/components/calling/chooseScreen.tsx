@@ -23,8 +23,8 @@ import type {JSX} from '@emotion/react/jsx-runtime';
 import {container} from 'tsyringe';
 
 import {useApplicationContext} from '../../page/rootProvider';
-import {CallingViewMode, CallState} from '../../repositories/calling/CallState';
-import {ElectronDesktopCapturerSource} from '../../repositories/media/MediaDevicesHandler';
+import {CallingViewMode, CallState} from '../../repositories/calling/callState';
+import {ElectronDesktopCapturerSource} from '../../repositories/media/mediaDevicesHandler';
 import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {KEY} from '../../util/keyboardUtil';
 import {captureModalFocusContext} from '../../util/modalFocusUtil';

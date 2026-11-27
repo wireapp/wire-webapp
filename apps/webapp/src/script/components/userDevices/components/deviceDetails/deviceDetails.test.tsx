@@ -21,22 +21,22 @@ import type {ComponentProps} from 'react';
 import {render} from '@testing-library/react';
 
 import en from '../../../../../i18n/en-US.json';
-import {ClientEntity} from '../../../../repositories/client/ClientEntity';
+import {ClientEntity} from '../../../../repositories/client/clientEntity';
 import type {ClientRepository} from '../../../../repositories/client';
-import type {CryptographyRepository} from '../../../../repositories/cryptography/CryptographyRepository';
-import {User} from '../../../../repositories/entity/User';
-import type {MessageRepository} from '../../../../repositories/conversation/MessageRepository';
+import type {CryptographyRepository} from '../../../../repositories/cryptography/cryptographyRepository';
+import {User} from '../../../../repositories/entity/user';
+import type {MessageRepository} from '../../../../repositories/conversation/messageRepository';
 import {withThemeAndRootContext} from '../../../../auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from '../../../../page/testSupport/rootContextTestSupport';
-import {ConversationState} from '../../../../repositories/conversation/ConversationState';
+import {ConversationState} from '../../../../repositories/conversation/conversationState';
 import {setStrings, translate} from '../../../../util/localizerUtil';
 import type {Logger} from '../../../../util/logger';
 import {translateForTest} from '../../../../util/test/translateForTest';
 
-import {Config} from '../../../../Config';
+import {Config} from '../../../../config';
 
 import {DeviceDetails} from './deviceDetails';
 

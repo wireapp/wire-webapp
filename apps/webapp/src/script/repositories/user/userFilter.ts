@@ -19,8 +19,8 @@
 
 import {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {matchQualifiedIds} from '../../util/qualifiedId';
-import {Conversation} from '../entity/Conversation';
-import {User} from '../entity/User';
+import {Conversation} from '../entity/conversation';
+import {User} from '../entity/user';
 
 export class UserFilter {
   static isParticipant(conversationEntity: Conversation, userId: QualifiedId): boolean {

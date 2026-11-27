@@ -20,12 +20,12 @@
 import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
 import {asyncNoop} from 'noop-esm';
 
-import {generateConversation} from '../../../../test/helper/ConversationGenerator';
+import {generateConversation} from '../../../../test/helper/conversationGenerator';
 import {translateForTest} from '../../util/test/translateForTest';
 import {TIME_IN_MILLIS} from '../../util/timeUtil';
 
-import {Conversation} from '../../repositories/entity/Conversation';
-import {User} from '../../repositories/entity/User';
+import {Conversation} from '../../repositories/entity/conversation';
+import {User} from '../../repositories/entity/user';
 
 import {MLSMigrationStatus} from './migrationStatus';
 import {initialiseMLSMigrationFlow, type MLSMigrationFlowDependencies} from './mlsMigration';

@@ -19,7 +19,7 @@
 
 import {fireEvent, render, waitFor} from '@testing-library/react';
 
-import {GiphyRepository} from '../../repositories/extension/GiphyRepository';
+import {GiphyRepository} from '../../repositories/extension/giphyRepository';
 import {withTheme} from '../../auth/util/test/testUtil';
 import {translateForTest} from '../../util/test/translateForTest';
 import {

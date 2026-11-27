@@ -23,7 +23,7 @@ import {isUndefined} from '@sindresorhus/is';
 import type {Logger} from './logger';
 import {encodeLogOutput, type ConsoleLogOutput} from './logOutput';
 
-import {isUUIDv4} from '../commons/util/ValidationUtil';
+import {isUUIDv4} from '../commons/util/validationUtil';
 
 type LogRuntimeIdentityOptions = {
   readonly logger: Pick<Logger, 'info'>;

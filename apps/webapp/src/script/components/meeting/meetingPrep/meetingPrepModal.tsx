@@ -28,11 +28,11 @@ import {useMeetingPrepModal} from './useMeetingPrepModal';
 import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import {useApplicationContext} from '../../../page/rootProvider';
 import type {CallMediaChoice} from '../../../repositories/calling/callMediaChoice';
-import type {User} from '../../../repositories/entity/User';
+import type {User} from '../../../repositories/entity/user';
 import {handleEscDown} from '../../../util/keyboardUtil';
 import {captureModalFocusContext} from '../../../util/modalFocusUtil';
 import {showNoAudioInputModal, showNoCameraModal} from '../../calling/devicePermissionModals';
-import {ModalComponent} from '../../Modals/ModalComponent';
+import {ModalComponent} from '../../modals/modalComponent';
 import {modalWrapperStyles} from '../shared/styles/meetingModalShell.styles';
 
 export type MeetingPrepModalProps = {

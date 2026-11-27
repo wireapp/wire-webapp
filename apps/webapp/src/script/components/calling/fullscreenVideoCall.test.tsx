@@ -23,14 +23,14 @@ import {QUERY} from '../../uiKit/utils/mediaQueries';
 import {useMatchMedia} from '../../uiKit/layout/matchMedia/matchMedia';
 import {noop} from 'noop-esm';
 
-import {Call} from '../../repositories/calling/Call';
-import {Participant} from '../../repositories/calling/Participant';
+import {Call} from '../../repositories/calling/call';
+import {Participant} from '../../repositories/calling/participant';
 import {Grid} from '../../repositories/calling/videoGridHandler';
-import {Conversation} from '../../repositories/entity/Conversation';
-import {User} from '../../repositories/entity/User';
+import {Conversation} from '../../repositories/entity/conversation';
+import {User} from '../../repositories/entity/user';
 import {PropertiesRepository} from '../../repositories/properties/propertiesRepository';
 import {PropertiesService} from '../../repositories/properties/propertiesService';
-import {SelfService} from '../../repositories/self/SelfService';
+import {SelfService} from '../../repositories/self/selfService';
 import {
   buildCallingRepository,
   buildMediaDevicesHandler,
@@ -45,7 +45,7 @@ import {
 import {translate} from '../../util/localizerUtil';
 
 import {FullscreenVideoCall, FullscreenVideoCallProps} from './fullscreenVideoCall';
-import {CallingViewMode, CallState} from '../../repositories/calling/CallState';
+import {CallingViewMode, CallState} from '../../repositories/calling/callState';
 import {KEY} from '../../util/keyboardUtil';
 import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
 

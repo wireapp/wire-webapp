@@ -29,15 +29,15 @@ import {
 import {TeamCreationBanner} from './teamCreationBanner';
 
 import {FadingScrollbar} from '../../../components/fadingScrollbar';
-import {customHistorySharingInputCss} from '../../../components/Modals/CreateConversation/CreateConversationSteps/CreateConversationSteps.styles';
-import {ChatHistory, HistorySharingUnit} from '../../../components/Modals/CreateConversation/types';
+import {customHistorySharingInputCss} from '../../../components/modals/createConversation/createConversationSteps/createConversationSteps.styles';
+import {ChatHistory, HistorySharingUnit} from '../../../components/modals/createConversation/types';
 import {
   getChatHistoryOptions,
   getChatHistorySharingUnitOptions,
-} from '../../../components/Modals/CreateConversation/utils';
+} from '../../../components/modals/createConversation/utils';
 import {RadioGroup} from '../../../components/radio';
-import {User} from '../../../repositories/entity/User';
-import {TeamState} from '../../../repositories/team/TeamState';
+import {User} from '../../../repositories/entity/user';
+import {TeamState} from '../../../repositories/team/teamState';
 import {Input} from '../../../uiKit/inputs/input/input';
 import {Select} from '../../../uiKit/inputs/select/select';
 import {FlexBox} from '../../../uiKit/layout/flexBox/flexBox';

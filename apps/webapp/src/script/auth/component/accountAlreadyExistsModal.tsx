@@ -21,7 +21,7 @@ import type {FunctionComponent} from 'react';
 
 import {buttonCss, containerCss, headerCss, linkCss} from './accountAlreadyExistsModal.styles';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {useApplicationContext} from '../../page/rootProvider';
 import {Button} from '../../uiKit/inputs/button/button';
 import {Container} from '../../uiKit/layout/container/container';

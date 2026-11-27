@@ -1,0 +1,459 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+// @ts-check
+
+import 'core-js/full/reflect';
+
+// Polyfill for "tsyringe" dependency injection
+import {ClientClassification} from '../../src/script/apiClient/client/clientClassification';
+import {ClientType} from '../../src/script/apiClient/client/clientType';
+
+import ko from 'knockout';
+import {container} from 'tsyringe';
+
+import {AssetRepository} from '../../src/script/repositories/assets/assetRepository';
+import {AudioRepository} from '../../src/script/repositories/audio/audioRepository';
+import {CallingRepository} from '../../src/script/repositories/calling/callingRepository';
+import {ClientEntity} from '../../src/script/repositories/client/clientEntity';
+import {ClientRepository} from '../../src/script/repositories/client/clientRepository';
+import {ClientService} from '../../src/script/repositories/client/clientService';
+import {ClientState} from '../../src/script/repositories/client/clientState';
+import {ConnectionRepository} from '../../src/script/repositories/connection/connectionRepository';
+import {ConnectionService} from '../../src/script/repositories/connection/connectionService';
+import {ConversationRepository} from '../../src/script/repositories/conversation/conversationRepository';
+import {ConversationService} from '../../src/script/repositories/conversation/conversationService';
+import {ConversationState} from '../../src/script/repositories/conversation/conversationState';
+import {MessageRepository} from '../../src/script/repositories/conversation/messageRepository';
+import {CryptographyRepository} from '../../src/script/repositories/cryptography/cryptographyRepository';
+import {User} from '../../src/script/repositories/entity/user';
+import {EventRepository} from '../../src/script/repositories/event/eventRepository';
+import {EventService} from '../../src/script/repositories/event/eventService';
+import {NotificationService} from '../../src/script/repositories/event/notificationService';
+import {PropertiesRepository} from '../../src/script/repositories/properties/propertiesRepository';
+import {PropertiesService} from '../../src/script/repositories/properties/propertiesService';
+import {SearchRepository} from '../../src/script/repositories/search/searchRepository';
+import {SelfService} from '../../src/script/repositories/self/selfService';
+import {SelfRepository} from '../../src/script/repositories/self/selfRepository';
+import {Core} from '../../src/script/service/coreSingleton';
+import {APIClient} from '../../src/script/service/apiClientSingleton';
+import {createStorageEngine, DatabaseTypes} from '../../src/script/service/storeEngineProvider';
+import {StorageService} from '../../src/script/repositories/storage';
+import {StorageRepository} from '../../src/script/repositories/storage/storageRepository';
+import {TeamRepository} from '../../src/script/repositories/team/teamRepository';
+import {TeamService} from '../../src/script/repositories/team/teamService';
+import {TeamState} from '../../src/script/repositories/team/teamState';
+import {EventTrackingRepository} from '../../src/script/repositories/tracking/eventTrackingRepository';
+import {UserRepository} from '../../src/script/repositories/user/userRepository';
+import {UserService} from '../../src/script/repositories/user/userService';
+import {UserState} from '../../src/script/repositories/user/userState';
+import {serverTimeHandler} from '../../src/script/time/serverTimeHandler';
+import {translate} from '../../src/script/util/localizerUtil';
+
+import {entities} from '../api/payloads';
+import {MediaStreamHandler} from '../../src/script/repositories/media/mediaStreamHandler';
+import {MediaDevicesHandler} from '../../src/script/repositories/media/mediaDevicesHandler';
+import {MediaConstraintsHandler} from '../../src/script/repositories/media/mediaConstraintsHandler';
+import {BackgroundEffectsHandler} from '../../src/script/repositories/media/backgroundEffectsHandler';
+
+export class TestFactory {
+  /** @type {APIClient} */
+  #apiClient;
+
+  /** @param {Core | undefined} core */
+  constructor(core = undefined) {
+    container.clearInstances();
+    this.#apiClient = new APIClient();
+    container.registerInstance(APIClient, this.#apiClient);
+    if (core !== undefined) {
+      container.registerInstance(Core, core);
+    }
+    /** @type {StorageService} */
+    this.storage_service = Object.create(StorageService.prototype);
+    /** @type {StorageRepository} */
+    this.storage_repository = Object.create(StorageRepository.prototype);
+    /** @type {CryptographyRepository} */
+    this.cryptography_repository = Object.create(CryptographyRepository.prototype);
+    /** @type {ClientRepository} */
+    this.client_repository = Object.create(ClientRepository.prototype);
+    /** @type {EventService} */
+    this.event_service = Object.create(EventService.prototype);
+    /** @type {EventRepository} */
+    this.event_repository = Object.create(EventRepository.prototype);
+    /** @type {AssetRepository} */
+    this.assetRepository = Object.create(AssetRepository.prototype);
+    /** @type {ConnectionRepository} */
+    this.connection_repository = Object.create(ConnectionRepository.prototype);
+    /** @type {UserRepository} */
+    this.user_repository = Object.create(UserRepository.prototype);
+    /** @type {TeamRepository} */
+    this.team_repository = Object.create(TeamRepository.prototype);
+    /** @type {SelfRepository} */
+    this.self_repository = Object.create(SelfRepository.prototype);
+    /** @type {MessageRepository} */
+    this.message_repository = Object.create(MessageRepository.prototype);
+    /** @type {CallingRepository} */
+    this.calling_repository = Object.create(CallingRepository.prototype);
+    /** @type {ConversationRepository} */
+    this.conversation_repository = Object.create(ConversationRepository.prototype);
+  }
+
+  /** @returns {void} */
+  dispose() {
+    this.#apiClient.dispose();
+  }
+
+  /** @returns {void} */
+  [Symbol.dispose]() {
+    this.dispose();
+  }
+
+  /**
+   * @returns {Promise<StorageRepository>} The storage repository.
+   */
+  async exposeStorageActors() {
+    container.registerInstance(StorageService, new StorageService());
+    this.storage_service = container.resolve(StorageService);
+    if (!this.storage_service.db) {
+      const engine = await createStorageEngine('test', DatabaseTypes.PERMANENT);
+      this.storage_service.init(engine);
+    }
+    this.storage_repository = singleton(StorageRepository, this.storage_service);
+
+    return this.storage_repository;
+  }
+
+  /**
+   * @returns {Promise<CryptographyRepository>} The cryptography repository.
+   */
+  async exposeCryptographyActors() {
+    await this.exposeStorageActors();
+    const currentClient = new ClientEntity(true, null);
+    currentClient.id = entities.clients.john_doe.permanent.id;
+    this.cryptography_repository = new CryptographyRepository();
+
+    return this.cryptography_repository;
+  }
+
+  /**
+   * @returns {Promise<ClientRepository>} The client repository.
+   */
+  async exposeClientActors() {
+    const cryptographyRepository = await this.exposeCryptographyActors();
+
+    this.client_service = new ClientService(this.storage_service);
+    this.client_repository = new ClientRepository(
+      this.client_service,
+      cryptographyRepository,
+      translate,
+      new ClientState(),
+    );
+
+    const currentClient = new ClientEntity(false, null);
+    currentClient.address = '62.96.148.44';
+    currentClient.class = ClientClassification.DESKTOP;
+    currentClient.cookie = 'webapp@2153234453@temporary@1470926647664';
+    currentClient.id = '132b3653b33f851f';
+    currentClient.label = 'Windows 10';
+    currentClient.meta = {isVerified: ko.observable(true), primaryKey: 'local_identity'};
+    currentClient.model = 'Chrome (Temporary)';
+    currentClient.time = '2016-10-07T16:01:42.133Z';
+    currentClient.type = ClientType.TEMPORARY;
+
+    this.client_repository['clientState'].currentClient = currentClient;
+
+    return this.client_repository;
+  }
+
+  /**
+   * @returns {Promise<EventRepository>} The event repository.
+   */
+  async exposeEventActors() {
+    const userRepository = await this.exposeUserActors();
+
+    this.event_service = new EventService(this.storage_service);
+    this.notification_service = new NotificationService(this.storage_service);
+    this.conversation_service = new ConversationService(this.event_service);
+
+    this.event_repository = new EventRepository(
+      this.event_service,
+      this.notification_service,
+      serverTimeHandler,
+      userRepository['userState'],
+    );
+
+    return this.event_repository;
+  }
+
+  /**
+   * @returns {Promise<UserRepository>} The user repository.
+   */
+  async exposeUserActors() {
+    const clientRepository = await this.exposeClientActors();
+    this.assetRepository = new AssetRepository();
+
+    this.connection_service = new ConnectionService();
+    this.user_service = new UserService(this.storage_service);
+    this.propertyRepository = new PropertiesRepository(new PropertiesService(), new SelfService(), translate);
+
+    const userState = new UserState();
+    const selfUser = new User('self-id', '', translate);
+    selfUser.isMe = true;
+    userState.self(selfUser);
+    userState.users([selfUser]);
+
+    this.user_repository = new UserRepository(
+      this.user_service,
+      this.assetRepository,
+      new SelfService(),
+      clientRepository,
+      serverTimeHandler,
+      this.propertyRepository,
+      translate,
+      userState,
+    );
+
+    return this.user_repository;
+  }
+
+  /**
+   * @returns {Promise<ConnectionRepository>} The connection repository.
+   */
+  async exposeConnectionActors() {
+    const userRepository = await this.exposeUserActors();
+    this.connection_service = new ConnectionService();
+    this.self_service = new SelfService();
+    this.team_service = new TeamService();
+
+    this.connection_repository = new ConnectionRepository(
+      this.connection_service,
+      userRepository,
+      this.self_service,
+      this.team_service,
+      translate,
+    );
+
+    return this.connection_repository;
+  }
+
+  /**
+   * @returns {Promise<SearchRepository>} The search repository.
+   */
+  async exposeSearchActors() {
+    const userRepository = await this.exposeUserActors();
+    this.search_repository = new SearchRepository(userRepository);
+
+    return this.search_repository;
+  }
+
+  /**
+   * @returns {Promise<TeamRepository>} The team repository.
+   */
+  async exposeTeamActors() {
+    const userRepository = await this.exposeUserActors();
+    if (this.assetRepository === undefined) {
+      throw new Error('Asset repository was not initialized');
+    }
+    this.team_service = new TeamService();
+    this.team_service.getAllTeamFeatures = async () => ({});
+    this.team_repository = new TeamRepository(
+      userRepository,
+      this.assetRepository,
+      () => Promise.resolve(),
+      this.team_service,
+      translate,
+      userRepository['userState'],
+      new TeamState(userRepository['userState']),
+    );
+    return this.team_repository;
+  }
+
+  /**
+   * @returns {Promise<SelfRepository>} The self repository.
+   */
+  async exposeSelfActors() {
+    const userRepository = await this.exposeUserActors();
+    const teamRepository = await this.exposeTeamActors();
+    const clientRepository = await this.exposeClientActors();
+
+    this.self_service = new SelfService();
+
+    this.self_repository = new SelfRepository(
+      this.self_service,
+      userRepository,
+      teamRepository,
+      clientRepository,
+      userRepository['userState'],
+    );
+
+    return this.self_repository;
+  }
+
+  /**
+   * @returns {Promise<ConversationRepository>} The conversation repository.
+   */
+  async exposeConversationActors() {
+    const connectionRepository = await this.exposeConnectionActors();
+    await this.exposeTeamActors();
+    const eventRepository = await this.exposeEventActors();
+    const selfRepository = await this.exposeSelfActors();
+
+    if (this.event_service === undefined) {
+      throw new Error('Event service was not initialized');
+    }
+    this.conversation_service = new ConversationService(this.event_service);
+
+    this.propertyRepository = new PropertiesRepository(new PropertiesService(), new SelfService(), translate);
+
+    if (
+      this.user_repository === undefined ||
+      this.team_repository === undefined ||
+      this.assetRepository === undefined ||
+      this.cryptography_repository === undefined
+    ) {
+      throw new Error('Conversation dependencies were not initialized');
+    }
+    const userRepository = this.user_repository;
+    const teamRepository = this.team_repository;
+    const conversationState = new ConversationState(userRepository['userState'], teamRepository['teamState']);
+    const testFactory = this;
+    const clientEntity = new ClientEntity(false, null);
+    clientEntity.address = '192.168.0.1';
+    clientEntity.class = ClientClassification.DESKTOP;
+    clientEntity.id = '60aee26b7f55a99f';
+    const clientState = new ClientState();
+    clientState.currentClient = clientEntity;
+
+    this.message_repository = new MessageRepository(
+      /** @returns {ConversationRepository} */
+      function getConversationRepository() {
+        if (testFactory.conversation_repository === undefined) {
+          throw new Error('Conversation repository was not initialized');
+        }
+        return testFactory.conversation_repository;
+      },
+      this.cryptography_repository,
+      eventRepository,
+      this.propertyRepository,
+      serverTimeHandler,
+      userRepository,
+      this.assetRepository,
+      new AudioRepository(),
+      translate,
+      userRepository['userState'],
+      clientState,
+    );
+    const core = container.resolve(Core);
+    /** @type {CallingRepository} */
+    const callingRepository = this.calling_repository ?? Object.create(CallingRepository.prototype);
+    this.conversation_repository = new ConversationRepository(
+      this.conversation_service,
+      this.message_repository,
+      connectionRepository,
+      eventRepository,
+      teamRepository,
+      userRepository,
+      selfRepository,
+      this.propertyRepository,
+      callingRepository,
+      serverTimeHandler,
+      translate,
+      {isMarkAsUnreadFeatureEnabled: false},
+      userRepository['userState'],
+      teamRepository['teamState'],
+      conversationState,
+      connectionRepository['connectionState'],
+      core,
+    );
+
+    return this.conversation_repository;
+  }
+
+  /**
+   * @returns {Promise<CallingRepository>} The call center.
+   */
+  async exposeCallingActors() {
+    const conversationRepository = await this.exposeConversationActors();
+    if (
+      this.message_repository === undefined ||
+      this.event_repository === undefined ||
+      this.user_repository === undefined
+    ) {
+      throw new Error('Calling dependencies were not initialized');
+    }
+    const mediaConstraintsHandler = new MediaConstraintsHandler();
+    const mediaStreamHandler = new MediaStreamHandler(mediaConstraintsHandler);
+    const mediaDevicesHandler = new MediaDevicesHandler();
+    /** @type {BackgroundEffectsHandler} */
+    const backgroundEffectsHandler = Object.create(BackgroundEffectsHandler.prototype);
+
+    this.calling_repository = new CallingRepository(
+      this.message_repository,
+      this.event_repository,
+      this.user_repository,
+      mediaStreamHandler,
+      mediaDevicesHandler,
+      serverTimeHandler,
+      backgroundEffectsHandler,
+      translate,
+      undefined,
+      conversationRepository['conversationState'],
+    );
+
+    return this.calling_repository;
+  }
+
+  /**
+   * @returns {Promise<EventTrackingRepository>} The event tracking repository.
+   */
+  async exposeTrackingActors() {
+    await this.exposeTeamActors();
+    if (this.message_repository === undefined) {
+      throw new Error('Message repository was not initialized');
+    }
+    this.tracking_repository = new EventTrackingRepository(this.message_repository, container.resolve(APIClient));
+
+    return this.tracking_repository;
+  }
+}
+
+/**
+ * @template T
+ * @typedef {{new (...args: any[]): T}} Constructor<T>
+ */
+
+/**
+ * @type {Map<Constructor<unknown>, unknown>}
+ */
+const actorsCache = new Map();
+
+/**
+ * Will instantiate a service only once (uses the global actorsCache to store instances)
+ * @template T
+ * @param {Constructor<T>} Service the service to instantiate
+ * @param {...any} dependencies the dependencies required by the service
+ * @returns {T} the instantiated service
+ */
+function singleton(Service, ...dependencies) {
+  const cachedInstance = /** @type {T | undefined} */ (actorsCache.get(Service));
+  const serviceInstance = cachedInstance || new Service(...dependencies);
+  actorsCache.set(Service, serviceInstance);
+
+  return serviceInstance;
+}

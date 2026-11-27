@@ -17,7 +17,7 @@
  *
  */
 
-import type {Participant} from '../../../repositories/calling/Participant';
+import type {Participant} from '../../../repositories/calling/participant';
 
 /** One person in the call. Several devices of the same person are one CallPerson. */
 export interface CallPerson {

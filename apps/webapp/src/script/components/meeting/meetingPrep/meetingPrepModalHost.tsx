@@ -25,7 +25,7 @@ import {createMeetingPrepPreview} from './createMeetingPrepPreview';
 import {MeetingPrepModal} from './meetingPrepModal';
 import {useMeetingPrepJoin} from './useMeetingPrepJoin';
 
-import {MediaStreamHandler} from '../../../repositories/media/MediaStreamHandler';
+import {MediaStreamHandler} from '../../../repositories/media/mediaStreamHandler';
 import {UserState} from '../../../repositories/user/userState';
 
 export const MeetingPrepModalHost: FunctionComponent = () => {

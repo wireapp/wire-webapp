@@ -26,12 +26,12 @@ import {CONVERSATION_PROTOCOL} from '../../../../apiClient/team/feature/featureL
 import {result, task} from 'true-myth';
 import {container} from 'tsyringe';
 
-import {ConversationDatabaseData, ConversationMapper} from '../../../../repositories/conversation/ConversationMapper';
-import type {Conversation as ConversationEntity} from '../../../../repositories/entity/Conversation';
-import {User} from '../../../../repositories/entity/User';
+import {ConversationDatabaseData, ConversationMapper} from '../../../../repositories/conversation/conversationMapper';
+import type {Conversation as ConversationEntity} from '../../../../repositories/entity/conversation';
+import {User} from '../../../../repositories/entity/user';
 import {Core} from '../../../../service/coreSingleton';
 import {requireValueForTest} from '../../../../page/testSupport/rootContextTestSupport';
-import {TestFactory} from '../../../../../../test/helper/TestFactory';
+import {TestFactory} from '../../../../../../test/helper/testFactory';
 import {translate} from '../../../../util/localizerUtil';
 import {createUuid} from '../../../../util/uuid';
 

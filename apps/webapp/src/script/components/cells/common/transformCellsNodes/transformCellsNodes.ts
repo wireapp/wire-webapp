@@ -22,8 +22,8 @@ import {RestNode} from 'cells-sdk-ts';
 import {Maybe, maybe} from 'true-myth';
 
 import {parseQualifiedId} from '../../../../core/util/qualifiedIdUtil';
-import {Conversation} from '../../../../repositories/entity/Conversation';
-import {User} from '../../../../repositories/entity/User';
+import {Conversation} from '../../../../repositories/entity/conversation';
+import {User} from '../../../../repositories/entity/user';
 import {CellNode, CellNodeType} from '../../../../types/cellNode';
 import {matchQualifiedIds} from '../../../../util/qualifiedId';
 import {TIME_IN_MILLIS} from '../../../../util/timeUtil';

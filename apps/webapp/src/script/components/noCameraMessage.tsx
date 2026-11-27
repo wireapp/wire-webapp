@@ -19,7 +19,7 @@
 
 import type {FunctionComponent, ReactNode} from 'react';
 
-import {Config} from '../Config';
+import {Config} from '../config';
 import {createReactTranslationMarker, renderReactTranslation} from '../util/localizerUtil/reactLocalizerUtil';
 import type {Translate} from '../util/localizerUtil/translationTypes';
 

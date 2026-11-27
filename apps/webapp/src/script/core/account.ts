@@ -105,8 +105,8 @@ import {type WebSocketReconnectContext, WEBSOCKET_STATE} from '../apiClient/tcp/
 import {WebSocketClient} from '../apiClient/tcp/webSocketClient';
 import {FEATURE_KEY, FEATURE_STATUS} from '../apiClient/team/feature/featureList.types';
 import {QualifiedId} from '../apiClient/user/qualifiedId';
-import {TypedEventEmitter} from '../commons/TypedEventEmitter/TypedEventEmitter';
-import {TimeInMillis} from '../commons/util/TimeUtil';
+import {TypedEventEmitter} from '../commons/typedEventEmitter/typedEventEmitter';
+import {TimeInMillis} from '../commons/util/timeUtil';
 import {getLogger, type LogAttributes, type Logger} from '../logger/getLogger';
 import {getSafeNotificationErrorDetails} from '../logger/getSafeNotificationErrorDetails';
 

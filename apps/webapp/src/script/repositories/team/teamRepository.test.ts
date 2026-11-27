@@ -1,0 +1,460 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {CollaboratorPermission, TeamCollaborator} from '../../apiClient/team/team/collaborator/teamCollaborator';
+import {FeatureList, FEATURE_STATUS, CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
+import {QualifiedId} from '../../apiClient/user/qualifiedId';
+import {UserType} from '../../apiClient/user/user';
+
+import {randomUUID} from 'crypto';
+
+import {AssetRepository} from '../assets/assetRepository';
+import {User} from '../entity/user';
+import {ROLE} from '../user/userPermission';
+import {UserRepository} from '../user/userRepository';
+import {UserState} from '../user/userState';
+
+import {TeamEntity} from './teamEntity';
+import {TeamMemberEntity} from './teamMemberEntity';
+import {TeamRepository} from './teamRepository';
+import {TeamService} from './teamService';
+import {TeamState} from './teamState';
+import {translateForTest} from '../../util/test/translateForTest';
+
+type TeamRepositoryTestDependencies = {
+  readonly userState: UserState;
+  readonly teamState: TeamState;
+  readonly userRepository: UserRepository;
+  readonly assetRepository: AssetRepository;
+  readonly teamService: TeamService;
+  readonly translate: jest.Mock<string, [translationKey: string]>;
+};
+type TeamRepositoryTestFixture = readonly [TeamRepository, TeamRepositoryTestDependencies];
+
+function buildConnectionRepository(): TeamRepositoryTestFixture {
+  const team = new TeamEntity(randomUUID());
+  const userState = new UserState();
+  const selfUser = new User('self-id', 'self-domain', translateForTest);
+  selfUser.teamId = team.id;
+  selfUser.isMe = true;
+  selfUser.teamRole(ROLE.NONE);
+  userState.self(selfUser);
+
+  const teamState = new TeamState(userState);
+  teamState.team(team);
+  const userRepository = {} as UserRepository;
+  const assetRepository = {} as AssetRepository;
+  const teamService = new TeamService({} as any);
+  const onMemberDeleted = jest.fn();
+  const translate = jest.fn((translationKey: string) => {
+    return `translated:${translationKey}`;
+  });
+  return [
+    new TeamRepository(userRepository, assetRepository, onMemberDeleted, teamService, translate, userState, teamState),
+    {userState, teamState, userRepository, assetRepository, teamService, translate},
+  ] as const;
+}
+
+describe('TeamRepository', () => {
+  const teams_data = {
+    teams: [
+      {
+        binding: true,
+        creator: '9ca1bf41-42cd-4ee4-b54e-99e8dcc9d375',
+        icon_key: '',
+        icon: '',
+        id: 'e6d3adc5-9140-477a-abc1-8279d210ceab',
+        name: 'Wire GmbH',
+      },
+    ],
+    has_more: false,
+  };
+  const team_metadata = teams_data.teams[0];
+
+  const services_data: {has_more: boolean; services: any[]} = {has_more: false, services: []};
+
+  describe('getTeam()', () => {
+    it('returns the team entity', async () => {
+      const [teamRepo, {teamService}] = buildConnectionRepository();
+      jest.spyOn(teamService, 'getTeamById').mockResolvedValue(team_metadata);
+      jest.spyOn(teamService, 'getWhitelistedServices').mockResolvedValue(services_data);
+      jest.spyOn(teamRepo, 'getSelfMember').mockResolvedValue(new TeamMemberEntity(randomUUID()));
+
+      const team_et = await teamRepo.getTeam();
+      const [team_data] = teams_data.teams;
+
+      expect(team_et.creator).toEqual(team_data.creator);
+      expect(team_et.id).toEqual(team_data.id);
+    });
+  });
+
+  describe('initTeam', () => {
+    it('updates team feature config from backend', async () => {
+      const [teamRepo, {teamService, teamState}] = buildConnectionRepository();
+      jest.spyOn(teamService, 'getTeamById').mockResolvedValue(team_metadata);
+      jest.spyOn(teamService, 'getWhitelistedServices').mockResolvedValue(services_data);
+      jest.spyOn(teamRepo, 'getSelfMember').mockResolvedValue(new TeamMemberEntity(randomUUID()));
+
+      const localFeatures = {
+        appLock: {status: FEATURE_STATUS.ENABLED, config: {enforceAppLock: true, inactivityTimeoutSecs: 60}},
+        mls: {
+          config: {supportedProtocols: [CONVERSATION_PROTOCOL.PROTEUS]},
+          status: FEATURE_STATUS.ENABLED,
+        },
+      } as FeatureList;
+
+      teamState.teamFeatures(localFeatures);
+
+      const featuresFromBackend = {
+        appLock: {status: FEATURE_STATUS.ENABLED, config: {enforceAppLock: true, inactivityTimeoutSecs: 60}},
+        mls: {
+          config: {supportedProtocols: [CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS]},
+          status: FEATURE_STATUS.ENABLED,
+        },
+      } as FeatureList;
+
+      jest.spyOn(teamService, 'getAllTeamFeatures').mockResolvedValue(featuresFromBackend);
+
+      teamRepo.on('featureConfigUpdated', update => {
+        expect(update.prevFeatureList).toEqual(localFeatures);
+        expect(update.newFeatureList).toEqual(featuresFromBackend);
+        expect(teamState.teamFeatures()).toEqual(featuresFromBackend);
+      });
+
+      await teamRepo.initTeam();
+
+      expect(teamState.teamFeatures()).toEqual(featuresFromBackend);
+    });
+
+    it('marks initial compatibility defaults when fetching features fails', async () => {
+      const [teamRepo, {teamService, teamState}] = buildConnectionRepository();
+      jest.spyOn(teamService, 'getTeamById').mockResolvedValue(team_metadata);
+      jest.spyOn(teamService, 'getWhitelistedServices').mockResolvedValue(services_data);
+      jest.spyOn(teamRepo, 'getSelfMember').mockResolvedValue(new TeamMemberEntity(randomUUID()));
+      jest.spyOn(teamService, 'getAllTeamFeatures').mockRejectedValue(new Error('Backend unavailable'));
+
+      await teamRepo.initTeam();
+
+      expect(teamState.isTeamFeatureConfigFallback()).toBe(true);
+      expect(teamState.teamFeatures()?.appLock?.status).toBe(FEATURE_STATUS.ENABLED);
+    });
+
+    it('recovers from startup defaults when a valid response omits optional default features', async () => {
+      const [teamRepo, {teamService, teamState}] = buildConnectionRepository();
+      const backendFeatures = {
+        appLock: {status: FEATURE_STATUS.ENABLED, config: {enforceAppLock: false, inactivityTimeoutSecs: 60}},
+        fileSharing: {status: FEATURE_STATUS.DISABLED},
+      };
+      jest.spyOn(teamService, 'getTeamById').mockResolvedValue(team_metadata);
+      jest.spyOn(teamService, 'getWhitelistedServices').mockResolvedValue(services_data);
+      jest.spyOn(teamRepo, 'getSelfMember').mockResolvedValue(new TeamMemberEntity(randomUUID()));
+      jest
+        .spyOn(teamService, 'getAllTeamFeatures')
+        .mockRejectedValueOnce(new Error('Backend unavailable'))
+        .mockResolvedValueOnce({})
+        .mockResolvedValueOnce(backendFeatures);
+      const onUpdate = jest.fn();
+      teamRepo.on('featureConfigUpdated', onUpdate);
+
+      await teamRepo.initTeam();
+      const defaults = teamState.teamFeatures();
+      expect(defaults?.videoCalling).toBeDefined();
+      expect(teamState.isTeamFeatureConfigFallback()).toBe(true);
+
+      await teamRepo['updateFeatureConfig']();
+      expect(teamState.teamFeatures()).toBe(defaults);
+      expect(teamState.isTeamFeatureConfigFallback()).toBe(true);
+      expect(onUpdate).not.toHaveBeenCalled();
+
+      await teamRepo['updateFeatureConfig']();
+      expect(teamState.teamFeatures()).toBe(backendFeatures);
+      expect(teamState.isTeamFeatureConfigFallback()).toBe(false);
+      expect(onUpdate).toHaveBeenCalledTimes(1);
+      expect(onUpdate).toHaveBeenCalledWith({prevFeatureList: defaults, newFeatureList: backendFeatures});
+    });
+
+    it('keeps previously loaded features when initial fetching fails', async () => {
+      const [teamRepo, {teamService, teamState}] = buildConnectionRepository();
+      const previousFeatures = {
+        appLock: {status: FEATURE_STATUS.ENABLED, config: {enforceAppLock: true, inactivityTimeoutSecs: 60}},
+        fileSharing: {status: FEATURE_STATUS.DISABLED},
+      };
+      teamState.teamFeatures(previousFeatures);
+      jest.spyOn(teamService, 'getTeamById').mockResolvedValue(team_metadata);
+      jest.spyOn(teamService, 'getWhitelistedServices').mockResolvedValue(services_data);
+      jest.spyOn(teamRepo, 'getSelfMember').mockResolvedValue(new TeamMemberEntity(randomUUID()));
+      jest.spyOn(teamService, 'getAllTeamFeatures').mockRejectedValue(new Error('Backend unavailable'));
+
+      await teamRepo.initTeam();
+
+      expect(teamState.teamFeatures()).toBe(previousFeatures);
+      expect(teamState.isTeamFeatureConfigFallback()).toBe(false);
+    });
+  });
+
+  describe('feature refresh', () => {
+    const appLock = {
+      status: FEATURE_STATUS.ENABLED,
+      config: {enforceAppLock: true, inactivityTimeoutSecs: 60},
+    };
+
+    it('keeps the last feature configuration when the response is undefined', async () => {
+      const [teamRepo, {teamService, teamState}] = buildConnectionRepository();
+      const previousFeatures = {appLock, fileSharing: {status: FEATURE_STATUS.ENABLED}};
+      teamState.teamFeatures(previousFeatures);
+      jest.spyOn(teamService, 'getAllTeamFeatures').mockResolvedValue(undefined as unknown as FeatureList);
+      const onUpdate = jest.fn();
+      teamRepo.on('featureConfigUpdated', onUpdate);
+
+      await teamRepo['updateFeatureConfig']();
+
+      expect(teamState.teamFeatures()).toBe(previousFeatures);
+      expect(onUpdate).not.toHaveBeenCalled();
+    });
+
+    it('rejects an empty feature response without dropping other features', async () => {
+      const [teamRepo, {teamService, teamState}] = buildConnectionRepository();
+      const previousFeatures = {appLock, fileSharing: {status: FEATURE_STATUS.ENABLED}};
+      teamState.teamFeatures(previousFeatures);
+      jest.spyOn(teamService, 'getAllTeamFeatures').mockResolvedValue({});
+      const onUpdate = jest.fn();
+      teamRepo.on('featureConfigUpdated', onUpdate);
+
+      await teamRepo['updateFeatureConfig']();
+
+      expect(teamState.teamFeatures()).toBe(previousFeatures);
+      expect(onUpdate).not.toHaveBeenCalled();
+    });
+
+    it('rejects an app lock feature without enforcement and timeout settings', async () => {
+      const [teamRepo, {teamService, teamState}] = buildConnectionRepository();
+      const previousFeatures = {appLock};
+      teamState.teamFeatures(previousFeatures);
+      jest.spyOn(teamService, 'getAllTeamFeatures').mockResolvedValue({
+        appLock: {status: FEATURE_STATUS.ENABLED},
+      } as FeatureList);
+
+      await teamRepo['updateFeatureConfig']();
+
+      expect(teamState.teamFeatures()).toBe(previousFeatures);
+      expect(teamState.teamFeatures()?.appLock?.config?.enforceAppLock).toBe(true);
+    });
+
+    it('rejects a response that omits another previously known feature', async () => {
+      const [teamRepo, {teamService, teamState}] = buildConnectionRepository();
+      const previousFeatures = {appLock, fileSharing: {status: FEATURE_STATUS.ENABLED}};
+      teamState.teamFeatures(previousFeatures);
+      jest.spyOn(teamService, 'getAllTeamFeatures').mockResolvedValue({appLock});
+
+      await teamRepo['updateFeatureConfig']();
+
+      expect(teamState.teamFeatures()).toBe(previousFeatures);
+    });
+
+    it('does not rewrite MLS protocols or emit an update when fetching fails', async () => {
+      const [teamRepo, {teamService, teamState}] = buildConnectionRepository();
+      const protocols = [CONVERSATION_PROTOCOL.PROTEUS];
+      const previousFeatures = {
+        appLock,
+        mls: {status: FEATURE_STATUS.ENABLED, config: {supportedProtocols: protocols}},
+      } as FeatureList;
+      teamState.teamFeatures(previousFeatures);
+      teamRepo['hasPersistedSupportedProtocols'] = true;
+      jest.spyOn(teamService, 'getAllTeamFeatures').mockRejectedValue(new Error('Backend unavailable'));
+      const onUpdate = jest.fn();
+      teamRepo.on('featureConfigUpdated', onUpdate);
+
+      await teamRepo['updateFeatureConfig']();
+
+      expect(teamState.teamFeatures()).toBe(previousFeatures);
+      expect(teamState.teamFeatures()?.mls?.config.supportedProtocols).toBe(protocols);
+      expect(onUpdate).not.toHaveBeenCalled();
+    });
+
+    it('applies an explicit team disable', async () => {
+      const [teamRepo, {teamService, teamState}] = buildConnectionRepository();
+      teamState.teamFeatures({appLock});
+      const disabledAppLock = {...appLock, status: FEATURE_STATUS.DISABLED};
+      jest.spyOn(teamService, 'getAllTeamFeatures').mockResolvedValue({appLock: disabledAppLock});
+
+      await teamRepo['updateFeatureConfig']();
+
+      expect(teamState.teamFeatures()?.appLock).toEqual(disabledAppLock);
+    });
+  });
+
+  describe('sendAccountInfo', () => {
+    it('does not crash when there is no team logo', async () => {
+      const [teamRepo] = buildConnectionRepository();
+
+      expect(teamRepo['teamState'].isTeam()).toBe(true);
+
+      const accountInfo = await teamRepo.sendAccountInfo(true);
+
+      expect(accountInfo.picture).toBeUndefined();
+    });
+  });
+
+  describe('getTeamSupportedProtocols', () => {
+    it('returns team supported protocols from mls feature config', async () => {
+      const [teamRepo, {teamState}] = buildConnectionRepository();
+
+      const mockedTeamProtocols = [CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS];
+
+      const mockedFeatureList = {
+        mls: {config: {supportedProtocols: mockedTeamProtocols}, status: FEATURE_STATUS.ENABLED},
+      } as FeatureList;
+
+      teamState.teamFeatures(mockedFeatureList);
+
+      const protocols = teamRepo.getTeamSupportedProtocols();
+
+      expect(protocols).toEqual(mockedTeamProtocols);
+    });
+
+    it('returns proteus if mls feature is disabled', async () => {
+      const [teamRepo, {teamState}] = buildConnectionRepository();
+
+      const mockedTeamProtocols = [CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS];
+
+      const mockedFeatureList = {
+        mls: {config: {supportedProtocols: mockedTeamProtocols}, status: FEATURE_STATUS.DISABLED},
+      } as FeatureList;
+
+      teamState.teamFeatures(mockedFeatureList);
+
+      const protocols = teamRepo.getTeamSupportedProtocols();
+
+      expect(protocols).toEqual([CONVERSATION_PROTOCOL.PROTEUS]);
+    });
+
+    it('returns proteus if mls feature does not exist in team features', async () => {
+      const [teamRepo, {teamState}] = buildConnectionRepository();
+
+      const mockedFeatureList = {
+        mls: undefined,
+      } as FeatureList;
+
+      teamState.teamFeatures(mockedFeatureList);
+
+      const protocols = teamRepo.getTeamSupportedProtocols();
+
+      expect(protocols).toEqual([CONVERSATION_PROTOCOL.PROTEUS]);
+    });
+
+    it('returns proteus if supported protocols field does not exist on mls feature', async () => {
+      const [teamRepo, {teamState}] = buildConnectionRepository();
+
+      const mockedFeatureList = {
+        mls: {config: {supportedProtocols: undefined}, status: FEATURE_STATUS.ENABLED},
+      } as unknown as FeatureList;
+
+      teamState.teamFeatures(mockedFeatureList);
+
+      const protocols = teamRepo.getTeamSupportedProtocols();
+
+      expect(protocols).toEqual([CONVERSATION_PROTOCOL.PROTEUS]);
+    });
+
+    it('returns proteus if supported protocols on mls feature config is an empty list', async () => {
+      const [teamRepo, {teamState}] = buildConnectionRepository();
+
+      const mockedFeatureList = {
+        mls: {config: {supportedProtocols: []}, status: FEATURE_STATUS.ENABLED},
+      } as unknown as FeatureList;
+
+      teamState.teamFeatures(mockedFeatureList);
+
+      const protocols = teamRepo.getTeamSupportedProtocols();
+
+      expect(protocols).toEqual([CONVERSATION_PROTOCOL.PROTEUS]);
+    });
+  });
+
+  describe('getRoleBadge', () => {
+    it('uses the injected translate function', () => {
+      const [teamRepo, {teamState, translate}] = buildConnectionRepository();
+
+      teamState.memberRoles({'external-user': ROLE.PARTNER});
+      teamState.memberInviters({});
+
+      expect(teamRepo.getRoleBadge('external-user')).toBe('translated:rolePartner');
+      expect(translate).toHaveBeenCalledWith('rolePartner');
+    });
+  });
+
+  describe('loadTeamAppsAndCollaborators', () => {
+    function createResolvedUser(id: string, domain: string, type: UserType = UserType.REGULAR): User {
+      const user = new User(id, domain, translateForTest);
+      user.type = type;
+      return user;
+    }
+
+    it('merges team-owned apps with app-type collaborators, and puts human collaborators in teamCollaborators', async () => {
+      const [teamRepo, {teamState, teamService, userRepository}] = buildConnectionRepository();
+      const teamId = teamState.team().id as string;
+      const domain = teamState.teamDomain();
+
+      const ownedApp = createResolvedUser('owned-app-id', domain, UserType.APP);
+      const newAppCollaborator = createResolvedUser('collab-app-id', domain, UserType.APP);
+      const humanCollaborator = createResolvedUser('collab-human-id', domain, UserType.REGULAR);
+
+      const rawAppsFromBackend = [{id: 'owned-app-id'}] as any[];
+      const collaboratorsFromBackend: TeamCollaborator[] = [
+        {user: 'collab-app-id', team: teamId, permissions: [CollaboratorPermission.CREATE_TEAM_CONVERSATION]},
+        {user: 'collab-human-id', team: teamId, permissions: [CollaboratorPermission.IMPLICIT_CONNECTION]},
+      ];
+
+      jest.spyOn(teamService, 'getApps').mockResolvedValue(rawAppsFromBackend as any);
+      jest.spyOn(teamService, 'getCollaborators').mockResolvedValue(collaboratorsFromBackend);
+
+      (userRepository as any).userMapper = {mapUsersFromJson: jest.fn().mockReturnValue([ownedApp])};
+      const getUsersByIdMock = jest.fn().mockResolvedValue([newAppCollaborator, humanCollaborator]);
+      userRepository.getUsersById = getUsersByIdMock;
+
+      await teamRepo.loadTeamAppsAndCollaborators(teamId);
+
+      const requestedIds = getUsersByIdMock.mock.calls[0][0] as QualifiedId[];
+      expect(requestedIds).toEqual([
+        {domain, id: 'collab-app-id'},
+        {domain, id: 'collab-human-id'},
+      ]);
+
+      const teamApps = teamState.teamApps();
+      expect(teamApps).toEqual([ownedApp, newAppCollaborator]);
+
+      expect(teamState.teamCollaborators()).toEqual([humanCollaborator]);
+    });
+
+    it('resolves nothing when the team has no apps or collaborators', async () => {
+      const [teamRepo, {teamState, teamService, userRepository}] = buildConnectionRepository();
+      const teamId = teamState.team().id as string;
+
+      jest.spyOn(teamService, 'getApps').mockResolvedValue([]);
+      jest.spyOn(teamService, 'getCollaborators').mockResolvedValue([]);
+      (userRepository as any).userMapper = {mapUsersFromJson: jest.fn().mockReturnValue([])};
+      userRepository.getUsersById = jest.fn().mockResolvedValue([]);
+
+      await teamRepo.loadTeamAppsAndCollaborators(teamId);
+
+      expect(teamState.teamApps()).toEqual([]);
+      expect(teamState.teamCollaborators()).toEqual([]);
+    });
+  });
+});

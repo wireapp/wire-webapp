@@ -27,8 +27,8 @@ import {Subconversation, SUBCONVERSATION_ID} from '../../../apiClient/conversati
 import {BackendError} from '../../../apiClient/http/backendError';
 import {BackendErrorLabel} from '../../../apiClient/http/backendErrorLabel';
 import {QualifiedId} from '../../../apiClient/user/qualifiedId';
-import {TypedEventEmitter} from '../../../commons/TypedEventEmitter/TypedEventEmitter';
-import {TimeInMillis} from '../../../commons/util/TimeUtil';
+import {TypedEventEmitter} from '../../../commons/typedEventEmitter/typedEventEmitter';
+import {TimeInMillis} from '../../../commons/util/timeUtil';
 import {getLogger} from '../../../logger/getLogger';
 import {MLSService, MLSServiceEvents} from '../../messagingProtocols/mls';
 import {isMLSStaleMessageError} from '../../messagingProtocols/mls/mlsService/coreCryptoMlsError';

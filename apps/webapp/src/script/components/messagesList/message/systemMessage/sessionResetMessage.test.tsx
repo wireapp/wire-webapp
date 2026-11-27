@@ -22,7 +22,7 @@ import {act, render, screen} from '@testing-library/react';
 
 import enUS from '../../../../../i18n/en-US.json';
 import {createSessionResetMessage} from '../../../../repositories/entity/message/sessionResetMessage';
-import {User} from '../../../../repositories/entity/User';
+import {User} from '../../../../repositories/entity/user';
 import {translateForTest} from '../../../../util/test/translateForTest';
 
 import {SystemMessage} from './systemMessage';

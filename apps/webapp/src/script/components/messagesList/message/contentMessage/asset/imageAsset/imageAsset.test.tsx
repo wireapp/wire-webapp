@@ -30,7 +30,7 @@ import type {GetAssetUrl, ImageLogger} from '../../../../../image';
 import {AssetRemoteData} from '../../../../../../repositories/assets/assetRemoteData';
 import {ContentMessage} from '../../../../../../repositories/entity/message/contentMessage';
 import {MediumImage} from '../../../../../../repositories/entity/message/mediumImage';
-import {User} from '../../../../../../repositories/entity/User';
+import {User} from '../../../../../../repositories/entity/user';
 import {
   createExecutingFireAndForgetInvokerForTest,
   createRootContextValueForTest,

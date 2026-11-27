@@ -21,7 +21,7 @@ import {isUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import {result} from 'true-myth';
 
-import {Runtime} from '../../commons/util/Runtime';
+import {Runtime} from '../../commons/util/runtime';
 import {
   type SystemNotificationApi,
   type SystemNotificationError,

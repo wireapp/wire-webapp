@@ -19,9 +19,9 @@
 
 import {CONVERSATION_PROTOCOL} from '../../../../apiClient/team/feature/featureList.types';
 import {Account} from '../../../../core';
-import {ConversationRepository} from '../../../../repositories/conversation/ConversationRepository';
-import {MLSConversation, isMLSConversation} from '../../../../repositories/conversation/ConversationSelectors';
-import {Conversation} from '../../../../repositories/entity/Conversation';
+import {ConversationRepository} from '../../../../repositories/conversation/conversationRepository';
+import {MLSConversation, isMLSConversation} from '../../../../repositories/conversation/conversationSelectors';
+import {Conversation} from '../../../../repositories/entity/conversation';
 import {initMLSGroupConversations} from '../../../mlsConversations';
 
 /**

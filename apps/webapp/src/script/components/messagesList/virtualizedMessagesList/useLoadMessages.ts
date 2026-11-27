@@ -23,8 +23,8 @@ import {isUndefined} from '@sindresorhus/is';
 import {Virtualizer} from '@tanstack/react-virtual';
 
 import {useApplicationContext} from '../../../page/rootProvider';
-import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
-import {Conversation} from '../../../repositories/entity/Conversation';
+import {ConversationRepository} from '../../../repositories/conversation/conversationRepository';
+import {Conversation} from '../../../repositories/entity/conversation';
 import {isLastReceivedMessage} from '../../../util/conversationMessages';
 
 const viewportCenterDivisor = 2;

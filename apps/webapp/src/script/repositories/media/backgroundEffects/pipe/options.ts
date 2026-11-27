@@ -18,8 +18,8 @@
  */
 
 import {EffectMode, Metrics, QualityMode} from '..';
-import {Runtime} from '../../../../commons/util/Runtime';
-import {BackgroundSource} from '../../VideoBackgroundEffects';
+import {Runtime} from '../../../../commons/util/runtime';
+import {BackgroundSource} from '../../videoBackgroundEffects';
 
 export type ProcessVideoTrackOptions = {
   // MediaPipe options.

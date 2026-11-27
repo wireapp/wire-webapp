@@ -26,10 +26,10 @@ import {
 } from './conversationSidebar.styles';
 
 import {FadingScrollbar} from '../../../../../components/fadingScrollbar';
-import {ConversationRepository} from '../../../../../repositories/conversation/ConversationRepository';
-import {ConversationState} from '../../../../../repositories/conversation/ConversationState';
-import {Conversation} from '../../../../../repositories/entity/Conversation';
-import {User} from '../../../../../repositories/entity/User';
+import {ConversationRepository} from '../../../../../repositories/conversation/conversationRepository';
+import {ConversationState} from '../../../../../repositories/conversation/conversationState';
+import {Conversation} from '../../../../../repositories/entity/conversation';
+import {User} from '../../../../../repositories/entity/user';
 import {ChevronIcon} from '../../../../../uiKit/dataDisplay/icon/chevronIcon';
 import {IconButton} from '../../../../../uiKit/inputs/iconButton/iconButton';
 import {ContentState} from '../../../../useAppState';

@@ -22,7 +22,7 @@ import {create} from 'zustand';
 import {PanelEntity, PanelState} from './rightSidebar';
 
 import {Message} from '../repositories/entity/message/message';
-import {User} from '../repositories/entity/User';
+import {User} from '../repositories/entity/user';
 
 export enum ViewType {
   MOBILE_CENTRAL_COLUMN = 0,

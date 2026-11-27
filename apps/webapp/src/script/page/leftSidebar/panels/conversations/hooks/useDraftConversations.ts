@@ -24,7 +24,7 @@ import {amplify} from 'amplify';
 import {useDebouncedCallback} from 'use-debounce';
 
 import {DRAFT_STATE_CHANGED_EVENT} from '../../../../../components/inputBar/common/draftState/draftState';
-import {Conversation} from '../../../../../repositories/entity/Conversation';
+import {Conversation} from '../../../../../repositories/entity/conversation';
 import {StorageKey} from '../../../../../repositories/storage';
 import {conversationHasDraft} from '../utils/draftUtils';
 

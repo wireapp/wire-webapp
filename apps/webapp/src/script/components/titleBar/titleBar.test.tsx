@@ -23,19 +23,19 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 import {isNull} from '@sindresorhus/is';
 
-import {Runtime} from '../../commons/util/Runtime';
+import {Runtime} from '../../commons/util/runtime';
 import {useMatchMedia} from '../../uiKit/layout/matchMedia/matchMedia';
 import {WebAppEvents} from '../../webAppEvents';
 
 import en from '../../../i18n/en-US.json';
 import ru from '../../../i18n/ru-RU.json';
 import {TitleBar} from './';
-import {CallingRepository} from '../../repositories/calling/CallingRepository';
-import {CallState} from '../../repositories/calling/CallState';
-import {ConversationVerificationState} from '../../repositories/conversation/ConversationVerificationState';
-import {Conversation} from '../../repositories/entity/Conversation';
-import {User} from '../../repositories/entity/User';
-import {TeamState} from '../../repositories/team/TeamState';
+import {CallingRepository} from '../../repositories/calling/callingRepository';
+import {CallState} from '../../repositories/calling/callState';
+import {ConversationVerificationState} from '../../repositories/conversation/conversationVerificationState';
+import {Conversation} from '../../repositories/entity/conversation';
+import {User} from '../../repositories/entity/user';
+import {TeamState} from '../../repositories/team/teamState';
 import {withTheme} from '../../auth/util/test/testUtil';
 import {withThemeAndRootContext} from '../../auth/util/test/testUtil';
 import {ContentState} from '../../page/useAppState';
@@ -45,7 +45,7 @@ import {
 } from '../../page/testSupport/rootContextTestSupport';
 import {setStrings, translate} from '../../util/localizerUtil';
 
-import {TestFactory} from '../../../../test/helper/TestFactory';
+import {TestFactory} from '../../../../test/helper/testFactory';
 import {PanelState} from '../../page/rightSidebar/rightSidebar';
 import {ViewModelRepositories} from '../../viewModel/mainViewModel';
 import {translateForTest} from '../../util/test/translateForTest';

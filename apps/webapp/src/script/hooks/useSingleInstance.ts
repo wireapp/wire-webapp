@@ -25,7 +25,7 @@ import {Maybe, result} from 'true-myth';
 import {z} from 'zod';
 
 import {createStringKeyValueStorageFromWebStorage} from '../browser/storage/createStringKeyValueStorageFromWebStorage';
-import {Runtime} from '../commons/util/Runtime';
+import {Runtime} from '../commons/util/runtime';
 import {StringKeyValueStorage} from '../storage/stringKeyValueStorageTypes';
 import {getStorage} from '../util/localStorage';
 import {TIME_IN_MILLIS} from '../util/timeUtil';

@@ -25,7 +25,7 @@ import {useEffect, type FunctionComponent} from 'react';
 
 import {render} from '@testing-library/react';
 
-import {User} from '../../../../../../repositories/entity/User';
+import {User} from '../../../../../../repositories/entity/user';
 import {translateForTest} from '../../../../../../util/test/translateForTest';
 import {unwrap} from '../../../../../../util/test/resultTestSupport';
 

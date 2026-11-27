@@ -23,8 +23,8 @@ import type {Clock, TimeoutIdentifier} from '@enormora/clock/clock';
 import {isNonEmptyArray, isUndefined} from '@sindresorhus/is';
 import {groupBy} from 'underscore';
 
-import {MessageRepository} from '../../../repositories/conversation/MessageRepository';
-import {Conversation} from '../../../repositories/entity/Conversation';
+import {MessageRepository} from '../../../repositories/conversation/messageRepository';
+import {Conversation} from '../../../repositories/entity/conversation';
 import {Message} from '../../../repositories/entity/message/message';
 
 type ReadMessageBuffer = {conversation: Conversation; message: Message};

@@ -44,7 +44,7 @@ import {OAuthClient} from '../../apiClient/oauth/oAuthClient';
 import type {Self} from '../../apiClient/self/self';
 import type {TeamData} from '../../apiClient/team/team/teamData';
 import * as Icon from '../../components/icon';
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {useApplicationContext} from '../../page/rootProvider';
 import {AssetRemoteData} from '../../repositories/assets/assetRemoteData';
 import {AssetRepository} from '../../repositories/assets/assetRepository';

@@ -26,7 +26,7 @@ import {getScheduleMeetingSubmitErrorTranslationKeys} from './shared/submit/meet
 import type {MeetingInstance} from './types/meetingInstance';
 
 import {useApplicationContext} from '../../page/rootProvider';
-import {PrimaryModal} from '../Modals/PrimaryModal';
+import {PrimaryModal} from '../modals/primaryModal';
 
 type UseEditMeetingResult = {editMeeting: (meetingInstance: MeetingInstance) => Promise<void>};
 export const useEditMeeting = (): UseEditMeetingResult => {

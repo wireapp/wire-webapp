@@ -20,7 +20,7 @@
 import type {MeetingInstance} from '../types/meetingInstance';
 import type {MeetingSeries} from '../types/meetingSeries';
 import {canDeleteMeetingForAll, canDeleteMeetingForMe} from './canDeleteMeeting';
-import {User} from '../../../repositories/entity/User';
+import {User} from '../../../repositories/entity/user';
 import {translateForTest} from '../../../util/test/translateForTest';
 
 const createSeries = (overrides: Partial<MeetingSeries> = {}): MeetingSeries => {

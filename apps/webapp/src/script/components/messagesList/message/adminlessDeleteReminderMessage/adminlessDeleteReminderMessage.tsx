@@ -26,7 +26,7 @@ import {
   adminlessDeleteReminderTextContainerCss,
 } from './adminlessDeleteReminderMessage.styles';
 
-import {Config} from '../../../../Config';
+import {Config} from '../../../../config';
 import {useApplicationContext} from '../../../../page/rootProvider';
 import {AdminlessDeleteReminderMessage as AdminlessDeleteReminderMessageEntity} from '../../../../repositories/entity/message/adminlessDeleteReminderMessage';
 import {Link, LinkVariant} from '../../../../uiKit/typography/link/link';

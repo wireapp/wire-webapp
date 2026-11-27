@@ -20,7 +20,7 @@
 import type {RootContextValue} from '../../../../../../../page/rootProvider';
 import {CellNode, CellNodeType} from '../../../../../../../types/cellNode';
 import {replaceReactComponents} from '../../../../../../../util/localizerUtil/reactLocalizerUtil';
-import {PrimaryModal} from '../../../../../../Modals/PrimaryModal';
+import {PrimaryModal} from '../../../../../../modals/primaryModal';
 
 export const showDeletePermanentlyModal = ({
   node,

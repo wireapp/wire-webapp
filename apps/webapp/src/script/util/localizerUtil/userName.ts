@@ -22,7 +22,7 @@ import {escape} from 'underscore';
 import {Declension} from './localizerUtil.types';
 import type {Translate} from './translationTypes';
 
-import type {User} from '../../repositories/entity/User';
+import type {User} from '../../repositories/entity/user';
 import {sortUsersByPriority} from '../stringUtil';
 
 const finalNamePairCount = 2;

@@ -25,7 +25,7 @@ import {createStorageEngine, DatabaseTypes} from './storeEngineProvider';
 import {SystemCrypto, wrapSystemCrypto} from './utils/systemCryptoWrapper';
 
 import {isCoreCryptoEnabled} from '../browser/coreCryptoSupport';
-import {Config} from '../Config';
+import {Config} from '../config';
 import {Account} from '../core';
 import type {CRUDEngine} from '../core/storage/engine/crudEngine';
 import {supportsMLS} from '../util/util';

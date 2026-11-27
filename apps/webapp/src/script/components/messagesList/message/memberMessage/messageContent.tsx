@@ -24,12 +24,12 @@ import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 
 import {MemberLeaveReason} from '../../../../apiClient/conversation/data/conversationMemberLeaveData';
 import {CONVERSATION_EVENT} from '../../../../apiClient/event/conversationEvent';
-import {Config} from '../../../../Config';
+import {Config} from '../../../../config';
 import {SystemMessageType} from '../../../../message/systemMessageType';
 import {useApplicationContext, type RootContextValue} from '../../../../page/rootProvider';
 import {MemberMessage as MemberMessageEntity} from '../../../../repositories/entity/message/memberMessage';
-import {User} from '../../../../repositories/entity/User';
-import {ClientEvent} from '../../../../repositories/event/Client';
+import {User} from '../../../../repositories/entity/user';
+import {ClientEvent} from '../../../../repositories/event/client';
 import {Declension, joinNames} from '../../../../util/localizerUtil';
 import {createReactTranslationMarker, replaceReactComponents} from '../../../../util/localizerUtil/reactLocalizerUtil';
 import {matchQualifiedIds} from '../../../../util/qualifiedId';

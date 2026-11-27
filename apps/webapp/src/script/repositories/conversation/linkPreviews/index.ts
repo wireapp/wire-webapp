@@ -22,9 +22,9 @@ import type {Data as OpenGraphResult} from 'open-graph';
 
 import {isBlacklisted} from './blackList';
 import {getFirstLinkWithOffset} from './helpers';
-import {LinkPreviewError} from './LinkPreviewError';
+import {LinkPreviewError} from './linkPreviewError';
 
-import {Config} from '../../../Config';
+import {Config} from '../../../config';
 import {deArrayify} from '../../../util/arrayUtil';
 import {getLogger} from '../../../util/logger';
 import {truncate} from '../../../util/stringUtil';

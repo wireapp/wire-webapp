@@ -25,8 +25,8 @@ import {iconStyle} from './cellDescription.style';
 
 import {useLocalStorage} from '../../../../hooks/useLocalStorage';
 import {useApplicationContext} from '../../../../page/rootProvider';
-import {generateCellState} from '../../../../repositories/conversation/ConversationCellState';
-import {Conversation, UnreadState} from '../../../../repositories/entity/Conversation';
+import {generateCellState} from '../../../../repositories/conversation/conversationCellState';
+import {Conversation, UnreadState} from '../../../../repositories/entity/conversation';
 import * as Icon from '../../../icon';
 import {DraftState, generateConversationInputStorageKey} from '../../../inputBar/common/draftState/draftState';
 

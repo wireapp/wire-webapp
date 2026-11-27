@@ -36,7 +36,7 @@ import {translateForTest} from '../../../util/test/translateForTest';
 
 import {SingleSignOnForm} from './singleSignOnForm';
 
-import {Config, Configuration} from '../../../Config';
+import {Config, Configuration} from '../../../config';
 import germanMessages from '../../../../i18n/de-DE.json';
 import {configureStore} from '../../configureStore';
 import {actionRoot} from '../../module/action';

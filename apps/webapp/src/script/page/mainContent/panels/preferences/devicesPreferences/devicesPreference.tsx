@@ -28,12 +28,12 @@ import {DeviceDetailsPreferences} from './components/deviceDetailsPreferences';
 
 import {QualifiedId} from '../../../../../apiClient/user/qualifiedId';
 import {useUserIdentity} from '../../../../../hooks/useDeviceIdentities';
-import {ClientEntity} from '../../../../../repositories/client/ClientEntity';
-import {ClientState} from '../../../../../repositories/client/ClientState';
-import {ConversationState} from '../../../../../repositories/conversation/ConversationState';
-import {CryptographyRepository} from '../../../../../repositories/cryptography/CryptographyRepository';
-import {Conversation} from '../../../../../repositories/entity/Conversation';
-import {User} from '../../../../../repositories/entity/User';
+import {ClientEntity} from '../../../../../repositories/client/clientEntity';
+import {ClientState} from '../../../../../repositories/client/clientState';
+import {ConversationState} from '../../../../../repositories/conversation/conversationState';
+import {CryptographyRepository} from '../../../../../repositories/cryptography/cryptographyRepository';
+import {Conversation} from '../../../../../repositories/entity/conversation';
+import {User} from '../../../../../repositories/entity/user';
 import {useKoSubscribableChildren} from '../../../../../util/componentUtil';
 import {useApplicationContext} from '../../../../rootProvider';
 import {PreferencesPage} from '../components/preferencesPage';

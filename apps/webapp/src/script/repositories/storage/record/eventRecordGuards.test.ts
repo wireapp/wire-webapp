@@ -20,7 +20,7 @@
 import type {EventRecord} from './eventRecord';
 import {hasQuoteForMessage} from './eventRecordGuards';
 
-import {ClientEvent} from '../../event/Client';
+import {ClientEvent} from '../../event/client';
 
 describe('hasQuoteForMessage', () => {
   it('rejects a null quote read from serialized event storage', () => {

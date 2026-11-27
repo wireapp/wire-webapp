@@ -21,7 +21,7 @@ import React, {forwardRef} from 'react';
 
 import cx from 'classnames';
 
-import {User} from '../../../../../../repositories/entity/User';
+import {User} from '../../../../../../repositories/entity/user';
 import {TabIndex} from '../../../../../../uiKit/utils/enums';
 import {useKoSubscribableChildren} from '../../../../../../util/componentUtil';
 import {handleKeyDown, KEY} from '../../../../../../util/keyboardUtil';

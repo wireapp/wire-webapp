@@ -59,8 +59,8 @@ import {
 import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
 import {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import {Decoder} from '../../../commons/base64/decoder';
-import {TypedEventEmitter} from '../../../commons/TypedEventEmitter/TypedEventEmitter';
-import {XOR} from '../../../commons/util/TypeUtil';
+import {TypedEventEmitter} from '../../../commons/typedEventEmitter/typedEventEmitter';
+import {XOR} from '../../../commons/util/typeUtil';
 import {getLogger} from '../../../logger/getLogger';
 import {MessageTimer, MessageSendingState, RemoveUsersParams} from '../../conversation/';
 import {MLSService, MLSServiceEvents} from '../../messagingProtocols/mls';

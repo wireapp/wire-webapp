@@ -23,9 +23,9 @@ import {CONVERSATION_PROTOCOL} from '../../../../../../apiClient/team/feature/fe
 import {ThemeProvider} from '../../../../../../uiKit/identity/theme/theme';
 import {container} from 'tsyringe';
 
-import {User} from '../../../../../../repositories/entity/User';
-import {Conversation} from '../../../../../../repositories/entity/Conversation';
-import {ConversationState} from '../../../../../../repositories/conversation/ConversationState';
+import {User} from '../../../../../../repositories/entity/user';
+import {Conversation} from '../../../../../../repositories/entity/conversation';
+import {ConversationState} from '../../../../../../repositories/conversation/conversationState';
 import {UserState} from '../../../../../../repositories/user/userState';
 import {setStrings, translate} from '../../../../../../util/localizerUtil';
 import en from '../../../../../../../i18n/en-US.json';

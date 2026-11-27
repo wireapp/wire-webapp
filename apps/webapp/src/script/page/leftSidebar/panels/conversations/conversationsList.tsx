@@ -44,18 +44,18 @@ import {
 import {getConversationsToDisplay} from './helpers';
 import {useSidebarStore} from './useSidebarStore';
 
-import {TimeInMillis} from '../../../../commons/util/TimeUtil';
+import {TimeInMillis} from '../../../../commons/util/timeUtil';
 import {ConversationListCell} from '../../../../components/conversationListCell';
 import type {RegisterConversationElement} from '../../../../hooks/useConversationFocus';
-import {Call} from '../../../../repositories/calling/Call';
-import {CallState} from '../../../../repositories/calling/CallState';
+import {Call} from '../../../../repositories/calling/call';
+import {CallState} from '../../../../repositories/calling/callState';
 import {
   ConversationLabel,
   ConversationLabelRepository,
-} from '../../../../repositories/conversation/ConversationLabelRepository';
-import {ConversationState} from '../../../../repositories/conversation/ConversationState';
-import {Conversation} from '../../../../repositories/entity/Conversation';
-import {User} from '../../../../repositories/entity/User';
+} from '../../../../repositories/conversation/conversationLabelRepository';
+import {ConversationState} from '../../../../repositories/conversation/conversationState';
+import {Conversation} from '../../../../repositories/entity/conversation';
+import {User} from '../../../../repositories/entity/user';
 import {generateConversationUrl} from '../../../../router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from '../../../../router/routerBindings';
 import {WIDTH} from '../../../../uiKit/layout/sizes/sizes';

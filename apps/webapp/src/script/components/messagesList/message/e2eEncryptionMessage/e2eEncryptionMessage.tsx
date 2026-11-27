@@ -29,7 +29,7 @@ import {
   e2eMessageContentLinkCss,
 } from './e2eEncryptionMessage.styles';
 
-import {Config} from '../../../../Config';
+import {Config} from '../../../../config';
 import {useApplicationContext} from '../../../../page/rootProvider';
 import {ShieldIcon} from '../../../../uiKit/dataDisplay/icon/shieldIcon';
 import {Link, LinkVariant} from '../../../../uiKit/typography/link/link';

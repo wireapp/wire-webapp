@@ -1,0 +1,308 @@
+/*
+ * Wire
+ * Copyright (C) 2025 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {CONVERSATION_TYPE} from '../../apiClient/conversation/conversation';
+import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
+
+import type {CallingRepository} from '../calling/callingRepository';
+import type {ConnectionRepository} from '../connection/connectionRepository';
+import type {ConnectionState} from '../connection/connectionState';
+import type {EventRepository} from '../event/eventRepository';
+import {EventService} from '../event/eventService';
+import type {PropertiesRepository} from '../properties/propertiesRepository';
+import type {SelfRepository} from '../self/selfRepository';
+import type {TeamRepository} from '../team/teamRepository';
+import {TeamState} from '../team/teamState';
+import type {UserRepository} from '../user/userRepository';
+import {UserState} from '../user/userState';
+import {generateConversation} from '../../../../test/helper/conversationGenerator';
+import {generateUser} from '../../../../test/helper/userGenerator';
+import {translate} from '../../util/localizerUtil';
+
+jest.mock('./eventMapper', () => {
+  return {EventMapper: jest.fn().mockReturnValue({})};
+});
+
+import {ConversationRepository} from './conversationRepository';
+import type {ConversationService} from './conversationService';
+import {ConversationState} from './conversationState';
+import type {MessageRepository} from './messageRepository';
+
+import {Core} from '../../service/coreSingleton';
+import {serverTimeHandler} from '../../time/serverTimeHandler';
+
+type TeamMemberLeaveTestDependencies = {
+  readonly conversationState: ConversationState;
+  readonly teamState: TeamState;
+  readonly userState: UserState;
+  readonly eventRepository: jest.Mocked<Pick<EventRepository, 'eventService' | 'injectEvent' | 'injectEvents'>>;
+  readonly callingRepository: CallingRepository;
+  readonly userRepository: jest.Mocked<Pick<UserRepository, 'on' | 'getUserById' | 'getUsersById'>>;
+  readonly teamRepository: TeamRepository;
+  readonly messageRepository: jest.Mocked<Pick<MessageRepository, 'setClientMismatchHandler'>>;
+  readonly conversationService: jest.Mocked<
+    Pick<
+      ConversationService,
+      | 'deleteConversation'
+      | 'deleteConversationFromDb'
+      | 'wipeMLSCapableConversation'
+      | 'postBots'
+      | 'saveConversationStateInDb'
+    >
+  >;
+  readonly core: Core;
+  readonly serverTimeHandler: typeof serverTimeHandler;
+};
+type TeamMemberLeaveTestFixture = readonly [ConversationRepository, TeamMemberLeaveTestDependencies];
+type EventInjectFunction = EventRepository['injectEvent'];
+type ClearConversationUsersFunction = ConversationRepository['clearUsersFromConversation'];
+type TeamMemberLeaveSpies = {
+  readonly injectSpy: jest.SpyInstance<ReturnType<EventInjectFunction>, Parameters<EventInjectFunction>>;
+  readonly clearSpy: jest.SpyInstance<
+    ReturnType<ClearConversationUsersFunction>,
+    Parameters<ClearConversationUsersFunction>
+  >;
+};
+
+function buildConversationRepository(): TeamMemberLeaveTestFixture {
+  const teamState = new TeamState();
+  const conversationState = new ConversationState();
+
+  const conversationService: jest.Mocked<
+    Pick<
+      ConversationService,
+      | 'deleteConversation'
+      | 'deleteConversationFromDb'
+      | 'wipeMLSCapableConversation'
+      | 'postBots'
+      | 'saveConversationStateInDb'
+    >
+  > = {
+    deleteConversation: jest.fn(),
+    deleteConversationFromDb: jest.fn(),
+    wipeMLSCapableConversation: jest.fn(),
+    postBots: jest.fn(),
+    saveConversationStateInDb: jest.fn(),
+  };
+
+  const messageRepository: jest.Mocked<Pick<MessageRepository, 'setClientMismatchHandler'>> = {
+    setClientMismatchHandler: jest.fn(),
+  };
+
+  const callingRepository = {} as CallingRepository;
+
+  const connectionRepository: jest.Mocked<Pick<ConnectionRepository, 'setDeleteConnectionRequestConversationHandler'>> =
+    {
+      setDeleteConnectionRequestConversationHandler: jest.fn(),
+    };
+
+  const eventRepository: jest.Mocked<Pick<EventRepository, 'eventService' | 'injectEvent' | 'injectEvents'>> = {
+    eventService: new EventService(),
+    injectEvent: jest.fn(),
+    injectEvents: jest.fn(),
+  };
+
+  const selfRepository: jest.Mocked<Pick<SelfRepository, 'on'>> = {
+    on: jest.fn(),
+  };
+
+  const teamRepository = {} as TeamRepository;
+
+  const userRepository: jest.Mocked<Pick<UserRepository, 'on' | 'getUserById' | 'getUsersById'>> = {
+    on: jest.fn(),
+    getUserById: jest.fn(),
+    getUsersById: jest.fn(),
+  };
+
+  const propertiesRepository = {} as PropertiesRepository;
+  const userState = new UserState();
+  const core = {backendFeatures: {isFederated: false}} as Core;
+  const connectionState = {} as ConnectionState;
+
+  const conversationRepository = new ConversationRepository(
+    conversationService as unknown as ConversationService,
+    messageRepository as unknown as MessageRepository,
+    connectionRepository as unknown as ConnectionRepository,
+    eventRepository as unknown as EventRepository,
+    teamRepository as TeamRepository,
+    userRepository as unknown as UserRepository,
+    selfRepository as unknown as SelfRepository,
+    propertiesRepository,
+    callingRepository,
+    serverTimeHandler,
+    translate,
+    {isMarkAsUnreadFeatureEnabled: false},
+    userState,
+    teamState,
+    conversationState,
+    connectionState,
+    core,
+  );
+
+  return [
+    conversationRepository,
+    {
+      conversationState,
+      teamState,
+      userState,
+      eventRepository,
+      callingRepository,
+      userRepository,
+      teamRepository,
+      messageRepository,
+      conversationService,
+      core,
+      serverTimeHandler,
+    },
+  ] as const;
+}
+
+function setupTeamMemberLeaveSpies(
+  repo: ConversationRepository,
+  eventRepo: jest.Mocked<Pick<EventRepository, 'injectEvent'>>,
+): TeamMemberLeaveSpies {
+  eventRepo.injectEvent.mockResolvedValue(undefined);
+  type ClearFn = ConversationRepository['clearUsersFromConversation'];
+  const clearSpy = jest.spyOn(repo as unknown as {clearUsersFromConversation: ClearFn}, 'clearUsersFromConversation');
+  return {injectSpy: eventRepo.injectEvent, clearSpy};
+}
+
+describe('ConversationRepository.teamMemberLeave', () => {
+  it.each([
+    [CONVERSATION_TYPE.ONE_TO_ONE, CONVERSATION_PROTOCOL.PROTEUS],
+    [CONVERSATION_TYPE.ONE_TO_ONE, CONVERSATION_PROTOCOL.MLS],
+    [CONVERSATION_TYPE.REGULAR, CONVERSATION_PROTOCOL.PROTEUS],
+    [CONVERSATION_TYPE.CONNECT, CONVERSATION_PROTOCOL.PROTEUS],
+  ])('preserves deleted participants in direct conversations (%s, %s)', async (type, protocol) => {
+    const [conversationRepository, deps] = buildConversationRepository();
+    const deletedUser = generateUser();
+    deletedUser.isDeleted = true;
+    const directConversation = generateConversation({
+      type,
+      protocol,
+      users: [deletedUser],
+      overwites: {team_id: 'teamB'},
+    });
+    const groupConversation = generateConversation({
+      name: 'Group',
+      users: [generateUser(), deletedUser],
+      overwites: {team_id: 'teamB'},
+    });
+    deps.userRepository.getUserById.mockResolvedValue(deletedUser);
+    deps.userRepository.getUsersById.mockImplementation(async (userIds = []) => {
+      return groupConversation.participating_user_ets().filter(user => {
+        return userIds.some(userId => {
+          return userId.id === user.id && userId.domain === user.domain;
+        });
+      });
+    });
+    deps.conversationState.conversations([directConversation, groupConversation]);
+    const {injectSpy} = setupTeamMemberLeaveSpies(conversationRepository, deps.eventRepository);
+
+    // Simulate the profile refresh discovering a deleted team member, including repeated opens.
+    await conversationRepository.teamMemberLeave('teamB', deletedUser.qualifiedId, 0);
+    await conversationRepository.teamMemberLeave('teamB', deletedUser.qualifiedId, 0);
+
+    expect(directConversation.participating_user_ids()).toEqual([deletedUser.qualifiedId]);
+    expect(directConversation.firstUserEntity()).toBe(deletedUser);
+    expect(directConversation.isConversationWithDeletedUser()).toBe(true);
+    if (type !== CONVERSATION_TYPE.CONNECT) {
+      expect(directConversation.is1to1()).toBe(true);
+      expect(directConversation.isReadOnlyConversation()).toBe(true);
+    }
+    // History has not loaded at startup; retaining the participant keeps the chat visible.
+    expect(directConversation.hasContentMessages()).toBe(false);
+    expect(deps.conversationState.visibleConversations()).toContain(directConversation);
+    expect(groupConversation.participating_user_ids()).not.toContainEqual(deletedUser.qualifiedId);
+    expect(injectSpy).toHaveBeenCalledTimes(1);
+    expect(injectSpy).toHaveBeenCalledWith(expect.objectContaining({conversation: groupConversation.id}));
+    expect(deps.conversationService.deleteConversation).not.toHaveBeenCalled();
+    expect(deps.conversationService.deleteConversationFromDb).not.toHaveBeenCalled();
+  });
+
+  it('injects team leave events only for eligible conversations and cleans up groups across teams', async () => {
+    const [conversationRepository, deps] = buildConversationRepository();
+    const userA = generateUser();
+    const userB = generateUser();
+
+    deps.userRepository.getUserById.mockResolvedValue(userB);
+    deps.userRepository.getUsersById.mockResolvedValue([]);
+
+    const groupInTeamA = generateConversation({users: [userA, userB], overwites: {team_id: 'teamA'}});
+    const groupInTeamB = generateConversation({users: [userA, userB], overwites: {team_id: 'teamB'}});
+
+    deps.conversationState.conversations([groupInTeamA, groupInTeamB]);
+    const {injectSpy, clearSpy} = setupTeamMemberLeaveSpies(conversationRepository, deps.eventRepository);
+
+    await conversationRepository.teamMemberLeave('teamB', userB.qualifiedId);
+
+    // leave event only for conversations belonging to teamB
+    expect(injectSpy).toHaveBeenCalledTimes(1);
+    expect(injectSpy).toHaveBeenCalledWith(expect.objectContaining({conversation: groupInTeamB.id}));
+
+    // user is cleared from all conversations
+    expect(clearSpy).toHaveBeenCalledTimes(2);
+    expect(groupInTeamA.participating_user_ids()).not.toContainEqual(userB.qualifiedId);
+    expect(groupInTeamB.participating_user_ids()).not.toContainEqual(userB.qualifiedId);
+  });
+
+  it("does nothing when the user doesn't participate in any conversation", async () => {
+    const [conversationRepository, deps] = buildConversationRepository();
+    const userB = generateUser();
+    const otherUser = generateUser();
+
+    deps.userRepository.getUserById.mockResolvedValue(userB);
+    deps.userRepository.getUsersById.mockResolvedValue([]);
+
+    jest.spyOn(conversationRepository, 'updateParticipatingUserEntities').mockImplementation(async conversation => {
+      return conversation;
+    });
+
+    const conversationWithoutUser = generateConversation({
+      users: [otherUser],
+      overwites: {team_id: 'teamB'},
+    });
+
+    deps.conversationState.conversations([conversationWithoutUser]);
+
+    const {injectSpy, clearSpy} = setupTeamMemberLeaveSpies(conversationRepository, deps.eventRepository);
+
+    await conversationRepository.teamMemberLeave('teamB', userB.qualifiedId);
+
+    expect(injectSpy).not.toHaveBeenCalled();
+    expect(clearSpy).not.toHaveBeenCalled();
+  });
+
+  it('gracefully handles when there are no conversations', async () => {
+    const [conversationRepository, deps] = buildConversationRepository();
+    const userB = generateUser();
+
+    deps.userRepository.getUserById.mockResolvedValue(userB);
+    deps.userRepository.getUsersById.mockResolvedValue([]);
+
+    deps.conversationState.conversations([]);
+
+    const {injectSpy, clearSpy} = setupTeamMemberLeaveSpies(conversationRepository, deps.eventRepository);
+
+    await conversationRepository.teamMemberLeave('teamB', userB.qualifiedId);
+
+    expect(injectSpy).not.toHaveBeenCalled();
+    expect(clearSpy).not.toHaveBeenCalled();
+  });
+});

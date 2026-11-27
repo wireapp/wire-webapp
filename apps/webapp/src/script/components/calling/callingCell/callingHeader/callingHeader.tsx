@@ -31,7 +31,7 @@ import {
 } from './callingHeader.styles';
 
 import {useApplicationContext} from '../../../../page/rootProvider';
-import {User} from '../../../../repositories/entity/User';
+import {User} from '../../../../repositories/entity/user';
 import {createNavigate, createNavigateKeyboard} from '../../../../router/routerBindings';
 import {IconButton, IconButtonVariant} from '../../../../uiKit/inputs/iconButton/iconButton';
 import {TabIndex} from '../../../../uiKit/utils/enums';

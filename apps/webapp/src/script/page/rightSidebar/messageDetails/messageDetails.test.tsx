@@ -20,12 +20,12 @@
 import {render, waitFor} from '@testing-library/react';
 import {QualifiedId} from '../../../apiClient/user/qualifiedId';
 
-import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
-import {Conversation} from '../../../repositories/entity/Conversation';
+import {ConversationRepository} from '../../../repositories/conversation/conversationRepository';
+import {Conversation} from '../../../repositories/entity/conversation';
 import {ContentMessage} from '../../../repositories/entity/message/contentMessage';
-import {User} from '../../../repositories/entity/User';
+import {User} from '../../../repositories/entity/user';
 import {SearchRepository} from '../../../repositories/search/searchRepository';
-import {TeamRepository} from '../../../repositories/team/TeamRepository';
+import {TeamRepository} from '../../../repositories/team/teamRepository';
 import {UserRepository} from '../../../repositories/user/userRepository';
 import {
   createRootContextValueForTest,
@@ -36,7 +36,7 @@ import {createUuid} from '../../../util/uuid';
 
 import {MessageDetails} from './messageDetails';
 
-import {TestFactory} from '../../../../../test/helper/TestFactory';
+import {TestFactory} from '../../../../../test/helper/testFactory';
 import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
 
 const testFactory = new TestFactory();

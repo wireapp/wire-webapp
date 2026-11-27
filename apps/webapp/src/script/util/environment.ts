@@ -19,8 +19,8 @@
 
 import {isNonEmptyString, isNull} from '@sindresorhus/is';
 
-import {Runtime} from '../commons/util/Runtime';
-import {Config} from '../Config';
+import {Runtime} from '../commons/util/runtime';
+import {Config} from '../config';
 import {BackendEnvironment} from '../service/backendEnvironment';
 
 const APP_ENV = {

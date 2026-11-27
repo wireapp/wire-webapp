@@ -24,7 +24,7 @@ import {isEmptyString} from '@sindresorhus/is';
 import {UserlistMode} from '../..';
 import {pendingOnboardingStatusFeatureToggleName} from '../../../../featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from '../../../../page/rootProvider';
-import {User} from '../../../../repositories/entity/User';
+import {User} from '../../../../repositories/entity/user';
 import {Checkbox, CheckboxLabel} from '../../../../uiKit/inputs/checkbox/checkbox';
 import {TabIndex} from '../../../../uiKit/utils/enums';
 import {useKoSubscribableChildren} from '../../../../util/componentUtil';

@@ -20,7 +20,7 @@
 import {render} from '@testing-library/react';
 
 import {Message} from '../../../../../../../repositories/entity/message/message';
-import {User} from '../../../../../../../repositories/entity/User';
+import {User} from '../../../../../../../repositories/entity/user';
 import {translateForTest} from '../../../../../../../util/test/translateForTest';
 import * as TimeUtil from '../../../../../../../util/timeUtil';
 import {createUuid} from '../../../../../../../util/uuid';

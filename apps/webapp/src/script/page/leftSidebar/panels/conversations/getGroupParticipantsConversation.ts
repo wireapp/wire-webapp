@@ -21,9 +21,9 @@ import {isNullOrUndefined} from '@sindresorhus/is';
 
 import {SidebarTabs} from './useSidebarStore';
 
-import {ConversationLabel} from '../../../../repositories/conversation/ConversationLabelRepository';
-import {ConversationRepository} from '../../../../repositories/conversation/ConversationRepository';
-import {Conversation} from '../../../../repositories/entity/Conversation';
+import {ConversationLabel} from '../../../../repositories/conversation/conversationLabelRepository';
+import {ConversationRepository} from '../../../../repositories/conversation/conversationRepository';
+import {Conversation} from '../../../../repositories/entity/conversation';
 import {SearchRepository} from '../../../../repositories/search/searchRepository';
 
 type GetGroupParticipantsConversationsParams = {

@@ -46,10 +46,10 @@ import {stripImageExifData} from '../../util/imageUtil';
 import {getLogger, Logger} from '../../util/logger';
 import {downloadBlob, loadFileBuffer, loadImage} from '../../util/util';
 import {WebWorker} from '../../util/worker';
-import {Conversation} from '../entity/Conversation';
+import {Conversation} from '../entity/conversation';
 import {FileAsset} from '../entity/message/fileAsset';
-import type {User} from '../entity/User';
-import {TeamState} from '../team/TeamState';
+import type {User} from '../entity/user';
+import {TeamState} from '../team/teamState';
 
 const percentageScale = 100;
 type AssetUrlCacheKey = {domain: string | undefined; key: NonEmptyString};

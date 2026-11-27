@@ -22,11 +22,11 @@ import type {ComponentProps} from 'react';
 import {CONVERSATION_CELLS_STATE} from '../../../apiClient/conversation/conversation';
 import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
 
-import {Conversation} from '../../../repositories/entity/Conversation';
+import {Conversation} from '../../../repositories/entity/conversation';
 import {ContentMessage as ContentMessageEntity} from '../../../repositories/entity/message/contentMessage';
 import {MemberMessage as MemberMessageEntity} from '../../../repositories/entity/message/memberMessage';
 import {Text} from '../../../repositories/entity/message/text';
-import {User} from '../../../repositories/entity/User';
+import {User} from '../../../repositories/entity/user';
 import {withTheme, withThemeAndRootContext} from '../../../auth/util/test/testUtil';
 import {markAsUnreadFeatureToggleName} from '../../../featureToggles/startupFeatureToggleNames';
 import type {StartupFeatureToggleName} from '../../../featureToggles/startupFeatureToggleNames';
@@ -36,7 +36,7 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from '../../../page/testSupport/rootContextTestSupport';
-import {generateUser} from '../../../../../test/helper/UserGenerator';
+import {generateUser} from '../../../../../test/helper/userGenerator';
 import {createUuid} from '../../../util/uuid';
 
 import {MessageWrapper} from './messageWrapper';

@@ -18,7 +18,7 @@
  */
 
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
-import {TimeInMillis} from '../../commons/util/TimeUtil';
+import {TimeInMillis} from '../../commons/util/timeUtil';
 import {CredentialType} from '../../core/messagingProtocols/mls';
 
 import {getEnrollmentTimer, getRemainingGracePeriodDelay, messageRetentionTime} from './enrollmentTimer';

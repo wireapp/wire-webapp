@@ -31,7 +31,7 @@ import {BackendEvent} from '../../apiClient/event/backendEvent';
 import {CONVERSATION_EVENT} from '../../apiClient/event/conversationEvent';
 import {Notification} from '../../apiClient/notification/notification';
 import type {QualifiedId} from '../../apiClient/user/qualifiedId';
-import {TypedEventEmitter} from '../../commons/TypedEventEmitter/TypedEventEmitter';
+import {TypedEventEmitter} from '../../commons/typedEventEmitter/typedEventEmitter';
 import {getLogger} from '../../logger/getLogger';
 import {getSafeNotificationErrorDetails} from '../../logger/getSafeNotificationErrorDetails';
 import {ConversationService} from '../conversation';

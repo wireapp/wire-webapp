@@ -25,9 +25,9 @@ import {mlsMigrationLogger} from './mlsMigrationLogger';
 import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
 import type {QualifiedId} from '../../apiClient/user/qualifiedId';
 import type {Account} from '../../core';
-import type {ConversationRepository} from '../../repositories/conversation/ConversationRepository';
-import type {Conversation} from '../../repositories/entity/Conversation';
-import type {User} from '../../repositories/entity/User';
+import type {ConversationRepository} from '../../repositories/conversation/conversationRepository';
+import type {Conversation} from '../../repositories/entity/conversation';
+import type {User} from '../../repositories/entity/user';
 import {TIME_IN_MILLIS} from '../../util/timeUtil';
 
 const MIGRATION_TASK_KEY = 'mls-migration';

@@ -24,7 +24,7 @@ import {CONVERSATION_TYPE} from '../../../apiClient/conversation/conversation';
 import {QualifiedUserClients} from '../../../apiClient/conversation/qualifiedUserClients';
 import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
 import {QualifiedId} from '../../../apiClient/user/qualifiedId';
-import {RecursivePartial} from '../../../commons/util/TypeUtil';
+import {RecursivePartial} from '../../../commons/util/typeUtil';
 import ko from 'knockout';
 import {IntlProvider} from 'react-intl';
 import {Provider} from 'react-redux';
@@ -60,13 +60,13 @@ import sk from '../../../../i18n/sk-SK.json';
 import sl from '../../../../i18n/sl-SI.json';
 import tr from '../../../../i18n/tr-TR.json';
 import uk from '../../../../i18n/uk-UA.json';
-import {CallingRepository} from '../../../repositories/calling/CallingRepository';
-import {Participant} from '../../../repositories/calling/Participant';
-import {Conversation} from '../../../repositories/entity/Conversation';
-import {User} from '../../../repositories/entity/User';
+import {CallingRepository} from '../../../repositories/calling/callingRepository';
+import {Participant} from '../../../repositories/calling/participant';
+import {Conversation} from '../../../repositories/entity/conversation';
+import {User} from '../../../repositories/entity/user';
 import {BackgroundEffectsController} from '../../../repositories/media/backgroundEffects/backgroundEffectsController';
 import {BackgroundEffectsHandler} from '../../../repositories/media/backgroundEffectsHandler';
-import {MediaDevicesHandler} from '../../../repositories/media/MediaDevicesHandler';
+import {MediaDevicesHandler} from '../../../repositories/media/mediaDevicesHandler';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

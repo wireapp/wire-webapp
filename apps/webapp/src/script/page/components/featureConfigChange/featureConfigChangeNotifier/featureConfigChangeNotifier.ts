@@ -30,16 +30,16 @@ import {
   FEATURE_STATUS,
   SELF_DELETING_TIMEOUT,
 } from '../../../../apiClient/team/feature/featureList.types';
-import {Runtime} from '../../../../commons/util/Runtime';
-import {PrimaryModal} from '../../../../components/Modals/PrimaryModal';
+import {Runtime} from '../../../../commons/util/runtime';
+import {PrimaryModal} from '../../../../components/modals/primaryModal';
 import type {
   PrimaryModalTranslatedComponent,
   PrimaryModalTranslatedTranslation,
   PrimaryModalTranslatedValue,
-} from '../../../../components/Modals/PrimaryModal/PrimaryModalTypes';
-import {ButtonAction} from '../../../../components/Modals/PrimaryModal/PrimaryModalTypes';
-import {Config} from '../../../../Config';
-import {TeamState} from '../../../../repositories/team/TeamState';
+} from '../../../../components/modals/primaryModal/primaryModalTypes';
+import {ButtonAction} from '../../../../components/modals/primaryModal/primaryModalTypes';
+import {Config} from '../../../../config';
+import {TeamState} from '../../../../repositories/team/teamState';
 import {useKoSubscribableChildren} from '../../../../util/componentUtil';
 import {type TranslationKey} from '../../../../util/localizerUtil';
 import {getLogger} from '../../../../util/logger';

@@ -49,7 +49,7 @@ import {
 import {createKeyUpdateQueue, KeyUpdateMessage, KeyUpdateQueue} from './keyUpdateQueue';
 
 import {useApplicationContext} from '../../../page/rootProvider';
-import type {Participant} from '../../../repositories/calling/Participant';
+import type {Participant} from '../../../repositories/calling/participant';
 import {CloseIcon} from '../../../uiKit/dataDisplay/icon/closeIcon';
 import {InfoIcon} from '../../../uiKit/dataDisplay/icon/infoIcon';
 import {LockClosedIcon} from '../../../uiKit/dataDisplay/icon/lockClosedIcon';

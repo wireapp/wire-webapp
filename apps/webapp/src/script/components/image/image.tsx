@@ -28,11 +28,11 @@ import {container} from 'tsyringe';
 import {failedWrapperStyles, getImageStyle, getWrapperStyles} from './image.styles';
 import {RestrictedImage} from './restrictedImage';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {useApplicationContext} from '../../page/rootProvider';
 import {AssetRemoteData} from '../../repositories/assets/assetRemoteData';
 import {MediumImage} from '../../repositories/entity/message/mediumImage';
-import {TeamState} from '../../repositories/team/TeamState';
+import {TeamState} from '../../repositories/team/teamState';
 import {Button, ButtonVariant} from '../../uiKit/inputs/button/button';
 import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {getLogger, Logger} from '../../util/logger';

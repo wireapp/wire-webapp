@@ -19,7 +19,7 @@
 
 import {BackgroundEffectsHandler, ReleasableMediaStream} from './backgroundEffectsHandler';
 import {backgroundEffectsStore} from './useBackgroundEffectsStore';
-import {DEFAULT_BUILTIN_BACKGROUND_ID} from './VideoBackgroundEffects';
+import {DEFAULT_BUILTIN_BACKGROUND_ID} from './videoBackgroundEffects';
 import {SELFIE_MULTICLASS_MODEL_PATH, SELFIE_SEGMENTER_MODEL_PATH} from './backgroundEffects/pipe/options';
 import {detectCapabilities} from './backgroundEffects';
 
@@ -30,7 +30,7 @@ jest.mock('../../util/localStorage', () => {
   };
 });
 
-jest.mock('./VideoBackgroundEffects', () => {
+jest.mock('./videoBackgroundEffects', () => {
   return {
     BLUR_STRENGTHS: {high: 10},
     DEFAULT_BACKGROUND_EFFECT: {type: 'none'},
@@ -142,7 +142,7 @@ describe('BackgroundEffectsHandler', () => {
   });
 
   it('applies virtual background successfully', async () => {
-    const {loadBackgroundSource} = require('./VideoBackgroundEffects');
+    const {loadBackgroundSource} = require('./videoBackgroundEffects');
 
     loadBackgroundSource.mockResolvedValue('mock-bg');
 

@@ -38,15 +38,15 @@ import {
 } from './error';
 import {createMetaData, exportHistory, importLegacyBackupToDatabase} from './legacyBackup.helper';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {chunk} from '../../util/arrayUtil';
 import {Logger, getLogger} from '../../util/logger';
 import {constructUserPrimaryKey} from '../../util/storageUtil';
 import {WebWorker} from '../../util/worker';
-import type {ConversationRepository} from '../conversation/ConversationRepository';
-import {isReadableConversation} from '../conversation/ConversationSelectors';
-import type {Conversation} from '../entity/Conversation';
-import {User} from '../entity/User';
+import type {ConversationRepository} from '../conversation/conversationRepository';
+import {isReadableConversation} from '../conversation/conversationSelectors';
+import type {Conversation} from '../entity/conversation';
+import {User} from '../entity/user';
 import {EventRecord, UserRecord} from '../storage';
 import {ConversationRecord} from '../storage/record/conversationRecord';
 import {StorageSchemata} from '../storage/storageSchemata';

@@ -34,21 +34,21 @@ import {useConversationReadBoundary} from './utils/useConversationReadBoundary';
 
 import {useRoveFocus} from '../../hooks/useRoveFocus';
 import {AssetRepository} from '../../repositories/assets/assetRepository';
-import {ConversationRepository} from '../../repositories/conversation/ConversationRepository';
-import {MessageRepository} from '../../repositories/conversation/MessageRepository';
-import {Conversation} from '../../repositories/entity/Conversation';
+import {ConversationRepository} from '../../repositories/conversation/conversationRepository';
+import {MessageRepository} from '../../repositories/conversation/messageRepository';
+import {Conversation} from '../../repositories/entity/conversation';
 import {ContentMessage} from '../../repositories/entity/message/contentMessage';
 import {DecryptErrorMessage} from '../../repositories/entity/message/decryptErrorMessage';
 import {MemberMessage} from '../../repositories/entity/message/memberMessage';
 import {Message as MessageEntity} from '../../repositories/entity/message/message';
-import {User} from '../../repositories/entity/User';
-import {ServiceEntity} from '../../repositories/integration/ServiceEntity';
+import {User} from '../../repositories/entity/user';
+import {ServiceEntity} from '../../repositories/integration/serviceEntity';
 import type {UserRepository} from '../../repositories/user/userRepository';
 import {TabIndex} from '../../uiKit/utils/enums';
 import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {isLastReceivedMessage} from '../../util/conversationMessages';
-import {onHitTopOrBottom} from '../../util/DOM/onHitTopOrBottom';
-import {useResizeObserver} from '../../util/DOM/resizeObserver';
+import {onHitTopOrBottom} from '../../util/dom/onHitTopOrBottom';
+import {useResizeObserver} from '../../util/dom/resizeObserver';
 import {FadingScrollbar} from '../fadingScrollbar';
 
 const messageScrollDelayInMilliseconds = 10;

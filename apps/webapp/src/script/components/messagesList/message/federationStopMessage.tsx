@@ -24,7 +24,7 @@ import {isNonEmptyArray} from '@sindresorhus/is';
 import {MessageTime} from './messageTime';
 import {useMessageFocusedTabIndex} from './util';
 
-import {Config} from '../../../Config';
+import {Config} from '../../../config';
 import {useApplicationContext} from '../../../page/rootProvider';
 import {FederationStopMessage as FederationStopMessageEntity} from '../../../repositories/entity/message/federationStopMessage';
 import {Link, LinkVariant} from '../../../uiKit/typography/link/link';

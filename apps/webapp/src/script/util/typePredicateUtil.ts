@@ -22,7 +22,7 @@ import {AxiosError} from 'axios';
 import {RegisteredClient} from '../apiClient/client/registeredClient';
 import type {BackendError} from '../apiClient/http/backendError';
 import {isObject} from '../guards/common';
-import {Conversation} from '../repositories/entity/Conversation';
+import {Conversation} from '../repositories/entity/conversation';
 import {ClientRecord} from '../repositories/storage/record/clientRecord';
 
 type ErrorWithCode = Error & {readonly code: number};

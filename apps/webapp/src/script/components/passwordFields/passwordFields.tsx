@@ -22,7 +22,7 @@ import type {FunctionComponent} from 'react';
 import {errorMessageStyles} from './passwordFields.styles';
 
 import {ValidationUtil} from '../../commons/util';
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {ErrorMessage} from '../../uiKit/inputs/errorMessage/errorMessage';
 import {Input} from '../../uiKit/inputs/input/input';
 import type {Translate} from '../../util/localizerUtil';

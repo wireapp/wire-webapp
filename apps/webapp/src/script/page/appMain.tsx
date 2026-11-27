@@ -48,13 +48,13 @@ import {DetachedCallingCell} from '../components/calling/detachedCallingCell';
 import {ConfigToolbar} from '../components/configToolbar/configToolbar';
 import {SharedDriveUploadStatusScope} from '../components/conversation/conversationCells/sharedDriveUploadStatusContext';
 import {ErrorFallback} from '../components/errorFallback';
-import {CreateConversationModal} from '../components/Modals/CreateConversation/CreateConversaionModal';
-import {FileHistoryModal} from '../components/Modals/FileHistoryModal/FileHistoryModal';
-import {GroupCreationModal} from '../components/Modals/GroupCreation/GroupCreationModal';
-import {LegalHoldModal} from '../components/Modals/LegalHoldModal/LegalHoldModal';
-import {PrimaryModal} from '../components/Modals/PrimaryModal';
-import {showUserModal, UserModal} from '../components/Modals/UserModal';
-import {Config} from '../Config';
+import {CreateConversationModal} from '../components/modals/createConversation/createConversaionModal';
+import {FileHistoryModal} from '../components/modals/fileHistoryModal/fileHistoryModal';
+import {GroupCreationModal} from '../components/modals/groupCreation/groupCreationModal';
+import {LegalHoldModal} from '../components/modals/legalHoldModal/legalHoldModal';
+import {PrimaryModal} from '../components/modals/primaryModal';
+import {showUserModal, UserModal} from '../components/modals/userModal';
+import {Config} from '../config';
 import {
   driveBulkActionProgressFeatureToggleName,
   type StartupFeatureToggleName,
@@ -69,10 +69,10 @@ import {
   initialiseMigrationOfProteusConversations,
   joinUnestablishedMixedConversations,
 } from '../mls/mlsMigration/migrationInitialiser';
-import {CallingViewMode, CallState, DesktopScreenShareMenu} from '../repositories/calling/CallState';
-import {ConversationState} from '../repositories/conversation/ConversationState';
-import {User} from '../repositories/entity/User';
-import {TeamState} from '../repositories/team/TeamState';
+import {CallingViewMode, CallState, DesktopScreenShareMenu} from '../repositories/calling/callState';
+import {ConversationState} from '../repositories/conversation/conversationState';
+import {User} from '../repositories/entity/user';
+import {TeamState} from '../repositories/team/teamState';
 import {AppLockRepository} from '../repositories/user/appLockRepository';
 import {showInitialModal} from '../repositories/user/availabilityModal';
 import {UserState} from '../repositories/user/userState';

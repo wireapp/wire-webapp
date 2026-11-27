@@ -37,7 +37,7 @@ import {Video} from './video';
 
 import {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {useApplicationContext} from '../../page/rootProvider';
-import type {Participant} from '../../repositories/calling/Participant';
+import type {Participant} from '../../repositories/calling/participant';
 import {Loading} from '../../uiKit/dataDisplay/loading/loading';
 import {TabIndex} from '../../uiKit/utils/enums';
 import {useKoSubscribableChildren} from '../../util/componentUtil';

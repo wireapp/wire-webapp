@@ -22,7 +22,7 @@ import type {ConversationEvent} from '../../../apiClient/event/conversationEvent
 import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import type {ReactionType} from '../../../core/conversation';
 import {StatusType} from '../../../message/statusType';
-import {ClientConversationEvent} from '../../conversation/EventBuilder';
+import {ClientConversationEvent} from '../../conversation/eventBuilder';
 
 export interface ReadReceipt {
   domain?: string;

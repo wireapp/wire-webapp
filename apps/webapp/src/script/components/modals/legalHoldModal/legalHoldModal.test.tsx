@@ -1,0 +1,420 @@
+/*
+ * Wire
+ * Copyright (C) 2022 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {act, render, waitFor} from '@testing-library/react';
+import {ClientClassification} from '../../../apiClient/client/clientClassification';
+import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
+
+import en from '../../../../i18n/en-US.json';
+import si from '../../../../i18n/si-LK.json';
+import {ClientEntity} from '../../../repositories/client/clientEntity';
+import {useLegalHoldModalState} from './legalHoldModal.state';
+import {ClientRepository} from '../../../repositories/client';
+import {ConversationRepository} from '../../../repositories/conversation/conversationRepository';
+import {MessageRepository} from '../../../repositories/conversation/messageRepository';
+import {CryptographyRepository} from '../../../repositories/cryptography/cryptographyRepository';
+import {Conversation} from '../../../repositories/entity/conversation';
+import {User} from '../../../repositories/entity/user';
+import {SearchRepository} from '../../../repositories/search/searchRepository';
+import {TeamRepository} from '../../../repositories/team/teamRepository';
+import {UserRepository} from '../../../repositories/user/userRepository';
+import {translateForTest} from '../../../util/test/translateForTest';
+import {setStrings, translate} from '../../../util/localizerUtil';
+import {splitFingerprint} from '../../../util/stringUtil';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from '../../../page/testSupport/rootContextTestSupport';
+
+import {LegalHoldModal, LegalHoldModalProps, LegalHoldModalType} from './legalHoldModal';
+
+import {TestFactory} from '../../../../../test/helper/testFactory';
+import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
+
+const userRepository = {} as UserRepository;
+const testFactory = new TestFactory();
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({translate: translateForTest}),
+);
+const translationRootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate}));
+
+type TranslationTestFunction = () => void | Promise<void>;
+type IsolatedTranslationTestFunction = () => Promise<void>;
+
+function withTranslationStrings(
+  strings: typeof en,
+  testFunction: TranslationTestFunction,
+): IsolatedTranslationTestFunction {
+  return async function runTranslationTest(): Promise<void> {
+    setStrings({en: strings});
+
+    try {
+      await testFunction();
+    } finally {
+      act((): void => {
+        useLegalHoldModalState.getState().closeModal();
+      });
+      setStrings({en});
+    }
+  };
+}
+
+function createLegalHoldUser(): User {
+  const legalHoldUser = new User('legal-hold-user', '', translateForTest);
+  const legalHoldClient = new ClientEntity(false, null, 'legal-hold-client');
+  legalHoldClient.class = ClientClassification.LEGAL_HOLD;
+  legalHoldUser.devices([legalHoldClient]);
+
+  return legalHoldUser;
+}
+
+function createOthersDescriptionProps(): LegalHoldModalProps {
+  const props = defaultProps();
+  props.conversationRepository = {
+    getAllUsersInConversation: function getAllUsersInConversation(): Promise<User[]> {
+      return Promise.resolve([createLegalHoldUser()]);
+    },
+  } as unknown as ConversationRepository;
+
+  return props;
+}
+
+type DefaultPropsResult = {
+  clientRepository: ClientRepository;
+  conversationRepository: ConversationRepository;
+  cryptographyRepository: CryptographyRepository;
+  messageRepository: MessageRepository;
+  searchRepository: SearchRepository;
+  teamRepository: TeamRepository;
+  selfUser: User;
+};
+const defaultProps = (): DefaultPropsResult => {
+  return {
+    clientRepository: {} as ClientRepository,
+    conversationRepository: {
+      getAllUsersInConversation: (_: QualifiedId): Promise<User[]> => {
+        return Promise.resolve([]);
+      },
+    } as ConversationRepository,
+    cryptographyRepository: new CryptographyRepository({} as any),
+    messageRepository: {
+      updateAllClients: (..._: [Conversation, boolean]): Promise<void> => {
+        return Promise.resolve();
+      },
+    } as MessageRepository,
+    searchRepository: new SearchRepository(userRepository),
+    teamRepository: {
+      isSelfConnectedTo: function isSelfConnectedTo(): boolean {
+        return false;
+      },
+    } as unknown as TeamRepository,
+    selfUser: new User('mocked-id', '', translateForTest),
+  };
+};
+
+describe('LegalHoldModal', () => {
+  afterAll(() => {
+    testFactory.dispose();
+  });
+
+  beforeAll(async () => {
+    await testFactory.exposeCallingActors();
+  });
+
+  it('is showRequestModal', (): void => {
+    try {
+      render(<LegalHoldModal {...defaultProps()} />, {wrapper: rootProviderWrapper});
+      act((): void => {
+        useLegalHoldModalState.getState().showRequestModal();
+      });
+
+      expect(useLegalHoldModalState.getState().type).toBe(LegalHoldModalType.REQUEST);
+    } finally {
+      act((): void => {
+        useLegalHoldModalState.getState().closeModal();
+      });
+    }
+  });
+
+  it('is showUser', async (): Promise<void> => {
+    try {
+      const props = defaultProps();
+      await render(<LegalHoldModal {...props} />, {wrapper: rootProviderWrapper});
+      const selfConversation = new Conversation(props.selfUser.id, '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+
+      await act(async (): Promise<void> => {
+        useLegalHoldModalState.getState().showUsers(false, selfConversation);
+      });
+
+      expect(useLegalHoldModalState.getState().type).toBe(LegalHoldModalType.USERS);
+    } finally {
+      act((): void => {
+        useLegalHoldModalState.getState().closeModal();
+      });
+    }
+  });
+
+  it(
+    'renders request markers as React nodes',
+    withTranslationStrings(en, async (): Promise<void> => {
+      const fingerprint = 'A1B2C3D4';
+      const expectedFingerprintParts = splitFingerprint(fingerprint);
+      const expectedFingerprintRepresentation = expectedFingerprintParts
+        .map(fingerprintPart => {
+          return `${fingerprintPart} `;
+        })
+        .join('');
+      const {getByTestId} = render(<LegalHoldModal {...defaultProps()} />, {
+        wrapper: translationRootProviderWrapper,
+      });
+
+      act((): void => {
+        useLegalHoldModalState.getState().showRequestModal(false, false, fingerprint);
+      });
+
+      const statusText = await waitFor((): HTMLElement => {
+        return getByTestId('status-modal-text');
+      });
+      const fingerprintElement = statusText.querySelector('.legal-hold-modal__fingerprint');
+
+      expect(statusText.querySelectorAll('br')).toHaveLength(2);
+      expect(statusText.querySelectorAll('.legal-hold-modal__fingerprint')).toHaveLength(1);
+      expect(fingerprintElement).toHaveClass('legal-hold-modal__fingerprint');
+      expect(fingerprintElement).toHaveAttribute('data-uie-name', 'status-modal-fingerprint');
+      expect(fingerprintElement?.textContent).toBe(expectedFingerprintRepresentation);
+
+      const fingerprintPartElements = fingerprintElement?.querySelectorAll('span');
+      expect(fingerprintPartElements).toHaveLength(expectedFingerprintParts.length);
+      expectedFingerprintParts.forEach((fingerprintPart, fingerprintPartIndex) => {
+        expect(fingerprintPartElements?.[fingerprintPartIndex]?.textContent).toBe(`${fingerprintPart} `);
+      });
+    }),
+  );
+
+  it(
+    'renders the fingerprint with the expected presentation',
+    withTranslationStrings({...en, legalHoldModalText: 'Before[br][fingerprint]After'}, async (): Promise<void> => {
+      const fingerprint = 'A1B2C3D4E5F6G7H8';
+      const expectedFingerprintRepresentation = splitFingerprint(fingerprint)
+        .map(fingerprintPart => {
+          return `${fingerprintPart} `;
+        })
+        .join('');
+
+      const {getByTestId} = render(<LegalHoldModal {...defaultProps()} />, {
+        wrapper: translationRootProviderWrapper,
+      });
+      act((): void => {
+        useLegalHoldModalState.getState().showRequestModal(false, false, fingerprint);
+      });
+      const statusText = await waitFor((): HTMLElement => {
+        return getByTestId('status-modal-text');
+      });
+      const fingerprintElement = statusText.querySelector('.legal-hold-modal__fingerprint');
+
+      expect(fingerprintElement?.textContent).toBe(expectedFingerprintRepresentation);
+      expect(fingerprintElement?.querySelectorAll('span')).toHaveLength(splitFingerprint(fingerprint).length);
+    }),
+  );
+
+  it(
+    'keeps HTML-looking fingerprint text opaque in the React request rendering',
+    withTranslationStrings(en, async (): Promise<void> => {
+      const htmlLookingFingerprint = 'AB<CD>&EF';
+      const expectedFingerprintRepresentation = splitFingerprint(htmlLookingFingerprint)
+        .map(fingerprintPart => {
+          return `${fingerprintPart} `;
+        })
+        .join('');
+      const {getByTestId} = render(<LegalHoldModal {...defaultProps()} />, {
+        wrapper: translationRootProviderWrapper,
+      });
+
+      act((): void => {
+        useLegalHoldModalState.getState().showRequestModal(false, false, htmlLookingFingerprint);
+      });
+
+      const statusText = await waitFor((): HTMLElement => {
+        return getByTestId('status-modal-text');
+      });
+      const fingerprintElement = statusText.querySelector('.legal-hold-modal__fingerprint');
+
+      expect(fingerprintElement?.textContent).toBe(expectedFingerprintRepresentation);
+      expect(fingerprintElement?.querySelector('cd')).toBeNull();
+      expect(statusText.querySelector('img')).toBeNull();
+    }),
+  );
+
+  it(
+    'keeps translation-looking fingerprint text opaque in the React request rendering',
+    withTranslationStrings(en, async (): Promise<void> => {
+      const translationLookingFingerprint = '[link]fingerprint[/link]';
+      const expectedFingerprintRepresentation = splitFingerprint(translationLookingFingerprint)
+        .map(fingerprintPart => {
+          return `${fingerprintPart} `;
+        })
+        .join('');
+      const {getByTestId} = render(<LegalHoldModal {...defaultProps()} />, {
+        wrapper: translationRootProviderWrapper,
+      });
+
+      act((): void => {
+        useLegalHoldModalState.getState().showRequestModal(false, false, translationLookingFingerprint);
+      });
+
+      const statusText = await waitFor((): HTMLElement => {
+        return getByTestId('status-modal-text');
+      });
+      const fingerprintElement = statusText.querySelector('.legal-hold-modal__fingerprint');
+
+      expect(fingerprintElement?.textContent).toBe(expectedFingerprintRepresentation);
+      expect(fingerprintElement?.querySelector('a')).toBeNull();
+    }),
+  );
+
+  it(
+    'keeps request marker placement under translation control',
+    withTranslationStrings(
+      {...en, legalHoldModalText: '[fingerprint][br]is the recording-device fingerprint.'},
+      async (): Promise<void> => {
+        const fingerprint = 'A1B2';
+        const expectedFingerprintRepresentation = splitFingerprint(fingerprint)
+          .map(fingerprintPart => {
+            return `${fingerprintPart} `;
+          })
+          .join('');
+        const {getByTestId} = render(<LegalHoldModal {...defaultProps()} />, {
+          wrapper: translationRootProviderWrapper,
+        });
+
+        act((): void => {
+          useLegalHoldModalState.getState().showRequestModal(false, false, fingerprint);
+        });
+
+        const statusText = await waitFor((): HTMLElement => {
+          return getByTestId('status-modal-text');
+        });
+        const requestParagraph = statusText.querySelector('p');
+
+        expect(requestParagraph?.firstElementChild).toHaveClass('legal-hold-modal__fingerprint');
+        expect(requestParagraph?.querySelector('br')).toBeInTheDocument();
+        expect(requestParagraph?.textContent).toBe(
+          `${expectedFingerprintRepresentation}is the recording-device fingerprint.`,
+        );
+      },
+    ),
+  );
+
+  it(
+    'leaves unsupported request markup as text',
+    withTranslationStrings(
+      {...en, legalHoldModalText: 'Before<img src="example">[br]After'},
+      async (): Promise<void> => {
+        const {getByTestId} = render(<LegalHoldModal {...defaultProps()} />, {
+          wrapper: translationRootProviderWrapper,
+        });
+
+        act((): void => {
+          useLegalHoldModalState.getState().showRequestModal(false, false, 'A1B2');
+        });
+
+        const statusText = await waitFor((): HTMLElement => {
+          return getByTestId('status-modal-text');
+        });
+
+        expect(statusText).toHaveTextContent('Before<img src="example">After');
+        expect(statusText.querySelector('img')).toBeNull();
+      },
+    ),
+  );
+
+  it('keeps the Sinhala fingerprint marker in the translation protocol', (): void => {
+    expect(si.legalHoldModalText).toContain('[fingerprint]');
+    expect(si.legalHoldModalText).not.toContain('[ඇඟිලි සටහන]');
+  });
+
+  it(
+    'renders both Legal Hold descriptions with exact line-break compatibility',
+    withTranslationStrings(
+      {
+        ...en,
+        legalHoldDescriptionSelf: 'Self before<br />Self after',
+        legalHoldDescriptionOthers: 'Others before<br />Others after',
+      },
+      async (): Promise<void> => {
+        const selfRender = render(<LegalHoldModal {...defaultProps()} />, {
+          wrapper: translationRootProviderWrapper,
+        });
+        act((): void => {
+          useLegalHoldModalState.getState().showUsers(false);
+        });
+        const selfDescription = await waitFor((): HTMLElement => {
+          return selfRender.getByTestId('status-modal-text');
+        });
+
+        expect(selfDescription).toHaveTextContent('Self beforeSelf after');
+        expect(selfDescription.querySelectorAll('br')).toHaveLength(1);
+        selfRender.unmount();
+        act((): void => {
+          useLegalHoldModalState.getState().closeModal();
+        });
+
+        const othersRender = render(<LegalHoldModal {...createOthersDescriptionProps()} />, {
+          wrapper: translationRootProviderWrapper,
+        });
+        act((): void => {
+          useLegalHoldModalState
+            .getState()
+            .showUsers(false, new Conversation('conversation-id', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest));
+        });
+        const othersDescription = await waitFor((): HTMLElement => {
+          return othersRender.getByTestId('status-modal-text');
+        });
+
+        expect(othersDescription).toHaveTextContent('Others beforeOthers after');
+        expect(othersDescription.querySelectorAll('br')).toHaveLength(1);
+      },
+    ),
+  );
+
+  it(
+    'leaves unsupported Legal Hold description markup and newlines as text',
+    withTranslationStrings(
+      {
+        ...en,
+        legalHoldDescriptionSelf: 'Before<img src="example">\n\nAfter',
+      },
+      async (): Promise<void> => {
+        const {getByTestId} = render(<LegalHoldModal {...defaultProps()} />, {
+          wrapper: translationRootProviderWrapper,
+        });
+        act((): void => {
+          useLegalHoldModalState.getState().showUsers(false);
+        });
+        const description = await waitFor((): HTMLElement => {
+          return getByTestId('status-modal-text');
+        });
+
+        expect(description.textContent).toBe('Before<img src="example">\n\nAfter');
+        expect(description.querySelector('img')).toBeNull();
+        expect(description.querySelector('br')).toBeNull();
+      },
+    ),
+  );
+});

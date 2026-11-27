@@ -19,7 +19,7 @@
 
 import {CONVERSATION_TYPE} from '../../../../apiClient/conversation/conversation';
 
-import {Conversation} from '../../../../repositories/entity/Conversation';
+import {Conversation} from '../../../../repositories/entity/conversation';
 import {
   conversationFilters,
   conversationSearchFilter,
@@ -28,8 +28,8 @@ import {
   getTabConversations,
   scrollToConversation,
 } from './helpers';
-import {generateConversation} from '../../../../../../test/helper/ConversationGenerator';
-import {generateUser} from '../../../../../../test/helper/UserGenerator';
+import {generateConversation} from '../../../../../../test/helper/conversationGenerator';
+import {generateUser} from '../../../../../../test/helper/userGenerator';
 
 import {SidebarTabs} from './useSidebarStore';
 

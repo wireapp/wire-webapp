@@ -22,9 +22,9 @@ import {amplify} from 'amplify';
 
 import * as Icon from '../../../../components/icon';
 import {MenuItem} from '../../../../components/panel/panelActions';
-import {Config} from '../../../../Config';
-import {ConversationRepository} from '../../../../repositories/conversation/ConversationRepository';
-import {Conversation} from '../../../../repositories/entity/Conversation';
+import {Config} from '../../../../config';
+import {ConversationRepository} from '../../../../repositories/conversation/conversationRepository';
+import {Conversation} from '../../../../repositories/entity/conversation';
 import * as UserPermission from '../../../../repositories/user/userPermission';
 import {ActionsViewModel} from '../../../../viewModel/actionsViewModel';
 import {WebAppEvents} from '../../../../webAppEvents';

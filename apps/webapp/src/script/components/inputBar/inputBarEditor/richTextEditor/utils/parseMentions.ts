@@ -21,7 +21,7 @@ import {isNullOrUndefined} from '@sindresorhus/is';
 import {LexicalEditor, $nodesOfType} from 'lexical';
 
 import {MentionEntity} from '../../../../../message/mentionEntity';
-import {User} from '../../../../../repositories/entity/User';
+import {User} from '../../../../../repositories/entity/user';
 import {MentionNode} from '../nodes/mentionNode';
 
 export const parseMentions = (editor: LexicalEditor, textValue: string, mentions: User[]): MentionEntity[] => {

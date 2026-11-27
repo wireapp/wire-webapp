@@ -21,8 +21,8 @@ import {translateForTest} from '../../../util/test/translateForTest';
 
 import {diffCallPeople, getCallPeople} from './callPeople';
 
-import {Participant} from '../../../repositories/calling/Participant';
-import {User} from '../../../repositories/entity/User';
+import {Participant} from '../../../repositories/calling/participant';
+import {User} from '../../../repositories/entity/user';
 
 const createUser = (id: string, name: string, isMe = false): User => {
   const user = new User(id, 'wire.test', translateForTest);

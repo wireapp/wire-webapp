@@ -23,11 +23,11 @@ import {CALL_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 import {CONVERSATION_TYPE, GROUP_CONVERSATION_TYPE} from '../../../apiClient/conversation/conversation';
 import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
 
-import {Call} from '../../../repositories/calling/Call';
-import {CallState} from '../../../repositories/calling/CallState';
-import {Participant} from '../../../repositories/calling/Participant';
-import {Conversation} from '../../../repositories/entity/Conversation';
-import {User} from '../../../repositories/entity/User';
+import {Call} from '../../../repositories/calling/call';
+import {CallState} from '../../../repositories/calling/callState';
+import {Participant} from '../../../repositories/calling/participant';
+import {Conversation} from '../../../repositories/entity/conversation';
+import {User} from '../../../repositories/entity/user';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

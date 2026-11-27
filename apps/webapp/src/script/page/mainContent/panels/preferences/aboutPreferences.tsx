@@ -27,9 +27,9 @@ import {PreferencesPage} from './components/preferencesPage';
 import {PreferencesSection} from './components/preferencesSection';
 import {DownloadApplicationLogs} from './downloadApplicationLogs';
 
-import {Config} from '../../../../Config';
+import {Config} from '../../../../config';
 import {externalUrl} from '../../../../externalRoute';
-import {User} from '../../../../repositories/entity/User';
+import {User} from '../../../../repositories/entity/user';
 import {Link, LinkVariant} from '../../../../uiKit/typography/link/link';
 import {useApplicationContext} from '../../../rootProvider';
 

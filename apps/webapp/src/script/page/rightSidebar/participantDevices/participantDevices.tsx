@@ -22,7 +22,7 @@ import {FC} from 'react';
 import {FadingScrollbar} from '../../../components/fadingScrollbar';
 import {UserDevices, UserDevicesState} from '../../../components/userDevices';
 import {useUserDevicesHistory} from '../../../hooks/useUserDevicesHistory';
-import type {User} from '../../../repositories/entity/User';
+import type {User} from '../../../repositories/entity/user';
 import {ViewModelRepositories} from '../../../viewModel/mainViewModel';
 import {useApplicationContext} from '../../rootProvider';
 import {PanelHeader} from '../panelHeader';

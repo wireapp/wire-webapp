@@ -27,9 +27,9 @@ import {
 import {UserType} from '../../../apiClient/user/user';
 import {driveOffboardingFeatureToggleName} from '../../../featureToggles/startupFeatureToggleNames';
 
-import {Conversation} from '../../../repositories/entity/Conversation';
-import {User} from '../../../repositories/entity/User';
-import {TeamState} from '../../../repositories/team/TeamState';
+import {Conversation} from '../../../repositories/entity/conversation';
+import {User} from '../../../repositories/entity/user';
+import {TeamState} from '../../../repositories/team/teamState';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

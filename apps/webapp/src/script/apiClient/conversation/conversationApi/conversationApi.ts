@@ -36,7 +36,7 @@ import {
   QualifiedConversationIds,
   RemoteConversations,
 } from '..';
-import {chunk} from '../../../commons/util/ArrayUtil';
+import {chunk} from '../../../commons/util/arrayUtil';
 import {BackendFeatures} from '../../apiClient';
 import {
   ConversationAccessUpdateEvent,

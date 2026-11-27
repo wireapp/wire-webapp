@@ -19,7 +19,7 @@
 
 import {isUndefined} from '@sindresorhus/is';
 
-import {TimeInMillis} from '../../commons/util/TimeUtil';
+import {TimeInMillis} from '../../commons/util/timeUtil';
 import {getLogger} from '../logger';
 
 const logger = getLogger('ConnectionQualityListener');

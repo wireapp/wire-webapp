@@ -1,0 +1,174 @@
+/*
+ * Wire
+ * Copyright (C) 2024 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import React, {useState, type FunctionComponent} from 'react';
+
+import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
+import {container} from 'tsyringe';
+
+import {CALL_QUALITY_FEEDBACK_KEY, CALL_SURVEY_MUTE_INTERVAL, ratingListItems} from './constants';
+import {
+  buttonStyle,
+  buttonWrapper,
+  description,
+  ratingItemBubble,
+  ratingItemHeading,
+  ratingList,
+  title,
+  wrapper,
+} from './qualityFeedbackModal.styles';
+import {RatingListLabel} from './typings';
+
+import {CallingRepository} from '../../../repositories/calling/callingRepository';
+import {trackCallQualityFeedback} from '../../../repositories/tracking/helpers';
+import {UserState} from '../../../repositories/user/userState';
+import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';
+import {Checkbox, CheckboxLabel} from '../../../uiKit/inputs/checkbox/checkbox';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import type {Translate} from '../../../util/localizerUtil';
+import {getLogger} from '../../../util/logger';
+import {useAppNotification} from '../../appNotification';
+import {useCallAlertState} from '../../calling/useCallAlertState';
+import {ModalComponent} from '../modalComponent';
+
+const logger = getLogger('CallQualityFeedback');
+
+interface Props {
+  callingRepository: CallingRepository;
+  translate: Translate;
+}
+
+export const QualityFeedbackModal: FunctionComponent<Props> = ({callingRepository, translate}: Props) => {
+  const userState = container.resolve(UserState);
+  const {conversationId} = useCallAlertState();
+  const call = !isNullOrUndefined(conversationId) ? callingRepository.findCall(conversationId) : undefined;
+  const [isChecked, setIsChecked] = useState(false);
+  const {setQualityFeedbackModalShown, qualityFeedbackModalShown, setConversationId} = useCallAlertState();
+  const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
+
+  const submittedNotification = useAppNotification({
+    message: translate('qualityFeedback.notificationSubmitted'),
+  });
+
+  if (!qualityFeedbackModalShown) {
+    return null;
+  }
+
+  if (isNullOrUndefined(call)) {
+    logger.warn('Call not found for conversationId', {conversationId});
+    setQualityFeedbackModalShown(false);
+    return null;
+  }
+
+  const handleCloseModal = ({skipNotification = false} = {}): void => {
+    try {
+      const qualityFeedbackStorage = localStorage.getItem(CALL_QUALITY_FEEDBACK_KEY);
+      const currentStorageData =
+        qualityFeedbackStorage !== null && qualityFeedbackStorage !== '' ? JSON.parse(qualityFeedbackStorage) : {};
+      const currentDate = new Date();
+      const dateUntilShowModal = new Date(currentDate.getTime() + CALL_SURVEY_MUTE_INTERVAL);
+
+      currentStorageData[selfUser.id] = isChecked ? null : dateUntilShowModal.getTime();
+      localStorage.setItem(CALL_QUALITY_FEEDBACK_KEY, JSON.stringify(currentStorageData));
+
+      if (!skipNotification) {
+        submittedNotification.show();
+      }
+    } catch (error: unknown) {
+      logger.warn(`Can't send feedback: ${(error as Error).message}`);
+    } finally {
+      setQualityFeedbackModalShown(false);
+      setConversationId();
+    }
+  };
+
+  const sendQualityFeedback = (score: number): void => {
+    trackCallQualityFeedback({call, score, label: RatingListLabel.ANSWERED});
+
+    handleCloseModal();
+  };
+
+  const skipQualityFeedback = (): void => {
+    trackCallQualityFeedback({call, label: RatingListLabel.DISMISSED});
+    handleCloseModal({skipNotification: true});
+  };
+
+  return (
+    <ModalComponent isShown data-uie-name="modal-call-quality-feedback" className="quality-feedback">
+      <div css={wrapper}>
+        <h2 css={title}>{translate('qualityFeedback.heading')}</h2>
+
+        <p css={description}>{translate('qualityFeedback.description')}</p>
+
+        <ul css={ratingList}>
+          {ratingListItems.map(ratingItem => {
+            return (
+              <li key={ratingItem.value}>
+                {isNonEmptyString(ratingItem?.headingTranslationKey) && (
+                  // headingTranslationKey has to broad type to specify it
+                  // TODO: narrow down the type
+                  <div css={ratingItemHeading}>{translate(ratingItem.headingTranslationKey)}</div>
+                )}
+                <Button
+                  variant={ButtonVariant.TERTIARY}
+                  type="button"
+                  onClick={() => {
+                    return sendQualityFeedback(ratingItem.value);
+                  }}
+                  data-uie-name="go-rate-call-quality-feedback"
+                  data-uie-value={ratingItem.value}
+                  css={ratingItemBubble}
+                >
+                  {ratingItem.value}
+                </Button>
+              </li>
+            );
+          })}
+        </ul>
+
+        <div css={buttonWrapper}>
+          <Button
+            variant={ButtonVariant.TERTIARY}
+            type="button"
+            onClick={skipQualityFeedback}
+            data-uie-name="go-skip-call-quality-feedback"
+            css={buttonStyle}
+          >
+            {translate('qualityFeedback.skip')}
+          </Button>
+        </div>
+
+        <div>
+          <Checkbox
+            checked={isChecked}
+            data-uie-name="do-not-ask-again-checkbox"
+            id="do-not-ask-again-checkbox"
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              return setIsChecked(event.target.checked);
+            }}
+          >
+            <CheckboxLabel className="label-xs" htmlFor="do-not-ask-again-checkbox">
+              {translate('qualityFeedback.doNotAskAgain')}
+            </CheckboxLabel>
+          </Checkbox>
+        </div>
+      </div>
+    </ModalComponent>
+  );
+};

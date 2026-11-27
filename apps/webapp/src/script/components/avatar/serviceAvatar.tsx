@@ -26,7 +26,7 @@ import {AvatarBorder} from './avatarBorder';
 import {AvatarImage} from './avatarImage';
 import {AvatarWrapper} from './avatarWrapper';
 
-import {ServiceEntity} from '../../repositories/integration/ServiceEntity';
+import {ServiceEntity} from '../../repositories/integration/serviceEntity';
 import {CSS_FILL_PARENT} from '../../util/cssMixin';
 import * as Icon from '../icon';
 

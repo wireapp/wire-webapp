@@ -21,13 +21,13 @@ import {render, screen} from '@testing-library/react';
 import {container} from 'tsyringe';
 
 import {ClientRepository} from '../../../../repositories/client';
-import {ConversationRepository} from '../../../../repositories/conversation/ConversationRepository';
-import {User} from '../../../../repositories/entity/User';
+import {ConversationRepository} from '../../../../repositories/conversation/conversationRepository';
+import {User} from '../../../../repositories/entity/user';
 import {PropertiesRepository} from '../../../../repositories/properties/propertiesRepository';
-import {TeamState} from '../../../../repositories/team/TeamState';
+import {TeamState} from '../../../../repositories/team/teamState';
 import {AppLockRepository} from '../../../../repositories/user/appLockRepository';
 import type {UserRepository} from '../../../../repositories/user/userRepository';
-import {Config} from '../../../../Config';
+import {Config} from '../../../../config';
 import {withTheme} from '../../../../auth/util/test/testUtil';
 import {
   createRootContextValueForTest,

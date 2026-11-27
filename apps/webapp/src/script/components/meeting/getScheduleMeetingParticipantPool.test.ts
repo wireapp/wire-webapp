@@ -17,8 +17,8 @@
  *
  */
 
-import {User} from '../../repositories/entity/User';
-import type {TeamState} from '../../repositories/team/TeamState';
+import {User} from '../../repositories/entity/user';
+import type {TeamState} from '../../repositories/team/teamState';
 import type {UserState} from '../../repositories/user/userState';
 import {generateQualifiedIds} from '../../auth/util/test/testUtil';
 import {translateForTest} from '../../util/test/translateForTest';

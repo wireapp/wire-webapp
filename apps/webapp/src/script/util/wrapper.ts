@@ -21,7 +21,7 @@ import {amplify} from 'amplify';
 
 import {Environment} from './environment';
 
-import {Runtime} from '../commons/util/Runtime';
+import {Runtime} from '../commons/util/runtime';
 import {ROLE} from '../repositories/user/userPermission';
 import {WebAppEvents} from '../webAppEvents';
 

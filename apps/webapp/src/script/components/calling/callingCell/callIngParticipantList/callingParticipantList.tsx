@@ -29,9 +29,9 @@ import {
 } from './callingParticipantList.styles';
 
 import {useApplicationContext} from '../../../../page/rootProvider';
-import {CallingRepository} from '../../../../repositories/calling/CallingRepository';
-import {Participant} from '../../../../repositories/calling/Participant';
-import {Conversation} from '../../../../repositories/entity/Conversation';
+import {CallingRepository} from '../../../../repositories/calling/callingRepository';
+import {Participant} from '../../../../repositories/calling/participant';
+import {Conversation} from '../../../../repositories/entity/conversation';
 import {ContextMenuEntry, showContextMenu} from '../../../../ui/contextMenu';
 import {Tooltip} from '../../../../uiKit/dataDisplay/tooltip/tooltip';
 import {sortUsersByPriority} from '../../../../util/stringUtil';

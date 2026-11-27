@@ -35,10 +35,10 @@ import {
   tilePreviewStyles,
 } from './videoBackgroundSettings.styles';
 
-import {Config} from '../../../../Config';
+import {Config} from '../../../../config';
 import {useApplicationContext} from '../../../../page/rootProvider';
 import {BackgroundEffectsQuality} from '../../../../repositories/media/useBackgroundEffectsStore';
-import type {BackgroundEffectSelection, BuiltinBackground} from '../../../../repositories/media/VideoBackgroundEffects';
+import type {BackgroundEffectSelection, BuiltinBackground} from '../../../../repositories/media/videoBackgroundEffects';
 import {BlurHighIcon} from '../../../../uiKit/dataDisplay/icon/blurHighIcon';
 import {BlurLowIcon} from '../../../../uiKit/dataDisplay/icon/blurLowIcon';
 import {CircleIcon} from '../../../../uiKit/dataDisplay/icon/circleIcon';

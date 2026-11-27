@@ -30,7 +30,7 @@ import type {MentionEntity} from '../../../message/mentionEntity';
 import {renderMessage} from '../../../util/messageRenderer';
 import {AssetType} from '../../assets/assetType';
 import {containsOnlyLink} from '../../conversation/linkPreviews/helpers';
-import {mediaParser} from '../../media/MediaParser';
+import {mediaParser} from '../../media/mediaParser';
 
 export class Multipart extends Asset {
   public readonly mentions: ko.ObservableArray<MentionEntity>;

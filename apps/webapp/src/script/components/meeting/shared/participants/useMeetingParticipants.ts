@@ -21,8 +21,8 @@ import {useMemo} from 'react';
 
 import {container} from 'tsyringe';
 
-import type {User} from '../../../../repositories/entity/User';
-import {TeamState} from '../../../../repositories/team/TeamState';
+import type {User} from '../../../../repositories/entity/user';
+import {TeamState} from '../../../../repositories/team/teamState';
 import {UserState} from '../../../../repositories/user/userState';
 import {useKoSubscribableChildren} from '../../../../util/componentUtil';
 import {sortUsersByPriority} from '../../../../util/stringUtil';

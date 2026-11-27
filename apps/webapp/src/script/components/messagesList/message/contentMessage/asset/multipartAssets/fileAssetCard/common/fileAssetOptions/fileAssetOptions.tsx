@@ -30,7 +30,7 @@ import {
   CELLS_ACTION,
   useCellsActionPermissions,
 } from '../../../../../../../../conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
-import {useFileHistoryModal} from '../../../../../../../../Modals/FileHistoryModal/hooks/useFileHistoryModal';
+import {useFileHistoryModal} from '../../../../../../../../modals/fileHistoryModal/hooks/useFileHistoryModal';
 
 interface FileAssetOptionsProps {
   src?: string;

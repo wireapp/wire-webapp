@@ -25,7 +25,7 @@ import {ClientClassification} from '../../../../apiClient/client/clientClassific
 import {WireIdentity} from '../../../../e2eIdentity';
 import {FormattedId} from '../../../../page/mainContent/panels/preferences/devicesPreferences/components/formattedId';
 import {useApplicationContext} from '../../../../page/rootProvider';
-import {type ClientEntity} from '../../../../repositories/client/ClientEntity';
+import {type ClientEntity} from '../../../../repositories/client/clientEntity';
 import {handleKeyDown, KEY} from '../../../../util/keyboardUtil';
 import {splitFingerprint} from '../../../../util/stringUtil';
 import {DeviceVerificationBadges} from '../../../badge';

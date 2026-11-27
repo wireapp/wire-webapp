@@ -25,11 +25,11 @@ import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
 import {CallingViewModel} from './callingViewModel';
 
 import type {AudioRepository} from '../repositories/audio/audioRepository';
-import {Call} from '../repositories/calling/Call';
-import {CallingRepository} from '../repositories/calling/CallingRepository';
-import {CallState} from '../repositories/calling/CallState';
-import {Conversation} from '../repositories/entity/Conversation';
-import {MediaDevicesHandler} from '../repositories/media/MediaDevicesHandler';
+import {Call} from '../repositories/calling/call';
+import {CallingRepository} from '../repositories/calling/callingRepository';
+import {CallState} from '../repositories/calling/callState';
+import {Conversation} from '../repositories/entity/conversation';
+import {MediaDevicesHandler} from '../repositories/media/mediaDevicesHandler';
 import {Core} from '../service/coreSingleton';
 import {type Translate} from '../util/localizerUtil';
 

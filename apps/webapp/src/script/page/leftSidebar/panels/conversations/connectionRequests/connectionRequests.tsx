@@ -22,7 +22,7 @@ import type {FunctionComponent} from 'react';
 import cx from 'classnames';
 
 import {Avatar, AVATAR_SIZE, GroupAvatar} from '../../../../../components/avatar';
-import {User} from '../../../../../repositories/entity/User';
+import {User} from '../../../../../repositories/entity/user';
 import {TabIndex} from '../../../../../uiKit/utils/enums';
 import {handleKeyDown, KEY} from '../../../../../util/keyboardUtil';
 import {useApplicationContext} from '../../../../rootProvider';

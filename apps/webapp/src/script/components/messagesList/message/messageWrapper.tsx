@@ -46,12 +46,12 @@ import {markAsUnreadFeatureToggleName} from '../../../featureToggles/startupFeat
 import {QuoteEntity} from '../../../message/quoteEntity';
 import {useApplicationContext} from '../../../page/rootProvider';
 import {AssetRepository} from '../../../repositories/assets/assetRepository';
-import {OutgoingQuote} from '../../../repositories/conversation/MessageRepository';
-import {Conversation} from '../../../repositories/entity/Conversation';
+import {OutgoingQuote} from '../../../repositories/conversation/messageRepository';
+import {Conversation} from '../../../repositories/entity/conversation';
 import {CompositeMessage} from '../../../repositories/entity/message/compositeMessage';
 import {ContentMessage} from '../../../repositories/entity/message/contentMessage';
 import {Text} from '../../../repositories/entity/message/text';
-import {TeamState} from '../../../repositories/team/TeamState';
+import {TeamState} from '../../../repositories/team/teamState';
 import {ContextMenuEntry} from '../../../ui/contextMenu';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {WebAppEvents} from '../../../webAppEvents';

@@ -24,7 +24,7 @@ import EmojiPicker, {EmojiClickData, EmojiStyle} from 'emoji-picker-react';
 import {styles} from './emojisBar.styles';
 
 import {useApplicationContext} from '../../../../page/rootProvider';
-import {CallingRepository} from '../../../../repositories/calling/CallingRepository';
+import {CallingRepository} from '../../../../repositories/calling/callingRepository';
 
 interface EmojisBarProps {
   onEmojiClick: (emoji: string) => void;

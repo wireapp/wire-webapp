@@ -23,8 +23,8 @@ import {CSSObject} from '@emotion/react';
 import cx from 'classnames';
 
 import {useApplicationContext} from '../../page/rootProvider';
-import {Conversation} from '../../repositories/entity/Conversation';
-import {User} from '../../repositories/entity/User';
+import {Conversation} from '../../repositories/entity/conversation';
+import {User} from '../../repositories/entity/user';
 import {useKoSubscribableChildren} from '../../util/componentUtil';
 import * as Icon from '../icon';
 

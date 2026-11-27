@@ -20,7 +20,7 @@
 import {AudioPreference} from '../../apiClient/user/data/userPropertiesSetData';
 import {difference} from 'underscore';
 
-import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
+import {NOTIFICATION_HANDLING_STATE} from '../event/notificationHandlingState';
 
 import {AudioPlayingType} from './audioPlayingType';
 import {AudioRepository} from './audioRepository';

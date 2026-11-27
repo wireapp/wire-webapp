@@ -27,11 +27,11 @@ import {UserListItem} from './components/userListItem';
 import {collapseButton, collapseIcon} from './userList.styles';
 
 import {useApplicationContext} from '../../page/rootProvider';
-import type {ConversationRepository} from '../../repositories/conversation/ConversationRepository';
-import {ConversationState} from '../../repositories/conversation/ConversationState';
-import type {Conversation} from '../../repositories/entity/Conversation';
-import type {User} from '../../repositories/entity/User';
-import {TeamState} from '../../repositories/team/TeamState';
+import type {ConversationRepository} from '../../repositories/conversation/conversationRepository';
+import {ConversationState} from '../../repositories/conversation/conversationState';
+import type {Conversation} from '../../repositories/entity/conversation';
+import type {User} from '../../repositories/entity/user';
+import {TeamState} from '../../repositories/team/teamState';
 import {ChevronDownIcon} from '../../uiKit/dataDisplay/icon/chevronDownIcon';
 import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {isEnterKey, isSpaceKey} from '../../util/keyboardUtil';

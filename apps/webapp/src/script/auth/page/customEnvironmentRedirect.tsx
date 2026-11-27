@@ -25,7 +25,7 @@ import {connect} from 'react-redux';
 import {Page} from './page';
 
 import {UrlUtil} from '../../commons/util';
-import {Runtime} from '../../commons/util/Runtime';
+import {Runtime} from '../../commons/util/runtime';
 import {LogoIcon} from '../../components/icon';
 import {useApplicationContext} from '../../page/rootProvider';
 import {COLOR} from '../../uiKit/identity/colors/colors';

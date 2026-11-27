@@ -29,7 +29,7 @@ import {Success} from './teamCreationSteps/success';
 import {useTeamCreationModal} from './useTeamCreationModal';
 
 import * as Icon from '../../../../../../components/icon';
-import {ModalComponent} from '../../../../../../components/Modals/ModalComponent';
+import {ModalComponent} from '../../../../../../components/modals/modalComponent';
 import {EventName} from '../../../../../../repositories/tracking/eventName';
 import {Segmentation} from '../../../../../../repositories/tracking/segmentation';
 import {WebAppEvents} from '../../../../../../webAppEvents';

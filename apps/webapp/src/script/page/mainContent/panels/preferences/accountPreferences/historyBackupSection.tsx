@@ -20,7 +20,7 @@
 import {FC} from 'react';
 
 import {BackupFileUpload} from '../../../../../components/historyImport/backupFileUpload';
-import {Config} from '../../../../../Config';
+import {Config} from '../../../../../config';
 import {Button, ButtonVariant} from '../../../../../uiKit/inputs/button/button';
 import {useApplicationContext} from '../../../../rootProvider';
 import {ContentState} from '../../../../useAppState';

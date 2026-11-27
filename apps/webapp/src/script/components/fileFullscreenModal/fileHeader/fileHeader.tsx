@@ -41,7 +41,7 @@ import {
 import {createRelativeTimestampFormatter, useRelativeTimestamp} from '../../../hooks/useRelativeTimestamp';
 import {useApplicationContext} from '../../../page/rootProvider';
 import {CellsRepository} from '../../../repositories/cells/cellsRepository';
-import type {Conversation} from '../../../repositories/entity/Conversation';
+import type {Conversation} from '../../../repositories/entity/conversation';
 import {BadgesWithTooltip} from '../../../uiKit/dataDisplay/badgesWithTooltip/badgesWithTooltip';
 import {CloseIcon} from '../../../uiKit/dataDisplay/icon/closeIcon';
 import {DownloadIcon} from '../../../uiKit/dataDisplay/icon/downloadIcon';
@@ -63,7 +63,7 @@ import {isInRecycleBin} from '../../conversation/conversationCells/common/recycl
 import {EditIcon} from '../../icon';
 import {iconStyles} from '../../messagesList/message/contentMessage/asset/multipartAssets/fileAssetCard/common/fileAssetOptions/fileAssetOptions.styles';
 import {MessageTime} from '../../messagesList/message/messageTime';
-import {useFileHistoryModal} from '../../Modals/FileHistoryModal/hooks/useFileHistoryModal';
+import {useFileHistoryModal} from '../../modals/fileHistoryModal/hooks/useFileHistoryModal';
 
 interface FileHeaderProps {
   id: string;

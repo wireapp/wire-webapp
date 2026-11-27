@@ -22,7 +22,7 @@ import React, {type FunctionComponent} from 'react';
 import {FormattedMessage} from 'react-intl';
 
 import {LogoFullIcon} from '../../components/icon';
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {useApplicationContext} from '../../page/rootProvider';
 import {CloseIcon} from '../../uiKit/dataDisplay/icon/closeIcon';
 import {Content} from '../../uiKit/layout/content/content';

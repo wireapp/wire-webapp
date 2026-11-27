@@ -17,8 +17,8 @@
  *
  */
 
-import {AssetMetaData, BackupMessageContent} from './CPB.library';
-import {AudioAsset, ImageAsset} from './CPB.types';
+import {AssetMetaData, BackupMessageContent} from './cpb.library';
+import {AudioAsset, ImageAsset} from './cpb.types';
 
 import {isObject} from '../../../guards/common';
 

@@ -25,7 +25,7 @@ import {
   passwordFieldsStyles,
 } from './meetingLinkForm.styles';
 
-import {Config} from '../../../../Config';
+import {Config} from '../../../../config';
 import {CopyToClipboardButton} from '../../../copyToClipboardButton';
 import {PasswordFields, type PasswordFieldsProps} from '../../../passwordFields/passwordFields';
 import {PasswordGeneratorButton} from '../../../passwordGeneratorButton';

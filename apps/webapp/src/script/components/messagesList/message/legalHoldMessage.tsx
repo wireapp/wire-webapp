@@ -22,10 +22,10 @@ import type {FunctionComponent} from 'react';
 import {container} from 'tsyringe';
 
 import {useApplicationContext} from '../../../page/rootProvider';
-import {ConversationState} from '../../../repositories/conversation/ConversationState';
+import {ConversationState} from '../../../repositories/conversation/conversationState';
 import {LegalHoldMessage as LegalHoldMessageEntity} from '../../../repositories/entity/message/legalHoldMessage';
 import {LegalHoldDot} from '../../legalHoldDot';
-import {useLegalHoldModalState} from '../../Modals/LegalHoldModal/LegalHoldModal.state';
+import {useLegalHoldModalState} from '../../modals/legalHoldModal/legalHoldModal.state';
 
 interface LegalHoldMessageProps {
   conversationState?: ConversationState;

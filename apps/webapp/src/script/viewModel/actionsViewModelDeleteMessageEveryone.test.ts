@@ -16,7 +16,7 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  */
 
-import {PrimaryModal} from '../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../components/modals/primaryModal';
 import {ActionsViewModel} from './actionsViewModel';
 import {translateForTest} from '../util/test/translateForTest';
 

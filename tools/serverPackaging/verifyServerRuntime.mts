@@ -151,7 +151,7 @@ export async function verifyServerRuntime(artifactDirectory: string): Promise<vo
     }
 
     // The existing production URL guard provides a controlled exception without changing server code.
-    const serverSource = readFileSync(resolve(repositoryDirectory, 'apps/server/Server.ts'), 'utf8');
+    const serverSource = readFileSync(resolve(repositoryDirectory, 'apps/server/server.ts'), 'utf8');
     const exceptionLineNumber =
       serverSource.split('\n').findIndex(line => {
         return line.includes("throw new Error(`Config variable 'APP_BASE'");
@@ -173,7 +173,7 @@ export async function verifyServerRuntime(artifactDirectory: string): Promise<vo
     );
     assert.equal(exceptionProcess.error, undefined);
     assert.equal(exceptionProcess.status, 1);
-    assert(exceptionProcess.stderr.includes(`Server.ts:${exceptionLineNumber}:`), exceptionProcess.stderr);
+    assert(exceptionProcess.stderr.includes(`server.ts:${exceptionLineNumber}:`), exceptionProcess.stderr);
     console.info(
       'Server passed standalone startup, metadata, runtime configuration, template/GeoIP, and source-map checks.',
     );

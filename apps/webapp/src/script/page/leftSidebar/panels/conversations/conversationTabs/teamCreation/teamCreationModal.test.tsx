@@ -31,7 +31,7 @@ import {TeamCreationModal} from './teamCreationModal';
 import {useTeamCreationModal} from './useTeamCreationModal';
 import {translateForTest} from '../../../../../../util/test/translateForTest';
 
-jest.mock('../../../../../../repositories/team/TeamService');
+jest.mock('../../../../../../repositories/team/teamService');
 
 const testIdentifiers = {
   doContinue: 'do-continue',

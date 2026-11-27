@@ -22,9 +22,9 @@ import {container} from 'tsyringe';
 
 import {CONVERSATION_PROTOCOL} from '../apiClient/team/feature/featureList.types';
 
-import type {ConversationRepository} from '../repositories/conversation/ConversationRepository';
-import type {MessageRepository} from '../repositories/conversation/MessageRepository';
-import {Conversation} from '../repositories/entity/Conversation';
+import type {ConversationRepository} from '../repositories/conversation/conversationRepository';
+import type {MessageRepository} from '../repositories/conversation/messageRepository';
+import {Conversation} from '../repositories/entity/conversation';
 import {UserState} from '../repositories/user/userState';
 import type {UserRepository} from '../repositories/user/userRepository';
 

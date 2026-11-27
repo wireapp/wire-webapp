@@ -24,7 +24,7 @@ import {LexicalEditor} from 'lexical';
 import {RichTextEditor} from './richTextEditor';
 
 import {ContentMessage} from '../../../repositories/entity/message/contentMessage';
-import {User} from '../../../repositories/entity/User';
+import {User} from '../../../repositories/entity/user';
 import {DraftState} from '../common/draftState/draftState';
 import {MessageContent} from '../common/messageContent/messageContent';
 

@@ -35,7 +35,7 @@ import {
   MOCK_SCAN_DELAY_MILLISECONDS,
   type TroubleshooterService,
 } from '../../../../repositories/troubleshooter/troubleshooterService';
-import {Config} from '../../../../Config';
+import {Config} from '../../../../config';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

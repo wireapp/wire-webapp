@@ -29,7 +29,7 @@ import {
 } from './teamCreation.styles';
 
 import * as Icon from '../../../../../../components/icon';
-import {ModalComponent} from '../../../../../../components/Modals/ModalComponent';
+import {ModalComponent} from '../../../../../../components/modals/modalComponent';
 import {EventName} from '../../../../../../repositories/tracking/eventName';
 import {Segmentation} from '../../../../../../repositories/tracking/segmentation';
 import {Button, ButtonVariant} from '../../../../../../uiKit/inputs/button/button';

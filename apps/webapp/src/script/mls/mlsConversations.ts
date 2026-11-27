@@ -23,7 +23,7 @@ import {match, P} from 'ts-pattern';
 
 import {QualifiedId} from '../apiClient/user/qualifiedId';
 import {Account, MLSService} from '../core';
-import {ConversationRepository} from '../repositories/conversation/ConversationRepository';
+import {ConversationRepository} from '../repositories/conversation/conversationRepository';
 import {
   isMLSCapableConversation,
   isMLSConversation,
@@ -31,11 +31,11 @@ import {
   isTeamConversation,
   MLSCapableConversation,
   MLSConversation,
-} from '../repositories/conversation/ConversationSelectors';
-import {ConversationService} from '../repositories/conversation/ConversationService';
-import {ConversationState} from '../repositories/conversation/ConversationState';
-import {Conversation} from '../repositories/entity/Conversation';
-import {User} from '../repositories/entity/User';
+} from '../repositories/conversation/conversationSelectors';
+import {ConversationService} from '../repositories/conversation/conversationService';
+import {ConversationState} from '../repositories/conversation/conversationState';
+import {Conversation} from '../repositories/entity/conversation';
+import {User} from '../repositories/entity/user';
 import {UserState} from '../repositories/user/userState';
 import {getLogger} from '../util/logger';
 import {matchQualifiedIds} from '../util/qualifiedId';

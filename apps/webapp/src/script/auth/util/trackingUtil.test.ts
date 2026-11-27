@@ -17,10 +17,10 @@
  *
  */
 
-jest.mock('../../Config');
+jest.mock('../../config');
 jest.mock('../../util/uuid');
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {createUuid} from '../../util/uuid';
 
 import {

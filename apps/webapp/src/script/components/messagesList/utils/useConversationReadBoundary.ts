@@ -22,7 +22,7 @@ import type {Dispatch, MutableRefObject, SetStateAction} from 'react';
 
 import {isNumber} from '@sindresorhus/is';
 
-import {Conversation} from '../../../repositories/entity/Conversation';
+import {Conversation} from '../../../repositories/entity/conversation';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 
 export type ConversationReadBoundary = {

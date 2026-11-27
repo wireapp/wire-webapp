@@ -23,10 +23,10 @@ import {isNan, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 
 import {ConversationVerificationBadges} from '../../../../../components/badge';
 import * as Icon from '../../../../../components/icon';
-import {ConversationRepository} from '../../../../../repositories/conversation/ConversationRepository';
-import {Conversation} from '../../../../../repositories/entity/Conversation';
-import {User} from '../../../../../repositories/entity/User';
-import {ServiceEntity} from '../../../../../repositories/integration/ServiceEntity';
+import {ConversationRepository} from '../../../../../repositories/conversation/conversationRepository';
+import {Conversation} from '../../../../../repositories/entity/conversation';
+import {User} from '../../../../../repositories/entity/user';
+import {ServiceEntity} from '../../../../../repositories/integration/serviceEntity';
 import {useKoSubscribableChildren} from '../../../../../util/componentUtil';
 import {isEnterKey} from '../../../../../util/keyboardUtil';
 import {removeLineBreaks} from '../../../../../util/stringUtil';

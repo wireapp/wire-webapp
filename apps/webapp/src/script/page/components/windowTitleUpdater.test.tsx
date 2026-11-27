@@ -22,7 +22,7 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '../../webAppEvents';
 
-import {NOTIFICATION_HANDLING_STATE} from '../../repositories/event/NotificationHandlingState';
+import {NOTIFICATION_HANDLING_STATE} from '../../repositories/event/notificationHandlingState';
 import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {getLogger} from '../../util/logger';
 import {translateForTest} from '../../util/test/translateForTest';
@@ -51,7 +51,7 @@ jest.mock('../../util/logger', () => {
 });
 
 const mockWindowTitleLoggerDebug = (getLogger as jest.Mock).mock.results[0].value.debug as jest.Mock;
-jest.mock('../../Config', () => {
+jest.mock('../../config', () => {
   return {
     Config: {
       getConfig: jest.fn(() => {

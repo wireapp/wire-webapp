@@ -27,9 +27,9 @@ import type {MeetingStoreServiceTasks} from '../../../../meetingStore/meetingSto
 import {MeetingAction} from './meetingAction';
 import type {MeetingInstance} from '../../../../types/meetingInstance';
 import type {MeetingSeries} from '../../../../types/meetingSeries';
-import type {CallingRepository} from '../../../../../../repositories/calling/CallingRepository';
-import type {ConversationRepository} from '../../../../../../repositories/conversation/ConversationRepository';
-import {User} from '../../../../../../repositories/entity/User';
+import type {CallingRepository} from '../../../../../../repositories/calling/callingRepository';
+import type {ConversationRepository} from '../../../../../../repositories/conversation/conversationRepository';
+import {User} from '../../../../../../repositories/entity/user';
 import type {MeetingsRepository} from '../../../../../../repositories/meetings/meetingsRepository';
 import {translateForTest} from '../../../../../../util/test/translateForTest';
 import {

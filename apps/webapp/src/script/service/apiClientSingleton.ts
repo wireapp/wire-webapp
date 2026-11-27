@@ -23,7 +23,7 @@ import {singleton} from 'tsyringe';
 import {APIClient as APIClientUnconfigured} from '../apiClient/apiClient';
 import {browserPlatform} from '../apiClient/shims/browser/platform';
 import type {ReconnectingWebsocketWallClock} from '../apiClient/tcp/reconnectingWebsocket';
-import {Config} from '../Config';
+import {Config} from '../config';
 
 const wireClientHeaderName = 'Wire-Client';
 const wireClientVersionHeaderName = 'Wire-Client-Version';

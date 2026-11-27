@@ -23,9 +23,9 @@ import {task} from 'true-myth';
 
 import type {MeetingServiceDeps} from '../../meetingStore/meetingStoreDeps';
 import {meetingSubmitErrors} from '../../meetingSubmitErrors';
-import type {CallingRepository} from '../../../../repositories/calling/CallingRepository';
-import type {ConversationRepository} from '../../../../repositories/conversation/ConversationRepository';
-import {Conversation} from '../../../../repositories/entity/Conversation';
+import type {CallingRepository} from '../../../../repositories/calling/callingRepository';
+import type {ConversationRepository} from '../../../../repositories/conversation/conversationRepository';
+import {Conversation} from '../../../../repositories/entity/conversation';
 import type {MeetingsRepository} from '../../../../repositories/meetings/meetingsRepository';
 import {unwrapErr} from '../../../../util/test/resultTestSupport';
 import {translateForTest} from '../../../../util/test/translateForTest';

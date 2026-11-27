@@ -21,7 +21,7 @@ import React, {type FunctionComponent} from 'react';
 
 import {FormattedMessage} from 'react-intl';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {useApplicationContext} from '../../page/rootProvider';
 import {ContainerXS} from '../../uiKit/layout/container/container';
 import {H2} from '../../uiKit/typography/heading/heading';

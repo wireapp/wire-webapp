@@ -23,9 +23,9 @@ import {arrayIncludes} from 'ts-extras';
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {CONVERSATION_EVENT} from '../apiClient/event/conversationEvent';
-import type {Conversation} from '../repositories/entity/Conversation';
-import type {User} from '../repositories/entity/User';
-import {CONVERSATION} from '../repositories/event/Client';
+import type {Conversation} from '../repositories/entity/conversation';
+import type {User} from '../repositories/entity/user';
+import {CONVERSATION} from '../repositories/event/client';
 
 export type MappedEvent = Record<string, any> & {
   data?: MappedEventData | string;

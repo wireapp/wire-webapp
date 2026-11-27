@@ -26,7 +26,7 @@ import {Availability} from '@wireapp/protocol-messaging';
 
 import type {RichInfoField} from '../../apiClient/user/richInfo';
 import {RootContextValue, useApplicationContext} from '../../page/rootProvider';
-import type {User} from '../../repositories/entity/User';
+import type {User} from '../../repositories/entity/user';
 import {RichProfileRepository} from '../../repositories/user/richProfileRepository';
 import {availabilityStatus, availabilityTranslationKeys} from '../../util/availabilityStatus';
 import {useKoSubscribableChildren} from '../../util/componentUtil';

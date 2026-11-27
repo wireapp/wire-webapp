@@ -23,7 +23,7 @@ import {MessageCategory} from '../../../../message/messageCategory';
 
 import {mapEventRecord} from './mapEventRecord';
 
-import {BackupDateTime, BackupMessage, BackupMessageContent, BackupQualifiedId} from '../CPB.library';
+import {BackupDateTime, BackupMessage, BackupMessageContent, BackupQualifiedId} from '../cpb.library';
 
 type BackupMessageOptions = {
   readonly content: BackupMessageContent;

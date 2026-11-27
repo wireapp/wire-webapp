@@ -30,7 +30,7 @@ import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 
 import {ContentMessage} from '../../../../../../repositories/entity/message/contentMessage';
 import {FileAsset} from '../../../../../../repositories/entity/message/fileAsset';
-import {TeamState} from '../../../../../../repositories/team/TeamState';
+import {TeamState} from '../../../../../../repositories/team/teamState';
 import {StatusType} from '../../../../../../message/statusType';
 import {
   createRootContextValueForTest,

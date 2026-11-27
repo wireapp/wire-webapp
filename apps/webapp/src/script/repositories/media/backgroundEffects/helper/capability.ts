@@ -19,7 +19,7 @@
 
 import {isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 
-import {Runtime} from '../../../../commons/util/Runtime';
+import {Runtime} from '../../../../commons/util/runtime';
 import type {CapabilityInfo} from '../backgroundEffectsWorkerTypes';
 
 export function isDocumentAvailable(): boolean {

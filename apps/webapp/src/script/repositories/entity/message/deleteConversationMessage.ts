@@ -24,7 +24,7 @@ import {SystemMessage} from './systemMessage';
 import {TEAM_EVENT} from '../../../apiClient/event/teamEvent';
 import {SystemMessageType} from '../../../message/systemMessageType';
 import {type Translate} from '../../../util/localizerUtil';
-import type {Conversation} from '../Conversation';
+import type {Conversation} from '../conversation';
 
 export class DeleteConversationMessage extends SystemMessage {
   constructor(conversationEntity: Conversation, translate: Translate) {

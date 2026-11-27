@@ -24,11 +24,11 @@ import {Maybe} from 'true-myth';
 import {MessageIcon, IconInfo, Link as LinkStyles} from './e2eiVerificationMessage.styles';
 
 import type {QualifiedId} from '../../../../apiClient/user/qualifiedId';
-import {Config} from '../../../../Config';
+import {Config} from '../../../../config';
 import {E2EIHandler} from '../../../../e2eIdentity';
 import {E2EIVerificationMessageType} from '../../../../message/e2eiVerificationMessageType';
 import {useApplicationContext} from '../../../../page/rootProvider';
-import {Conversation} from '../../../../repositories/entity/Conversation';
+import {Conversation} from '../../../../repositories/entity/conversation';
 import {E2EIVerificationMessage as E2EIVerificationMessageEntity} from '../../../../repositories/entity/message/e2eiVerificationMessage';
 import {MLSVerified} from '../../../../uiKit/dataDisplay/icon/mlsVerified';
 import {Link, LinkVariant} from '../../../../uiKit/typography/link/link';

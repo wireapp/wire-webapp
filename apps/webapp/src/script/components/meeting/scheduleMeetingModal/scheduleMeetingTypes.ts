@@ -19,7 +19,7 @@
 
 import type {Maybe} from 'true-myth';
 
-import type {User} from '../../../repositories/entity/User';
+import type {User} from '../../../repositories/entity/user';
 import type {MeetingPasswordErrorKey} from '../shared/validation/meetingPasswordValidation';
 
 export const scheduleMeetingModes = {

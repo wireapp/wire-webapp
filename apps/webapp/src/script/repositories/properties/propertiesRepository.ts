@@ -32,16 +32,16 @@ import {
   NotificationPreference,
   WebappProperties,
 } from '../../apiClient/user/data/userPropertiesSetData';
-import {PrimaryModal} from '../../components/Modals/PrimaryModal';
-import {PrimaryModalType} from '../../components/Modals/PrimaryModal/PrimaryModalTypes';
-import {Config} from '../../Config';
+import {PrimaryModal} from '../../components/modals/primaryModal';
+import {PrimaryModalType} from '../../components/modals/primaryModal/primaryModalTypes';
+import {Config} from '../../config';
 import {Environment} from '../../util/environment';
 import {type Translate} from '../../util/localizerUtil';
 import {getLogger, Logger} from '../../util/logger';
 import {loadValue} from '../../util/storageUtil';
 import {WebAppEvents} from '../../webAppEvents';
-import type {User} from '../entity/User';
-import type {SelfService} from '../self/SelfService';
+import type {User} from '../entity/user';
+import type {SelfService} from '../self/selfService';
 import {StorageKey} from '../storage';
 import {isTelemetryEnabledAtCurrentEnvironment} from '../tracking/telemetry.helpers';
 import {ConsentValue} from '../user/consentValue';

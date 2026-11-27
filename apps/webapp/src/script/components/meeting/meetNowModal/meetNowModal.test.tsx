@@ -29,9 +29,9 @@ import type {MeetingStoreState} from '../meetingStore/createMeetingStore';
 import {MeetingStoreProvider} from '../meetingStore/meetingStoreProvider';
 import {meetingSubmitErrors} from '../meetingSubmitErrors';
 import {MEETING_TITLE_MAX_LENGTH, meetingTitleErrorKeys} from '../shared/validation/meetingTitleValidation';
-import {ConversationState} from '../../../repositories/conversation/ConversationState';
-import {User} from '../../../repositories/entity/User';
-import {TeamState} from '../../../repositories/team/TeamState';
+import {ConversationState} from '../../../repositories/conversation/conversationState';
+import {User} from '../../../repositories/entity/user';
+import {TeamState} from '../../../repositories/team/teamState';
 import {UserState} from '../../../repositories/user/userState';
 import {withThemeAndRootContext} from '../../../auth/util/test/testUtil';
 import {

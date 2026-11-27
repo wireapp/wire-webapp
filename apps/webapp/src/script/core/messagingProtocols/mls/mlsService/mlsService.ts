@@ -76,7 +76,7 @@ import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
 import {Converter} from '../../../../commons/base64/converter';
 import {Decoder} from '../../../../commons/base64/decoder';
 import {Encoder} from '../../../../commons/base64/encoder';
-import {TypedEventEmitter} from '../../../../commons/TypedEventEmitter/TypedEventEmitter';
+import {TypedEventEmitter} from '../../../../commons/typedEventEmitter/typedEventEmitter';
 import {TimeUtil} from '../../../../commons/util';
 import {getLogger} from '../../../../logger/getLogger';
 import {AddUsersFailure, AddUsersFailureReasons, KeyPackageClaimUser} from '../../../conversation';

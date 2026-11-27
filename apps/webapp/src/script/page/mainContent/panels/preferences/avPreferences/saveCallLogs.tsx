@@ -21,9 +21,9 @@ import type {FunctionComponent} from 'react';
 
 import {container} from 'tsyringe';
 
-import {PrimaryModal} from '../../../../../components/Modals/PrimaryModal';
-import {Config} from '../../../../../Config';
-import type {CallingRepository} from '../../../../../repositories/calling/CallingRepository';
+import {PrimaryModal} from '../../../../../components/modals/primaryModal';
+import {Config} from '../../../../../config';
+import type {CallingRepository} from '../../../../../repositories/calling/callingRepository';
 import {UserState} from '../../../../../repositories/user/userState';
 import {Button, ButtonVariant} from '../../../../../uiKit/inputs/button/button';
 import {getCurrentDate} from '../../../../../util/timeUtil';

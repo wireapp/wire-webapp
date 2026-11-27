@@ -33,7 +33,7 @@ import {
 } from './tabAndFilterSettings.styles';
 
 import * as Icon from '../../../../../components/icon';
-import {Config} from '../../../../../Config';
+import {Config} from '../../../../../config';
 import {Checkbox, CheckboxLabel} from '../../../../../uiKit/inputs/checkbox/checkbox';
 import {TabIndex} from '../../../../../uiKit/utils/enums';
 import {handleEscDown, isEnterKey, isKey, isSpaceKey, KEY} from '../../../../../util/keyboardUtil';

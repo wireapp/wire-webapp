@@ -21,9 +21,9 @@ import {render, fireEvent} from '@testing-library/react';
 import {CONVERSATION_TYPE} from '../../../../../apiClient/conversation/conversation';
 import {CONVERSATION_PROTOCOL} from '../../../../../apiClient/team/feature/featureList.types';
 
-import {Conversation} from '../../../../../repositories/entity/Conversation';
-import {User} from '../../../../../repositories/entity/User';
-import {ServiceEntity} from '../../../../../repositories/integration/ServiceEntity';
+import {Conversation} from '../../../../../repositories/entity/conversation';
+import {User} from '../../../../../repositories/entity/user';
+import {ServiceEntity} from '../../../../../repositories/integration/serviceEntity';
 import {createUuid} from '../../../../../util/uuid';
 import {
   createRootContextValueForTest,

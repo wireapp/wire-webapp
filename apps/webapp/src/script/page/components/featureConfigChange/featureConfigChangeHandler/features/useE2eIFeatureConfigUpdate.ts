@@ -27,8 +27,8 @@ import {FEATURE_KEY, FeatureList} from '../../../../../apiClient/team/feature/fe
 import {
   FeatureUpdateType,
   detectTeamFeatureUpdate,
-} from '../../../../../repositories/team/TeamFeatureConfigChangeDetector/TeamFeatureConfigChangeDetector';
-import {TeamRepository} from '../../../../../repositories/team/TeamRepository';
+} from '../../../../../repositories/team/teamFeatureConfigChangeDetector/teamFeatureConfigChangeDetector';
+import {TeamRepository} from '../../../../../repositories/team/teamRepository';
 
 export function useE2EIFeatureConfigUpdate(teamRepository: TeamRepository, clock: Clock): void {
   useEffect(() => {

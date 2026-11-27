@@ -21,7 +21,7 @@ import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.ty
 
 import {preprocessConversations} from './recordPreprocessors';
 
-import {Conversation} from '../entity/Conversation';
+import {Conversation} from '../entity/conversation';
 import {translateForTest} from '../../util/test/translateForTest';
 
 describe('preprocessConversations', () => {

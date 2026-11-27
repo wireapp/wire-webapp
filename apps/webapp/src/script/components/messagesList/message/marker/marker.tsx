@@ -25,7 +25,7 @@ import {isNull} from '@sindresorhus/is';
 import {dayMarkerStyle, baseMarkerStyle, notVirtualizedMarkerStyle} from './marker.styles';
 import {getMessagesGroupLabel} from './marker.utils';
 
-import {Config} from '../../../../Config';
+import {Config} from '../../../../config';
 import {createRelativeTimestampFormatter, useRelativeTimestamp} from '../../../../hooks/useRelativeTimestamp';
 import {useApplicationContext} from '../../../../page/rootProvider';
 import {TabIndex} from '../../../../uiKit/utils/enums';

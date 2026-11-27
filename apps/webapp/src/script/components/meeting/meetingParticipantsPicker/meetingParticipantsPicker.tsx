@@ -41,12 +41,12 @@ import {isAllowedMeetingParticipant} from './participantPickerUtils';
 import {useMeetingParticipantsPicker} from './useMeetingParticipantsPicker';
 
 import {useApplicationContext} from '../../../page/rootProvider';
-import type {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
-import type {ConversationState} from '../../../repositories/conversation/ConversationState';
-import type {User} from '../../../repositories/entity/User';
+import type {ConversationRepository} from '../../../repositories/conversation/conversationRepository';
+import type {ConversationState} from '../../../repositories/conversation/conversationState';
+import type {User} from '../../../repositories/entity/user';
 import type {SearchRepository} from '../../../repositories/search/searchRepository';
-import type {TeamRepository} from '../../../repositories/team/TeamRepository';
-import type {TeamState} from '../../../repositories/team/TeamState';
+import type {TeamRepository} from '../../../repositories/team/teamRepository';
+import type {TeamState} from '../../../repositories/team/teamState';
 import {ChevronDownIcon} from '../../../uiKit/dataDisplay/icon/chevronDownIcon';
 import {SearchIcon} from '../../../uiKit/dataDisplay/icon/searchIcon';
 import {InputLabel} from '../../../uiKit/inputs/inputLabel/inputLabel';

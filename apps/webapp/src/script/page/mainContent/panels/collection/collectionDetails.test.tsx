@@ -19,7 +19,7 @@
 
 import {render} from '@testing-library/react';
 
-import {Conversation} from '../../../../repositories/entity/Conversation';
+import {Conversation} from '../../../../repositories/entity/conversation';
 import {ContentMessage} from '../../../../repositories/entity/message/contentMessage';
 import {FileAsset} from '../../../../repositories/entity/message/fileAsset';
 import {LinkPreview} from '../../../../repositories/entity/message/linkPreview';

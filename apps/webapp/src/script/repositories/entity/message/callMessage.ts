@@ -24,7 +24,7 @@ import {Message} from './message';
 import {CALL_MESSAGE_TYPE} from '../../../message/callMessageType';
 import {SuperType} from '../../../message/superType';
 import {type Translate} from '../../../util/localizerUtil';
-import type {TERMINATION_REASON} from '../../calling/enum/TerminationReason';
+import type {TERMINATION_REASON} from '../../calling/enum/terminationReason';
 
 export class CallMessage extends Message {
   private readonly call_message_type: CALL_MESSAGE_TYPE;

@@ -24,8 +24,8 @@ import {getCoreCryptoSupport, isCoreCryptoEnabled, type CoreCryptoSupport} from 
 import {startWithCoreCryptoSupport} from './startWithCoreCryptoSupport';
 import {supportsMLS} from './supportsMls';
 
-import {Runtime} from '../commons/util/Runtime';
-import {Config} from '../Config';
+import {Runtime} from '../commons/util/runtime';
+import {Config} from '../config';
 
 /** Compose the preflight without eagerly importing React, localization, or application modules. */
 export async function startBrowserApplication(

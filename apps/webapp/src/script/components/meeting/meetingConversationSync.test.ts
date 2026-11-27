@@ -21,9 +21,9 @@ import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.ty
 import type {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {task} from 'true-myth';
 
-import {Conversation} from '../../repositories/entity/Conversation';
-import type {ConversationRepository} from '../../repositories/conversation/ConversationRepository';
-import {User} from '../../repositories/entity/User';
+import {Conversation} from '../../repositories/entity/conversation';
+import type {ConversationRepository} from '../../repositories/conversation/conversationRepository';
+import {User} from '../../repositories/entity/user';
 import {translateForTest} from '../../util/test/translateForTest';
 import {unwrapErr} from '../../util/test/resultTestSupport';
 

@@ -19,7 +19,7 @@
 
 import {render} from '@testing-library/react';
 
-import {User} from '../../repositories/entity/User';
+import {User} from '../../repositories/entity/user';
 
 import {TemporaryGuestAvatar} from './temporaryGuestAvatar';
 

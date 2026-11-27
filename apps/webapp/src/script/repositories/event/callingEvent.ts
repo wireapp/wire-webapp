@@ -1,0 +1,77 @@
+/*
+ * Wire
+ * Copyright (C) 2023 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {CALL} from './client';
+
+import type {QualifiedUserClients} from '../../apiClient/conversation/qualifiedUserClients';
+import type {QualifiedId} from '../../apiClient/user/qualifiedId';
+import {InCallEmojiType} from '../../core/conversation';
+import {CALL_MESSAGE_TYPE} from '../calling/enum/callMessageType';
+
+interface CallingRemoteMuteEventContentData {
+  targets: QualifiedUserClients;
+}
+
+interface CallingEventContentData {
+  [CALL_MESSAGE_TYPE.REMOTE_MUTE]: CallingRemoteMuteEventContentData;
+  [CALL_MESSAGE_TYPE.EMOJIS]: {};
+  [CALL_MESSAGE_TYPE.HAND_RAISED]: {};
+}
+
+type CallingModeratorEventContent =
+  | {
+      type: CALL_MESSAGE_TYPE.REMOTE_MUTE;
+      version?: string;
+      data: CallingEventContentData[CALL_MESSAGE_TYPE.REMOTE_MUTE];
+      emojis?: InCallEmojiType;
+      isHandUp?: boolean;
+    }
+  | {type: CALL_MESSAGE_TYPE.REMOTE_KICK; version?: string};
+
+type CallingEventContent =
+  | {
+      [EventType in CALL_MESSAGE_TYPE]: EventType extends keyof CallingEventContentData
+        ? {
+            type: EventType;
+            version: string;
+            data: CallingEventContentData[EventType];
+            emojis: InCallEmojiType;
+            isHandUp: boolean;
+          }
+        : EventType extends CALL_MESSAGE_TYPE.SETUP
+          ? {type: EventType; version: string; resp?: boolean; sessid?: string; sdp?: string}
+          : {type: EventType; version: string};
+    }[Exclude<CALL_MESSAGE_TYPE, CallingModeratorEventContent['type']>]
+  | CallingModeratorEventContent;
+
+export interface CallingEvent {
+  /**
+   * content is an object that comes from avs
+   */
+  content: CallingEventContent;
+  targetConversation?: QualifiedId;
+  conversation: string;
+  from: string;
+  qualified_conversation?: QualifiedId;
+  qualified_from?: QualifiedId;
+  sender: string;
+  time?: string;
+  type: CALL;
+  senderClientId?: string;
+}

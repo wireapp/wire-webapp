@@ -30,7 +30,7 @@ import {
   reactionsCountAlignment,
 } from '../../../components/messagesList/message/contentMessage/messageActions/messageReactions/messageReactions.styles';
 import {UserList} from '../../../components/userList';
-import {User} from '../../../repositories/entity/User';
+import {User} from '../../../repositories/entity/user';
 import {ReactionMap} from '../../../repositories/storage';
 import {getEmojiTitleFromEmojiUnicode, getEmojiUnicode} from '../../../util/emojiUtil';
 import {capitalizeFirstChar} from '../../../util/stringUtil';

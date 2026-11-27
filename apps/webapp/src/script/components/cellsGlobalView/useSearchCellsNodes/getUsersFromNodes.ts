@@ -21,7 +21,7 @@ import {isNonEmptyArray} from '@sindresorhus/is';
 import {RestNode} from 'cells-sdk-ts';
 import {isPresent} from 'ts-extras';
 
-import type {User} from '../../../repositories/entity/User';
+import type {User} from '../../../repositories/entity/user';
 import {UserRepository} from '../../../repositories/user/userRepository';
 import {getUserQualifiedIdFromNode} from '../../cells/common/getUserQualifiedIdFromNode/getUserQualifiedIdFromNode';
 
