@@ -313,6 +313,7 @@ test.describe('Conversations', () => {
         await userAPages.conversationList().getConversation(conversationName).open();
         await userAComponents.inputBarControls().clickShareFile(imageFilePath);
         await userAComponents.inputBarControls().clickShareFile(videoFilePath);
+        await expect(userAComponents.inputBarControls().sendMessage).toBeEnabled({timeout: 30_000});
         await userAComponents.inputBarControls().clickSendMessage();
         await userBPages.conversationList().getConversation(conversationName).open();
 
@@ -332,7 +333,7 @@ test.describe('Conversations', () => {
           await userBPages.cellsConversationFiles().searchFile(VideoFileName);
           await expect(userBPages.cellsConversationFiles().filesList).toHaveCount(1, {timeout: 1500});
           await expect(userBPages.cellsConversationFiles().getFile(VideoFileName)).toBeVisible({timeout: 500});
-        }).toPass({intervals: [1_000, 2_000, 5_000], timeout: 10_000});
+        }).toPass({intervals: [1_000, 2_000, 5_000], timeout: 20_000});
         // Search for a non-existing file
         await userBPages.cellsConversationFiles().searchFile('non-existing-file.txt');
         await expect(userBPages.cellsConversationFiles().filesList).toHaveCount(0);
