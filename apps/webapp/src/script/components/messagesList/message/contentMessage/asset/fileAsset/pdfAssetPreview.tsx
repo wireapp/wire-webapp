@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useState, type ReactElement} from 'react';
+import {useEffect, useRef, useState, type ReactElement} from 'react';
 
 import {container} from 'tsyringe';
 
@@ -49,10 +49,10 @@ interface PdfAssetPreviewProps {
 
 const keyLength = 32;
 const maxPreviewSize = 1_048_576;
-const pdfHeaderLength = 1024;
+const pdfHeaderLength = 8;
 const pngSignature = '\x89PNG\r\n\x1a\n';
 const jpegSignature = '\xff\xd8\xff';
-const pdfSignature = '%PDF-';
+const pdfHeaderPattern = /^%PDF-\d\.\d$/;
 
 type PreviewStatus = 'loading' | 'unavailable' | 'success';
 
@@ -71,12 +71,13 @@ const matchesSignature = (bytes: Uint8Array, signature: string): boolean => {
 };
 
 const hasPdfSignature = async (blob: Blob): Promise<boolean> => {
-  if (blob.size === 0) {
+  if (blob.size < pdfHeaderLength) {
     return false;
   }
 
-  const header = new Uint8Array(await readPreviewBlob(blob.slice(0, pdfHeaderLength)));
-  return new TextDecoder().decode(header).includes(pdfSignature);
+  const header = new TextDecoder().decode(await readPreviewBlob(blob.slice(0, pdfHeaderLength)));
+  // Reject prefixed or malformed headers before PDF.js performs full document parsing.
+  return pdfHeaderPattern.test(header);
 };
 
 export const PdfAssetPreview = ({
@@ -102,8 +103,12 @@ export const PdfAssetPreview = ({
   const [thumbnail, setThumbnail] = useState<{resource: AssetRemoteDataType; url: string}>();
   const [failedThumbnailUrl, setFailedThumbnailUrl] = useState<string>();
   const [thumbnailLoadFailed, setThumbnailLoadFailed] = useState(false);
-  const [pdfUrl, setPdfUrl] = useState<string>();
-  const [pdfStatus, setPdfStatus] = useState<PreviewStatus>('loading');
+  const cachedPdfUrl = useRef<{resource: AssetRemoteDataType; url: string} | undefined>(undefined);
+  const [pdfPreview, setPdfPreview] = useState<{
+    resource: AssetRemoteDataType;
+    url?: string;
+    status: PreviewStatus;
+  }>();
 
   useEffect(() => {
     if (hasBeenInView || isOpen) {
@@ -169,21 +174,29 @@ export const PdfAssetPreview = ({
   }, [shouldLoadThumbnail, thumbnailResource, loadAsset]);
 
   useEffect(() => {
-    if (!isOpen) {
+    return () => {
+      const cachedPreview = cachedPdfUrl.current;
+      if (cachedPreview?.resource === originalResource) {
+        URL.revokeObjectURL(cachedPreview.url);
+        cachedPdfUrl.current = undefined;
+      }
+    };
+  }, [originalResource]);
+
+  useEffect(() => {
+    if (!isOpen || cachedPdfUrl.current?.resource === originalResource) {
       return undefined;
     }
 
     let disposed = false;
     let isLoading = true;
-    let objectUrl: string | undefined;
     const pdfResource = createPreviewResource(originalResource);
-    setPdfUrl(undefined);
-    setPdfStatus('loading');
+    setPdfPreview({resource: originalResource, status: 'loading'});
 
     const loadPdf = async (): Promise<void> => {
       try {
         if (pdfResource.otrKey?.length !== keyLength || pdfResource.sha256?.length !== keyLength) {
-          setPdfStatus('unavailable');
+          setPdfPreview({resource: originalResource, status: 'unavailable'});
           return;
         }
 
@@ -192,7 +205,7 @@ export const PdfAssetPreview = ({
           return;
         }
         if (blob === undefined) {
-          setPdfStatus('unavailable');
+          setPdfPreview({resource: originalResource, status: 'unavailable'});
           return;
         }
 
@@ -201,16 +214,16 @@ export const PdfAssetPreview = ({
           return;
         }
         if (!isPdf) {
-          setPdfStatus('unavailable');
+          setPdfPreview({resource: originalResource, status: 'unavailable'});
           return;
         }
 
-        objectUrl = URL.createObjectURL(new Blob([blob], {type: 'application/pdf'}));
-        setPdfUrl(objectUrl);
-        setPdfStatus('success');
+        const url = URL.createObjectURL(new Blob([blob], {type: 'application/pdf'}));
+        cachedPdfUrl.current = {resource: originalResource, url};
+        setPdfPreview({resource: originalResource, url, status: 'success'});
       } catch {
         if (!disposed) {
-          setPdfStatus('unavailable');
+          setPdfPreview({resource: originalResource, status: 'unavailable'});
         }
       } finally {
         isLoading = false;
@@ -223,9 +236,6 @@ export const PdfAssetPreview = ({
       if (isLoading) {
         pdfResource.cancelDownload();
       }
-      if (objectUrl !== undefined) {
-        URL.revokeObjectURL(objectUrl);
-      }
     };
   }, [isOpen, originalResource, loadAsset]);
 
@@ -237,9 +247,8 @@ export const PdfAssetPreview = ({
       setFailedThumbnailUrl(thumbnailUrl);
     }
   };
+  const activePdfPreview = pdfPreview?.resource === originalResource ? pdfPreview : undefined;
   const closePreview = (): void => {
-    setPdfUrl(undefined);
-    setPdfStatus('loading');
     onClose();
   };
 
@@ -266,12 +275,12 @@ export const PdfAssetPreview = ({
         dialogId={id}
         isOpen={isOpen}
         onClose={closePreview}
-        filePreviewUrl={pdfUrl}
+        filePreviewUrl={activePdfPreview?.url}
         fileName={fileName}
         fileExtension={fileExtension}
         senderName={senderName}
         timestamp={timestamp}
-        status={pdfStatus}
+        status={activePdfPreview?.status ?? 'loading'}
         previewType="pdf"
         context="chat"
         onDownload={onDownload}
