@@ -78,9 +78,7 @@ describe('message', () => {
       isMsgElementsFocusable: true,
       isFileShareRestricted: false,
       loadUsersByIdsFromDb: jest.fn().mockResolvedValue([]),
-      getOutboxState: () => {
-        return 'outbox-disabled';
-      },
+      outboxState: undefined,
     };
   });
 

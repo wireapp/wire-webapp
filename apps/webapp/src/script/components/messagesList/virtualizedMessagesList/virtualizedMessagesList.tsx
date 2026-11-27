@@ -47,7 +47,7 @@ import {MessagesListParams} from '../messageList.types';
 import {UploadAssets} from '../uploadAssets';
 import {verticallyCenterMessage} from '../utils/helpers';
 import {filterMessages} from '../utils/messagesFilter';
-import {findFirstPendingMessage} from '../utils/sendingState';
+import {findFirstOutgoingMessage} from '../utils/sendingState';
 import {useConversationReadBoundary} from '../utils/useConversationReadBoundary';
 import {useLoadConversation} from '../utils/useLoadConversation';
 import {useScrollToLastUnreadMessage} from '../utils/useScrollToLastUnreadMessage';
@@ -159,7 +159,7 @@ export const VirtualizedMessagesList: FunctionComponent<Props> = ({
     hasManualUnreadMarker,
   } = useConversationReadBoundary(conversation);
 
-  const firstPendingMessage = offlineNotice === null ? undefined : findFirstPendingMessage(filteredMessages);
+  const firstOutgoingMessage = offlineNotice === null ? undefined : findFirstOutgoingMessage(filteredMessages);
   const groupedMessages = useMemo(() => {
     return groupMessagesBySenderAndTime({
       messages: filteredMessages,
@@ -407,7 +407,7 @@ export const VirtualizedMessagesList: FunctionComponent<Props> = ({
                   index={virtualItem.index}
                   message={item.message}
                   hideHeader={item.shouldGroup}
-                  offlineNotice={item.message === firstPendingMessage ? offlineNotice : null}
+                  offlineNotice={item.message === firstOutgoingMessage ? offlineNotice : null}
                   messageActions={messageActions}
                   conversation={conversation}
                   cancelPendingReadReceiptsForConversation={cancelPendingReadReceiptsForConversation}
@@ -450,7 +450,7 @@ export const VirtualizedMessagesList: FunctionComponent<Props> = ({
           );
         })}
 
-        {offlineNotice !== null && firstPendingMessage === undefined && (
+        {offlineNotice !== null && firstOutgoingMessage === undefined && (
           <div
             key={`offline-notice-${conversation.id}`}
             ref={virtualizer.measureElement}

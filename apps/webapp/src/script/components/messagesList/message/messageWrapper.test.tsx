@@ -105,7 +105,7 @@ const createBaseProps = (
       sendTextWithLinkPreview: jest.fn(),
       retryUploadFile: jest.fn(),
       toggleReaction: jest.fn(),
-      getOutboxState: jest.fn().mockReturnValue('outbox-disabled'),
+      getOutboxState: jest.fn().mockReturnValue(undefined),
     } as any,
     loadUsersByIdsFromDb: jest.fn().mockResolvedValue([]),
     messageActions: {

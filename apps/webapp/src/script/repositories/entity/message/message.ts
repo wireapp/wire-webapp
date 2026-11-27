@@ -480,11 +480,11 @@ export class Message {
     );
   }
 
-  /** `pending` while the message waits to be sent, and `failed` when it could not be sent */
-  sendingState(): 'sent' | 'pending' | 'failed' {
+  /** `outgoing` until the message is sent, whether it waits or a send is in flight; `failed` when it could not be sent */
+  sendingState(): 'sent' | 'outgoing' | 'failed' {
     const status = this.status();
     if (status === StatusType.SENDING) {
-      return 'pending';
+      return 'outgoing';
     }
     if (status === StatusType.FAILED || status === StatusType.FEDERATION_ERROR) {
       return 'failed';

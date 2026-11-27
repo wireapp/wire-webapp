@@ -20,7 +20,7 @@
 /** Structural, so that this module stays out of the import cycle of the message entities */
 type SendingStateMessage = {
   isContent: () => boolean;
-  sendingState: () => 'sent' | 'pending' | 'failed';
+  sendingState: () => 'sent' | 'outgoing' | 'failed';
 };
 
 /** Messages in another sending state than the one before them start a group of their own, with their own header */
@@ -31,11 +31,11 @@ export function startsSendingStateGroup(
   return previousMessage !== undefined && message.sendingState() !== previousMessage.sendingState();
 }
 
-/** The message the offline notice goes above: the first one that waits to be sent */
-export function findFirstPendingMessage<Message extends SendingStateMessage>(
+/** The message the offline notice goes above: the first one that is not sent yet */
+export function findFirstOutgoingMessage<Message extends SendingStateMessage>(
   messages: readonly Message[],
 ): Message | undefined {
   return messages.find(message => {
-    return message.isContent() && message.sendingState() === 'pending';
+    return message.isContent() && message.sendingState() === 'outgoing';
   });
 }

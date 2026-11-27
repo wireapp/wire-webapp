@@ -22,7 +22,7 @@ import {ContentMessage} from '../../../repositories/entity/message/contentMessag
 import {User} from '../../../repositories/entity/User';
 import {translateForTest} from '../../../util/test/translateForTest';
 
-import {findFirstPendingMessage, startsSendingStateGroup} from './sendingState';
+import {findFirstOutgoingMessage, startsSendingStateGroup} from './sendingState';
 import {groupMessagesBySenderAndTime as groupMessages, isMarker} from './messagesGroup';
 import {groupMessagesBySenderAndTime as groupVirtualizedMessages} from './virtualizedMessagesGroup';
 
@@ -97,7 +97,7 @@ describe('sending states of messages', () => {
     });
   });
 
-  describe('finding the first pending message', () => {
+  describe('finding the first outgoing message', () => {
     it('finds the first message that is sending', () => {
       const messages = [
         createMessage('sent', StatusType.SENT, 0),
@@ -106,12 +106,12 @@ describe('sending states of messages', () => {
         createMessage('pending-2', StatusType.SENDING, 3),
       ];
 
-      expect(findFirstPendingMessage(messages)?.id).toBe('pending-1');
+      expect(findFirstOutgoingMessage(messages)?.id).toBe('pending-1');
     });
 
-    it('finds nothing when nothing is pending', () => {
-      expect(findFirstPendingMessage([createMessage('failed', StatusType.FAILED, 0)])).toBeUndefined();
-      expect(findFirstPendingMessage([])).toBeUndefined();
+    it('finds nothing when nothing is outgoing', () => {
+      expect(findFirstOutgoingMessage([createMessage('failed', StatusType.FAILED, 0)])).toBeUndefined();
+      expect(findFirstOutgoingMessage([])).toBeUndefined();
     });
   });
 });

@@ -30,7 +30,7 @@ import {UploadAssets} from './uploadAssets';
 import {filterMessages} from './utils/messagesFilter';
 import {groupMessagesBySenderAndTime, isMarker} from './utils/messagesGroup';
 import {updateScroll, FocusedElement} from './utils/scrollUpdater';
-import {findFirstPendingMessage} from './utils/sendingState';
+import {findFirstOutgoingMessage} from './utils/sendingState';
 import {useConversationReadBoundary} from './utils/useConversationReadBoundary';
 
 import {useRoveFocus} from '../../hooks/useRoveFocus';
@@ -148,7 +148,7 @@ export const MessagesList: FC<MessagesListParams> = ({
   const filteredMessages = filterMessages(allMessages);
   const filteredMessagesLength = filteredMessages.length;
 
-  const firstPendingMessage = offlineNotice === null ? undefined : findFirstPendingMessage(filteredMessages);
+  const firstOutgoingMessage = offlineNotice === null ? undefined : findFirstOutgoingMessage(filteredMessages);
 
   const groupedMessages = groupMessagesBySenderAndTime({
     messages: filteredMessages,
@@ -358,7 +358,7 @@ export const MessagesList: FC<MessagesListParams> = ({
 
               return (
                 <Fragment key={key}>
-                  {message === firstPendingMessage && offlineNotice}
+                  {message === firstOutgoingMessage && offlineNotice}
                   <Message
                     onVisible={visibleCallback}
                     onVisibilityLost={lastMessageInvisibleCallback}
@@ -420,7 +420,7 @@ export const MessagesList: FC<MessagesListParams> = ({
             });
           })}
 
-          {firstPendingMessage === undefined && offlineNotice}
+          {firstOutgoingMessage === undefined && offlineNotice}
 
           <UploadAssets assetRepository={assetRepository} conversationId={conversation.id} />
         </div>

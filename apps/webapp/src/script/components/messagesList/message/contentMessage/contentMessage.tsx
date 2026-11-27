@@ -46,6 +46,7 @@ import {
 import {EphemeralStatusType} from '../../../../message/ephemeralStatusType';
 import {StatusType} from '../../../../message/statusType';
 import {useApplicationContext} from '../../../../page/rootProvider';
+import type {OutboxState} from '../../../../repositories/conversation/outbox/OutboxState';
 import {Conversation} from '../../../../repositories/entity/Conversation';
 import {CompositeMessage} from '../../../../repositories/entity/message/compositeMessage';
 import {ContentMessage} from '../../../../repositories/entity/message/contentMessage';
@@ -82,7 +83,8 @@ export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetS
   is1to1?: boolean;
   isFileShareRestricted: boolean;
   loadUsersByIdsFromDb: (userIds: QualifiedId[]) => Promise<User[]>;
-  getOutboxState: (messageId: string) => 'pending' | 'sending' | 'not-in-outbox' | 'outbox-disabled';
+  /** `undefined` while the outbox doesn't have the message */
+  outboxState: OutboxState | undefined;
 }
 
 /** A message sent at least this long after it was written says when it was written */
@@ -130,7 +132,7 @@ export const ContentMessageComponent: FunctionComponent<ContentMessageProps> = (
   is1to1,
   isFileShareRestricted,
   loadUsersByIdsFromDb,
-  getOutboxState,
+  outboxState,
 }: ContentMessageProps) => {
   const messageRef = useRef<HTMLDivElement | null>(null);
   const {translate, isFeatureToggleEnabled} = useApplicationContext();
@@ -181,7 +183,6 @@ export const ContentMessageComponent: FunctionComponent<ContentMessageProps> = (
   const timeAgo = useRelativeTimestamp(message.timestamp(), false, relativeTimestampFormatter);
 
   const isFailed = [StatusType.FAILED, StatusType.FEDERATION_ERROR].includes(status);
-  const outboxState = getOutboxState(message.id);
   // A message restored after a reload has no outbox state until the outbox started, but it already waits
   const isWaitingForConnection = isOutboxEnabled && status === StatusType.SENDING && outboxState !== 'sending';
   const isPendingInOutbox = outboxState === 'pending' && status === StatusType.SENDING;

@@ -515,14 +515,14 @@ describe('MessageRepository.getOutboxState', () => {
     ['queued', 'pending'],
     ['on-hold', 'pending'],
     ['in-progress', 'sending'],
-    ['dead-lettered', 'not-in-outbox'],
-    ['succeeded', 'not-in-outbox'],
-    [undefined, 'not-in-outbox'],
+    ['dead-lettered', undefined],
+    ['succeeded', undefined],
+    [undefined, undefined],
   ])('maps the outbox state %s to %s', (outboxState, expected) => {
     expect(buildWithFoundOperation(outboxState).getOutboxState('message-id')).toBe(expected);
   });
 
-  it('answers outbox-disabled without an outbox', () => {
-    expect(buildMessageRepository().getOutboxState('message-id')).toBe('outbox-disabled');
+  it('has no outbox state without an outbox', () => {
+    expect(buildMessageRepository().getOutboxState('message-id')).toBeUndefined();
   });
 });

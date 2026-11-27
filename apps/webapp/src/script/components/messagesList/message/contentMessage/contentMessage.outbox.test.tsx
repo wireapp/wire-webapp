@@ -96,9 +96,7 @@ describe.each([THEME_ID.LIGHT, THEME_ID.DARK])('content message with the outbox 
       isMsgElementsFocusable: true,
       isFileShareRestricted: false,
       loadUsersByIdsFromDb: jest.fn().mockResolvedValue([]),
-      getOutboxState: () => {
-        return 'pending';
-      },
+      outboxState: 'pending',
     };
   });
 
@@ -114,15 +112,9 @@ describe.each([THEME_ID.LIGHT, THEME_ID.DARK])('content message with the outbox 
     it('shows the clock for a message restored after a reload, before the outbox knows it', () => {
       message.status(StatusType.SENDING);
 
-      const {getByRole} = render(
-        <ContentMessageComponent
-          {...params}
-          getOutboxState={() => {
-            return 'not-in-outbox';
-          }}
-        />,
-        {wrapper: createWrapper(true)},
-      );
+      const {getByRole} = render(<ContentMessageComponent {...params} outboxState={undefined} />, {
+        wrapper: createWrapper(true),
+      });
 
       expect(getByRole('img', {name: 'outboxWaitingForConnection'})).toBeInTheDocument();
     });
@@ -130,15 +122,9 @@ describe.each([THEME_ID.LIGHT, THEME_ID.DARK])('content message with the outbox 
     it('shows no clock while the send is in flight', () => {
       message.status(StatusType.SENDING);
 
-      const {queryByRole} = render(
-        <ContentMessageComponent
-          {...params}
-          getOutboxState={() => {
-            return 'sending';
-          }}
-        />,
-        {wrapper: createWrapper(true)},
-      );
+      const {queryByRole} = render(<ContentMessageComponent {...params} outboxState="sending" />, {
+        wrapper: createWrapper(true),
+      });
 
       expect(queryByRole('img', {name: 'outboxWaitingForConnection'})).not.toBeInTheDocument();
     });
@@ -280,15 +266,9 @@ describe.each([THEME_ID.LIGHT, THEME_ID.DARK])('content message with the outbox 
     it('offers neither while the send is in flight', () => {
       message.status(StatusType.SENDING);
 
-      const {container} = render(
-        <ContentMessageComponent
-          {...params}
-          getOutboxState={() => {
-            return 'sending';
-          }}
-        />,
-        {wrapper: createWrapper(true)},
-      );
+      const {container} = render(<ContentMessageComponent {...params} outboxState="sending" />, {
+        wrapper: createWrapper(true),
+      });
 
       expect(replyButton(container)).not.toBeInTheDocument();
     });
@@ -296,15 +276,9 @@ describe.each([THEME_ID.LIGHT, THEME_ID.DARK])('content message with the outbox 
     it('offers neither on a sending message with the toggle off', () => {
       message.status(StatusType.SENDING);
 
-      const {container} = render(
-        <ContentMessageComponent
-          {...params}
-          getOutboxState={() => {
-            return 'outbox-disabled';
-          }}
-        />,
-        {wrapper: createWrapper(false)},
-      );
+      const {container} = render(<ContentMessageComponent {...params} outboxState={undefined} />, {
+        wrapper: createWrapper(false),
+      });
 
       expect(replyButton(container)).not.toBeInTheDocument();
     });

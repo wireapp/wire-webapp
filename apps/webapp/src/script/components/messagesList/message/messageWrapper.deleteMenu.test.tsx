@@ -64,7 +64,10 @@ const renderMenu = (isOutboxEnabled: boolean, isNeverAttempted: boolean): Setup 
   self.isMe = true;
   message.user(self);
 
-  const messageRepository = {isPendingAndNeverAttempted: jest.fn().mockReturnValue(isNeverAttempted)};
+  const messageRepository = {
+    getOutboxState: jest.fn(),
+    isPendingAndNeverAttempted: jest.fn().mockReturnValue(isNeverAttempted),
+  };
   const messageActions = {deleteMessage: jest.fn(), deleteMessageEveryone: jest.fn()};
   const props = {
     conversation,

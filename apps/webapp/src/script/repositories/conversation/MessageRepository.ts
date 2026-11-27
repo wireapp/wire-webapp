@@ -69,6 +69,7 @@ import {
   type StoredMention,
   type TextMessagePayload as OutboxTextPayload,
 } from './outbox/messageOutboxTypes';
+import type {OutboxState} from './outbox/OutboxState';
 
 import {AssetAuditData} from '../../apiClient/asset/assetApi';
 import {MessageSendingStatus} from '../../apiClient/conversation/messageSendingStatus';
@@ -3229,30 +3230,14 @@ export class MessageRepository {
     return attempts > 0 || ((payload.type === 'text' || payload.type === 'asset') && payload.mayBeDelivered === true);
   }
 
-  // Pending state of a message
+  // Outbox state of a message
 
-  /**
-   * `pending` while the message waits to be sent, `sending` while a send is in flight, `not-in-outbox` when the
-   * outbox doesn't have the message, and `outbox-disabled` when there is no outbox.
-   */
-  public getOutboxState(messageId: string): 'pending' | 'sending' | 'not-in-outbox' | 'outbox-disabled' {
+  /** `undefined` when there is no outbox, or the outbox doesn't have the message */
+  public getOutboxState(messageId: string): OutboxState | undefined {
     if (this.outbox === undefined) {
-      return 'outbox-disabled';
+      return undefined;
     }
-    return this.pendingStateOf(this.findPendingMessage(messageId));
-  }
-
-  /** A message that waits and was never attempted reached nobody, so it can't be deleted for everyone. */
-  public isPendingAndNeverAttempted(messageId: string): boolean {
-    if (this.outbox === undefined) {
-      return false;
-    }
-    const pending = this.findPendingMessage(messageId);
-    return pending !== undefined && this.pendingStateOf(pending) === 'pending' && !this.isUnconfirmed(pending);
-  }
-
-  private pendingStateOf(pending: OperationView<MessagePayload> | undefined): 'pending' | 'sending' | 'not-in-outbox' {
-    return match(pending?.state)
+    return match(this.findPendingMessage(messageId)?.state)
       .with('queued', 'on-hold', () => {
         return 'pending' as const;
       })
@@ -3260,8 +3245,17 @@ export class MessageRepository {
         return 'sending' as const;
       })
       .otherwise(() => {
-        return 'not-in-outbox' as const;
+        return undefined;
       });
+  }
+
+  /** A message that waits and was never attempted reached nobody, so it can't be deleted for everyone. */
+  public isPendingAndNeverAttempted(messageId: string): boolean {
+    if (this.getOutboxState(messageId) !== 'pending') {
+      return false;
+    }
+    const pending = this.findPendingMessage(messageId);
+    return pending !== undefined && !this.isUnconfirmed(pending);
   }
 
   // Shared by the kinds

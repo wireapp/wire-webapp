@@ -263,9 +263,7 @@ export const MessageWrapper: FunctionComponent<MessageParams> = ({
         is1to1={conversation.is1to1()}
         isFileShareRestricted={isFileShareRestricted}
         loadUsersByIdsFromDb={loadUsersByIdsFromDb}
-        getOutboxState={messageId => {
-          return messageRepository.getOutboxState(messageId);
-        }}
+        outboxState={messageRepository.getOutboxState(message.id)}
       />
     );
   }
