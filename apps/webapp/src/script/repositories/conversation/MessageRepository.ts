@@ -223,9 +223,6 @@ const enum SendAndInjectSendingState {
   QUEUED = 'QUEUED',
 }
 
-/** What a change keeps in its payload to be taken back when it is deleted unsent */
-type PreviousState = {type: 'reactions'; reactions: string} | {type: 'event'; event: StoredEvent};
-
 type SendAndInjectResult = Omit<SendResult, 'state'> & {state: MessageSendingState | SendAndInjectSendingState};
 
 type BackendSendOptions = MessageSendingOptions & {
@@ -293,6 +290,10 @@ function referencedMessageId(payload: MessagePayload): string | undefined {
     default:
       return undefined;
   }
+}
+
+function changeTargetOf(payload: MessageChangePayload): string {
+  return payload.type === 'edit' ? payload.originalMessageId : payload.targetMessageId;
 }
 
 /** An enqueue with the key of a running attempt answers how that attempt ended, whichever way it ended. */
@@ -1998,8 +1999,8 @@ export class MessageRepository {
           attempt: this.attemptReceiptOperation,
         }),
       ),
-      // A change to a message that was sent is forgotten when it can't go out, and the local change stays. Nothing
-      // shows whether it went through, so one made during a connectivity drop isn't worth sending much later.
+      // A change to a message that was sent is forgotten when it can't go out, and the local change is taken back.
+      // Nothing shows whether it went through, so one made during a connectivity drop isn't worth sending much later.
       messageChange: handleOf(
         this.outbox.register({
           name: 'message-change',
@@ -2724,10 +2725,17 @@ export class MessageRepository {
     reactions: ReactionType,
   ): Promise<SendAndInjectResult> {
     const reaction = MessageBuilder.buildReactionMessage({originalMessageId: message.id, type: reactions});
+    const payload: Extract<MessageChangePayload, {type: 'reaction'}> = {
+      type: 'reaction',
+      conversationId: conversation.qualifiedId,
+      targetMessageId: message.id,
+      reactions,
+    };
     const reactionsBefore = this.reactionsOfSelf(message);
     const outcome = await this.enqueueChange(
-      {type: 'reaction', conversationId: conversation.qualifiedId, targetMessageId: message.id, reactions},
-      reactionsBefore === undefined ? undefined : {type: 'reactions', reactions: reactionsBefore},
+      reactionsBefore === undefined
+        ? payload
+        : {...payload, previousReactions: this.unsentReactionBase(messageCorrelationKey(payload)) ?? reactionsBefore},
     );
     if (!this.isAccepted(outcome)) {
       return {id: reaction.messageId, sentAt: new Date().toISOString(), state: SendAndInjectSendingState.FAILED};
@@ -2828,18 +2836,20 @@ export class MessageRepository {
       })
       .flat()
       .filter(Boolean);
+    const payload: OutboxEditPayload = {
+      type: 'edit',
+      conversationId: conversation.qualifiedId,
+      originalMessageId: originalMessage.id,
+      messageId: createUuid(),
+      text: textMessage,
+      mentions: this.toStoredMentions(mentions),
+      attachments: isNonEmptyArray(attachments) ? attachments : undefined,
+    };
     const shownEvent = await this.eventService.loadEvent(conversation.id, originalMessage.id);
     const outcome = await this.enqueueChange(
-      {
-        type: 'edit',
-        conversationId: conversation.qualifiedId,
-        originalMessageId: originalMessage.id,
-        messageId: createUuid(),
-        text: textMessage,
-        mentions: this.toStoredMentions(mentions),
-        attachments: isNonEmptyArray(attachments) ? attachments : undefined,
-      },
-      shownEvent === undefined ? undefined : {type: 'event', event: shownEvent},
+      shownEvent === undefined
+        ? payload
+        : {...payload, previousEvent: this.unsentEditBase(payload, shownEvent) ?? shownEvent},
     );
     this.isAccepted(outcome);
     return outcome;
@@ -2920,8 +2930,9 @@ export class MessageRepository {
     }
     if (pending === undefined || !isDeletable || this.isUnconfirmed(pending)) {
       const shownEvent = await this.eventService.loadEvent(conversation.id, message.id);
-      const previous = shownEvent === undefined ? undefined : ({type: 'event', event: shownEvent} as const);
-      const removalResult = await this.enqueueChange(removal, previous);
+      const removalResult = await this.enqueueChange(
+        shownEvent === undefined ? removal : {...removal, removedEvent: shownEvent},
+      );
       this.isAccepted(removalResult);
       if (this.isOutboxUnavailable(removalResult)) {
         this.logger.warn('The message stays, because the outbox could not save its removal');
@@ -2932,35 +2943,9 @@ export class MessageRepository {
   }
 
   /**
-   * The payload with what it takes to take the change back when it is deleted unsent. A change that replaces one
-   * still unsent keeps what the first one would take back to.
-   */
-  private withPreviousState(
-    payload: MessageChangePayload,
-    correlationKey: string,
-    previous: PreviousState | undefined,
-  ): MessageChangePayload {
-    if (previous === undefined) {
-      return payload;
-    }
-    switch (payload.type) {
-      case 'reaction':
-        return previous.type === 'reactions'
-          ? {...payload, previousReactions: this.unsentReactionBase(correlationKey) ?? previous.reactions}
-          : payload;
-      case 'edit':
-        return previous.type === 'event'
-          ? {...payload, previousEvent: this.unsentEditBase(payload, previous.event) ?? previous.event}
-          : payload;
-      case 'delete':
-      case 'hide':
-        return previous.type === 'event' ? {...payload, removedEvent: previous.event} : payload;
-    }
-  }
-
-  /**
-   * What the message was before the edits that still wait to be sent: the first of them has it. A later edit is of
-   * the message the earlier one made, or of the same message when the first one was replaced.
+   * What the message was before the edits that still wait to be sent: the first of them has it, and a later edit that
+   * replaces it takes it back to the same. A later edit is of the message the earlier one made, or of the same
+   * message when the first one was replaced.
    */
   private unsentEditBase(payload: OutboxEditPayload, shownEvent: StoredEvent): StoredEvent | undefined {
     const replacedMessageId = (shownEvent as {data?: {replacing_message_id?: string}}).data?.replacing_message_id;
@@ -3020,7 +3005,7 @@ export class MessageRepository {
 
   /**
    * The message of a change is never shown as failed. A change that can't go out, or that the user declines to send,
-   * is deleted, and the optimistic change stays local.
+   * is deleted, and the optimistic change is taken back.
    */
   private readonly attemptChangeOperation = async ({
     payload,
@@ -3093,9 +3078,13 @@ export class MessageRepository {
       return;
     }
     if (state === 'deleted') {
-      this.activeFireAndForgetInvoker.fireAndForget(() => {
-        return this.takeBackUnsentChange(conversation, payload);
-      });
+      // Only the deletion of a message deletes a change while the outbox still has the change's target, and the target
+      // goes right after its changes, so there is nothing left to take the change back on.
+      if (this.findPendingMessage(changeTargetOf(payload)) === undefined) {
+        this.activeFireAndForgetInvoker.fireAndForget(() => {
+          return this.takeBackUnsentChange(conversation, payload);
+        });
+      }
       return;
     }
     if (payload.type === 'edit' && state === 'queued') {
@@ -3453,25 +3442,20 @@ export class MessageRepository {
   /**
    * A change goes behind its target in the lane of messages while the outbox still has the target, or an earlier
    * change to it, so that the change fails with its target. Every other change goes to the lane of changes, which
-   * pending messages never block. A hide always goes there, because it is sent to the self conversations. Only a
-   * change in the lane of changes keeps what it takes to take it back, because only that lane gives changes up.
+   * pending messages never block. A hide always goes there, because it is sent to the self conversations.
    */
-  private async enqueueChange(
-    payload: MessageChangePayload,
-    previous?: PreviousState,
-  ): Promise<EnqueueOutcome<unknown>> {
+  private async enqueueChange(payload: MessageChangePayload): Promise<EnqueueOutcome<unknown>> {
     const correlationKey = messageCorrelationKey(payload);
-    const targetMessageId = payload.type === 'edit' ? payload.originalMessageId : payload.targetMessageId;
+    const targetMessageId = changeTargetOf(payload);
     const followsTarget =
       this.findPendingMessage(targetMessageId) !== undefined || this.findPendingMessage(correlationKey) !== undefined;
     const enqueueInLaneOfChanges = (): Promise<EnqueueOutcome<unknown>> => {
-      const request = {
-        payload: this.withPreviousState(payload, correlationKey, previous),
-        correlationKey,
-        laneKey: laneOfChanges(payload.conversationId),
-      };
       const enqueueRequest = (): Promise<EnqueueOutcome<unknown>> => {
-        return this.outboxKinds.messageChange.enqueue(request);
+        return this.outboxKinds.messageChange.enqueue({
+          payload,
+          correlationKey,
+          laneKey: laneOfChanges(payload.conversationId),
+        });
       };
       // A running attempt of the change sent an older payload.
       return this.enqueueAgainIfAttemptEnded(enqueueRequest, enqueueRequest);

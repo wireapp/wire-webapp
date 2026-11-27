@@ -80,7 +80,7 @@ const reactionSchema = z.object({
   targetMessageId: messageIdSchema,
   /** The final reactions of the self user, comma separated; empty when all were taken back */
   reactions: z.string(),
-  /** What they were before this reaction, for putting them back when it is deleted unsent; set for changes only */
+  /** What they were before this reaction, for putting them back when it is deleted unsent */
   previousReactions: z.string().optional(),
 });
 
@@ -92,7 +92,7 @@ const editSchema = z.object({
   text: z.string(),
   mentions: z.array(mentionSchema),
   attachments: attachmentsSchema.optional(),
-  /** The record of the message before this edit, for showing it again when the edit is deleted unsent; set for changes only */
+  /** The record of the message before this edit, for showing it again when the edit is deleted unsent */
   previousEvent: storedEventSchema.optional(),
 });
 
@@ -100,7 +100,7 @@ const deleteSchema = z.object({
   type: z.literal('delete'),
   conversationId: conversationIdSchema,
   targetMessageId: messageIdSchema,
-  /** The record of the message, for showing it again when the deletion is deleted unsent; set for changes only */
+  /** The record of the message, for showing it again when the deletion is deleted unsent */
   removedEvent: storedEventSchema.optional(),
 });
 

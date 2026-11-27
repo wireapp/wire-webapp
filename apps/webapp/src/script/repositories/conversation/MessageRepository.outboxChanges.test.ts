@@ -40,7 +40,7 @@ import {
   sentResult,
   type OutboxRepository,
 } from './outbox/testing/createOutboxRepository';
-import {deletePayload, editPayload} from './outbox/testing/payloadFactories';
+import {deletePayload, editPayload, reactionPayload} from './outbox/testing/payloadFactories';
 
 const CONVERSATION_ID = {id: 'conversation-1', domain: 'wire.test'};
 const MESSAGES_LANE = `${CONVERSATION_ID.id}@${CONVERSATION_ID.domain}`;
@@ -142,6 +142,7 @@ describe('MessageRepository routes changes through the outbox', () => {
             conversationId: CONVERSATION_ID,
             targetMessageId: 'message-1',
             reactions: '❤️',
+            previousReactions: '',
           },
         }),
       );
@@ -1048,6 +1049,27 @@ describe('MessageRepository routes changes through the outbox', () => {
 
       expect(parts.injectEvent).not.toHaveBeenCalled();
       expect(undone).not.toHaveBeenCalled();
+    });
+
+    it('leaves a change alone that is deleted with its pending message', async () => {
+      seedMessage(parts, {messageId: 'message-1'});
+      parts.store.seed(
+        createStoredSnapshot({
+          kind: 'message-change',
+          id: 'operation-reaction',
+          correlation: {state: 'correlated', correlationKey: 'message-1:reaction'},
+          lane: {state: 'in-lane', laneKey: CHANGES_LANE},
+          payload: reactionPayload({targetMessageId: 'message-1', reactions: '👍', previousReactions: ''}),
+          expiry: {state: 'expires-at', serverTime: 1_000_000 + TIME_IN_MILLIS.MINUTE},
+        }),
+      );
+      await startOutbox(parts);
+
+      await parts.repository.deleteMessage(parts.conversation, createMessage(parts, 'message-1'));
+      await parts.clock.settle();
+
+      expect(parts.outbox.findByCorrelationKey('message-1:reaction').outcome).toBe('operation-not-found');
+      expect(parts.injectEvent).not.toHaveBeenCalled();
     });
 
     it('tells the listeners of the change that was undone, until they stop listening', async () => {

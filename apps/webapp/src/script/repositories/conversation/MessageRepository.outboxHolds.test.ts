@@ -309,6 +309,22 @@ describe('the holds of MessageRepository', () => {
       });
     });
 
+    it('takes back a change the user declines to send', async () => {
+      const undone = jest.fn();
+      parts.repository.onChangeUndone(undone);
+      const removedEvent = {id: 'message-1', data: {content: 'old'}};
+      await parts.kit.start();
+      parts.degrade(parts.conversation);
+      await changeOf(deletePayload({removedEvent}))(parts);
+      await parts.kit.clock.settle();
+
+      await parts.prompts[0].answer(false);
+      await parts.kit.clock.settle();
+
+      expect(parts.injectEvent).toHaveBeenCalledWith(removedEvent);
+      expect(undone).toHaveBeenCalledWith('delete');
+    });
+
     it('sends a confirmation without a prompt, even when the conversation is degraded', async () => {
       await parts.kit.start();
       parts.degrade(parts.conversation);
