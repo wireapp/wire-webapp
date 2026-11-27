@@ -24,7 +24,20 @@ import {MentionEntity} from '../../../../../message/mentionEntity';
 import {User} from '../../../../../repositories/entity/User';
 import {MentionNode} from '../nodes/mentionNode';
 
-export const parseMentions = (editor: LexicalEditor, textValue: string, mentions: User[]): MentionEntity[] => {
+/**
+ * Maps the mention nodes in the editor to mention entities.
+ *
+ * @param editor The editor
+ * @param textValue The text of the message
+ * @param mentions The users who can be mentioned
+ * @param isEveryoneMentionAvailable Whether mentions of everyone (`@all`) can be sent. When not, they are sent as plain text.
+ */
+export const parseMentions = (
+  editor: LexicalEditor,
+  textValue: string,
+  mentions: User[],
+  isEveryoneMentionAvailable = false,
+): MentionEntity[] => {
   const editorMentions = editor.getEditorState().read(() => {
     return (
       $nodesOfType(MentionNode)
@@ -34,19 +47,27 @@ export const parseMentions = (editor: LexicalEditor, textValue: string, mentions
           return m1.isBefore(m2) ? -1 : 1;
         })
         .map(node => {
-          return node.getValue();
+          return {isEveryone: node.isEveryone(), value: node.getValue()};
         })
     );
   });
   let position = -1;
 
-  return editorMentions.flatMap(mention => {
-    const mentionPosition = textValue.indexOf(`@${mention}`, position + 1);
+  return editorMentions.flatMap(({isEveryone, value}) => {
+    const mentionPosition = textValue.indexOf(`@${value}`, position + 1);
+    position = mentionPosition;
+
+    if (isEveryone) {
+      // A mention of everyone carries no user, so it is never looked up by name
+      return isEveryoneMentionAvailable && mentionPosition !== -1
+        ? [MentionEntity.everyone(mentionPosition, value.length + 1)]
+        : [];
+    }
+
     const mentionOption = mentions.find(user => {
-      return user.name() === mention;
+      return user.name() === value;
     });
 
-    position = mentionPosition;
     return !isNullOrUndefined(mentionOption) ? [createMentionEntity(mentionOption, mentionPosition)] : [];
   });
 };
