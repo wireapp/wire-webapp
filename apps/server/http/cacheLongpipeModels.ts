@@ -17,21 +17,16 @@
  *
  */
 
-import {SELFIE_MULTICLASS_MODEL_PATH, SELFIE_SEGMENTER_MODEL_PATH} from './pipe/options';
+import type {RequestHandler} from 'express';
 
-import {BackgroundEffectsQuality} from '../useBackgroundEffectsStore';
-
-export const qualityTierFromModel = (modelPath: string, enhancePerformance: boolean): BackgroundEffectsQuality => {
-  if (modelPath === SELFIE_MULTICLASS_MODEL_PATH) {
-    return 'privacy';
-  }
-
-  return enhancePerformance ? 'performance' : 'balanced';
-};
-
-export const deriveModelConfig = (tier: BackgroundEffectsQuality): {modelPath: string; enhancePerformance: boolean} => {
-  return {
-    modelPath: tier === 'privacy' ? SELFIE_MULTICLASS_MODEL_PATH : SELFIE_SEGMENTER_MODEL_PATH,
-    enhancePerformance: tier === 'performance',
+// Only versioned weights are immutable. Other assets keep their existing cache policy.
+export const cacheLongpipeModels = (fallback: RequestHandler): RequestHandler => {
+  return (req, res, next) => {
+    if (/^\/assets\/longpipe\/models\/v\d+\.\d+\.\d+\/model_(xs|small|medium|large)(\.f16)?\.bin$/.test(req.path)) {
+      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+      next();
+      return;
+    }
+    fallback(req, res, next);
   };
 };

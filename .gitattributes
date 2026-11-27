@@ -20,3 +20,4 @@
 *.onnx binary
 *.pb binary
 *.pt binary
+apps/webapp/assets/longpipe/**/*.bin binary

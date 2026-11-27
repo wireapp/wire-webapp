@@ -64,7 +64,6 @@ import {CallingRepository} from '../../../repositories/calling/CallingRepository
 import {Participant} from '../../../repositories/calling/Participant';
 import {Conversation} from '../../../repositories/entity/Conversation';
 import {User} from '../../../repositories/entity/User';
-import {BackgroundEffectsController} from '../../../repositories/media/backgroundEffects/backgroundEffectsController';
 import {BackgroundEffectsHandler} from '../../../repositories/media/backgroundEffectsHandler';
 import {MediaDevicesHandler} from '../../../repositories/media/MediaDevicesHandler';
 import {
@@ -229,16 +228,11 @@ export const buildMediaDevicesHandler = (): MediaDevicesHandler => {
 };
 
 export const buildCallingRepository = (): CallingRepository => {
-  const controller: BackgroundEffectsController = {
-    getQuality: jest.fn(),
-    getCapabilityInfo: jest.fn(),
-  } as unknown as BackgroundEffectsController;
-  const backgroundEffectsHandler = new BackgroundEffectsHandler(controller);
+  const backgroundEffectsHandler = new BackgroundEffectsHandler();
 
   return {
     getBackgroundEffectsHandler: () => {
       return backgroundEffectsHandler;
     },
-    isSuperhighQualityTierAllowed: jest.fn(),
   } as unknown as CallingRepository;
 };

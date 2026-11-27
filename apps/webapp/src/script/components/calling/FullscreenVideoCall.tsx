@@ -53,7 +53,7 @@ import {CallingViewMode, CallState, MuteState} from '../../repositories/calling/
 import {Participant} from '../../repositories/calling/Participant';
 import type {Grid} from '../../repositories/calling/videoGridHandler';
 import type {Conversation} from '../../repositories/entity/Conversation';
-import {detectCapabilities} from '../../repositories/media/backgroundEffects';
+import {isBackgroundEffectsSupported} from '../../repositories/media/backgroundEffectsSupport';
 import {MediaDevicesHandler} from '../../repositories/media/MediaDevicesHandler';
 import {BackgroundEffectsQuality, useBackgroundEffectsStore} from '../../repositories/media/useBackgroundEffectsStore';
 import type {BackgroundEffectSelection} from '../../repositories/media/VideoBackgroundEffects';
@@ -309,13 +309,13 @@ const FullscreenVideoCall: FunctionComponent<FullscreenVideoCallProps> = ({
 
   const isModerator = !isNullOrUndefined(selfUser) && roles[selfUser.id] === DefaultConversationRoleName.WIRE_ADMIN;
   const backgroundEffectsHandler = callingRepository.getBackgroundEffectsHandler();
-  const isWebGLAvailable = detectCapabilities().webgl2;
+  const isWebGLAvailable = isBackgroundEffectsSupported();
 
   const selectedBackgroundEffect = useBackgroundEffectsStore(state => {
     return state.preferredEffect;
   });
   const backgroundEffectsQuality = useBackgroundEffectsStore(state => {
-    return state.effectiveQualityTier;
+    return state.qualityTier;
   });
 
   const handleBackgroundSidebarSelect = (effect: BackgroundEffectSelection): void => {

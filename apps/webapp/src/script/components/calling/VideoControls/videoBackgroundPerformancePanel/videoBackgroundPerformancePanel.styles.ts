@@ -31,6 +31,8 @@ export const performancePanelStyles = css({
   borderRadius: 12,
   padding: 16,
   minWidth: 220,
+  maxHeight: 'calc(100vh - 88px)',
+  overflowY: 'auto',
   boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
 });
 
@@ -51,10 +53,6 @@ export const performancePanelTitleStyles = css({
 export const performancePanelCloseButtonStyles = css({
   minWidth: 0,
 });
-
-export const performancePanelResetButtonContainerStyles = css({display: 'flex', justifyContent: 'flex-end'});
-
-export const performancePanelResetButtonStyles = css({marginBottom: 0});
 
 export const buttonBaseStyles = css({
   display: 'flex',

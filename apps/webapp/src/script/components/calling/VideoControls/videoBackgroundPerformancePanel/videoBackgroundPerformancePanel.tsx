@@ -17,12 +17,8 @@
  *
  */
 
-import {ReactNode, useCallback, useEffect, useMemo, useState, type FunctionComponent} from 'react';
+import {useEffect, useState, type FunctionComponent} from 'react';
 
-import {isNullOrUndefined} from '@sindresorhus/is';
-import {Maybe} from 'true-myth';
-
-import {areCapabilityInfosEqual} from './capabilityInformationValidator';
 import {
   buttonBaseStyles,
   buttonNeutralStyles,
@@ -33,250 +29,249 @@ import {
   performancePanelCloseButtonStyles,
   performancePanelContainerStyles,
   performancePanelHeaderStyles,
-  performancePanelResetButtonContainerStyles,
-  performancePanelResetButtonStyles,
   performancePanelStyles,
   performancePanelTitleStyles,
 } from './videoBackgroundPerformancePanel.styles';
 
 import {useApplicationContext} from '../../../../page/rootProvider';
-import {QualityMode} from '../../../../repositories/media/backgroundEffects';
-import {CapabilityInfo} from '../../../../repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
 import type {BackgroundEffectsHandler} from '../../../../repositories/media/backgroundEffectsHandler';
-import {RenderMetrics, useBackgroundEffectsStore} from '../../../../repositories/media/useBackgroundEffectsStore';
+import type {QualityMode} from '../../../../repositories/media/backgroundEffectsResolution';
+import type {FrameSize} from '../../../../repositories/media/longpipeBackgroundEffects';
+import {useBackgroundEffectsStore} from '../../../../repositories/media/useBackgroundEffectsStore';
 import {CloseIcon} from '../../../../uiKit/dataDisplay/icon/closeIcon';
-import {Button, ButtonVariant} from '../../../../uiKit/inputs/button/button';
-import {Option, Select} from '../../../../uiKit/inputs/select/select';
+import {Select} from '../../../../uiKit/inputs/select/select';
 
 type PerformancePanelProps = {
   backgroundEffectsHandler: BackgroundEffectsHandler;
 };
 
-const QUALITY_OPTIONS: readonly QualityMode[] = ['auto', 'fhd', 'hd', 'qhd', 'nhd', 'bypass'];
+const QUALITY_OPTIONS: readonly QualityMode[] = ['auto', 'fhd', 'hd', 'qhd', 'nhd'];
+const POLLING_INTERVAL_MS = 1000;
+const qualityOptions = QUALITY_OPTIONS.map(value => {
+  return {label: value.toUpperCase(), value};
+});
 
-const formatMs = (value?: number | null): string => {
-  return typeof value === 'number' ? `${value.toFixed(1)} ms` : '-';
+const formatValue = (value: string | number | boolean | null | undefined, unit = ''): string => {
+  if (value === null || value === undefined) {
+    return '–';
+  }
+  return `${typeof value === 'number' ? value.toFixed(1) : String(value)}${unit}`;
 };
 
-const formatPercent = (value?: number | null): string => {
-  return typeof value === 'number' ? `${value.toFixed(1)} %` : '-';
+const formatFrameSize = (size: FrameSize | null | undefined): string | null => {
+  return size === undefined || size === null ? null : `${size.width} × ${size.height} px`;
 };
 
-const formatValue = (value?: string | number | null): string => {
-  return value === null || value === undefined || value === '' ? '-' : String(value);
-};
-
-type GetMetricRowsResult = never[] | {label: string; value: string}[];
-const getMetricRows = (renderMetrics: RenderMetrics): GetMetricRowsResult => {
-  return Maybe.of(renderMetrics)
-    .map(metrics => {
-      return [
-        {label: 'Quality', value: formatValue(metrics.tier).toUpperCase()},
-        {label: 'Total', value: formatMs(metrics.avgTotalMs)},
-        {label: 'Segmentation', value: formatMs(metrics.avgSegmentationMs)},
-        {label: 'GPU', value: formatMs(metrics.avgGpuMs)},
-        {label: 'Budget', value: formatMs(metrics.budget)},
-        {label: 'ML delegate type', value: formatValue(metrics.ml)},
-        {label: 'Utilization', value: formatPercent(metrics.utilShare)},
-        {label: 'ML', value: formatPercent(metrics.mlShare)},
-        {label: 'WebGL', value: formatPercent(metrics.webglShare)},
-        {
-          label: 'Delegate',
-          value: formatValue(metrics.segmentationDelegate),
-        },
-        {label: 'Dropped', value: formatValue(metrics.droppedFrames)},
-      ];
-    })
-    .unwrapOr([]);
-};
-
-type GetCapabilityRowsResult = never[] | {label: string; value: string}[];
-const getCapabilityRows = (capabilityInfo: CapabilityInfo | null | undefined): GetCapabilityRowsResult => {
-  return Maybe.of(capabilityInfo)
-    .map(info => {
-      return [
-        {label: 'WebGL2', value: info.webgl2 ? '✔' : '✖'},
-        {label: 'Worker', value: info.worker ? '✔' : '✖'},
-        {label: 'OffscreenCanvas', value: info.offscreenCanvas ? '✔' : '✖'},
-        {label: 'VideoFrameCallback', value: info.requestVideoFrameCallback ? '✔' : '✖'},
-      ];
-    })
-    .unwrapOr([]);
-};
-
-type MetricRowProps = {
-  label: string;
-  value: ReactNode;
-};
-
-type MetricsDisplayProps = {
-  readonly capabilityInfo: CapabilityInfo;
-};
-
-const MetricRow: FunctionComponent<MetricRowProps> = ({label, value}: MetricRowProps) => {
-  return (
-    <div css={metricsRowStyles}>
-      <span css={metricsLabelStyles}>{label}</span>
-      <span css={metricsValueStyles}>{value}</span>
-    </div>
-  );
-};
-
-const POLLING_INTERVAL = 500;
-
-const MetricsDisplay: FunctionComponent<MetricsDisplayProps> = ({capabilityInfo}: MetricsDisplayProps) => {
-  const renderMetrics = useBackgroundEffectsStore(state => {
-    return state.metrics;
+const MetricsDisplay: FunctionComponent = () => {
+  const stats = useBackgroundEffectsStore(state => {
+    return state.longpipeStats;
   });
-  const model = useBackgroundEffectsStore(state => {
-    return state.model;
+  const frameSizes = useBackgroundEffectsStore(state => {
+    return state.frameSizes;
   });
-
-  const metricRows = isNullOrUndefined(renderMetrics) ? [] : getMetricRows(renderMetrics);
-
-  const capabilityRows = getCapabilityRows(capabilityInfo);
+  const fpsDiagnostics = useBackgroundEffectsStore(state => {
+    return state.fpsDiagnostics;
+  });
+  const rows = [
+    {
+      label: 'Status',
+      value: stats?.status,
+      description: 'Current pipeline state, such as starting, running, recovering or ended.',
+    },
+    {
+      label: 'Backend',
+      value: stats?.backend,
+      description: 'Graphics backend used for processing: WebGPU or WebGL2. None means no effects backend is active.',
+    },
+    {
+      label: 'Preset',
+      value: stats?.preset,
+      description:
+        'Current model and processing preset, from xs to xl. Adaptive mode can change it as performance changes.',
+    },
+    {
+      label: 'Input resolution',
+      value: formatFrameSize(frameSizes?.input),
+      description:
+        'Actual input frame dimensions reported by the camera track feeding Longpipe. A dash means the browser does not report the dimensions.',
+    },
+    {
+      label: 'Output resolution',
+      value: formatFrameSize(frameSizes?.output),
+      description:
+        'Actual processed video track dimensions reported by the browser. The displayed preview can keep the same size while the pixel resolution changes. A dash means the browser does not report the dimensions.',
+    },
+    {
+      label: 'Requested output',
+      value: formatFrameSize(frameSizes?.requestedOutput),
+      description:
+        'Pixel dimensions requested when creating the current Longpipe output. Compare with Output resolution to check whether the actual track matches the requested size.',
+    },
+    {
+      label: 'FPS',
+      value: stats?.fps,
+      description:
+        'Frames rendered by Longpipe in the last second. This is separate from camera input FPS and the frame rate sent by AVS.',
+    },
+    {
+      label: 'Input FPS',
+      value: stats?.inputFps,
+      description:
+        'Estimated incoming camera frame rate. Falls back to the input track frame-rate setting when frame counters are unavailable.',
+    },
+    {
+      label: 'Capture FPS request',
+      value: fpsDiagnostics?.requestedInputFps,
+      description:
+        'Frame rate requested by the input track constraints (exact, ideal or max). This request may differ from the actual delivered rate.',
+    },
+    {
+      label: 'Input track FPS',
+      value: fpsDiagnostics?.inputTrackFps,
+      description:
+        'The input track.getSettings().frameRate value. Longpipe uses this value when frame counters are unavailable; it is not an independent frame count.',
+    },
+    {
+      label: 'Counted input FPS',
+      value: fpsDiagnostics?.countedInputFps,
+      description:
+        'Frame rate calculated from the change in input track.stats.totalFrames between dashboard samples. A dash means the browser exposes no usable counter or the first sample is still pending.',
+    },
+    {
+      label: 'Input FPS source',
+      value: fpsDiagnostics?.inputFpsSource,
+      description:
+        'Identifies the input data available to Longpipe: track-settings is the fallback without a frame counter, track-counter uses track frame statistics, and video-frame-callback uses presented-frame counts. During counter warm-up Longpipe can still use track settings.',
+    },
+    {
+      label: 'Model FPS',
+      value: stats?.modelFps,
+      description:
+        'In this SDK version, this counts model timing samples in the last second. WebGPU samples every fifth model run, so this is not the actual inference rate.',
+    },
+    {
+      label: 'Model time',
+      value: stats?.modelMs,
+      unit: ' ms',
+      description: 'Median duration of sampled model runs. WebGPU timing samples include a GPU synchronization step.',
+    },
+    {
+      label: 'Display time',
+      value: stats?.displayMs,
+      unit: ' ms',
+      description:
+        'Median time spent submitting rendering work. Asynchronous GPU execution may continue after this measurement.',
+    },
+    {
+      label: 'Latency',
+      value: stats?.latencyMs,
+      unit: ' ms',
+      description:
+        'Internal frame-path latency reported by Longpipe. This is not end-to-end call latency and may not include all asynchronous GPU work.',
+    },
+    {
+      label: 'Skipped',
+      value: stats?.skipped,
+      description:
+        'Cumulative number of skipped full model runs in the current renderer. Intermediate video frames can still be processed; this is not a lost-video-frame counter.',
+    },
+    {
+      label: 'Skip frames',
+      value: stats?.skipFrames,
+      description:
+        'Configured number of frames between full model runs. A value of 1 skips one full model run between inferences; it does not necessarily halve output FPS.',
+    },
+    {
+      label: 'Enabled',
+      value: stats?.enabled,
+      description: 'Whether effect processing is currently enabled.',
+    },
+    {
+      label: 'Input path',
+      value: stats?.inputPath,
+      description:
+        'How camera frames enter the pipeline. mstp means MediaStreamTrackProcessor; rvfc-postmessage uses video-frame callbacks and worker messages.',
+    },
+    {
+      label: 'Output path',
+      value: stats?.outputPath,
+      description:
+        'How processed frames become a video track. mstg means MediaStreamTrackGenerator; other paths use canvas capture.',
+    },
+    {
+      label: 'Restarts',
+      value: stats?.restarts,
+      description:
+        'Internal recovery restarts in the current Longpipe instance. Recreating the pipeline for a resolution change starts a new instance and resets this counter.',
+    },
+  ];
 
   return (
     <div css={metricsListStyles}>
-      <MetricRow label="Model" value={formatValue(model)} />
-      {metricRows.map(row => {
-        return <MetricRow key={row.label} label={row.label} value={row.value} />;
-      })}
-      {capabilityRows.map(row => {
-        return <MetricRow key={row.label} label={row.label} value={row.value} />;
+      <div css={metricsRowStyles}>
+        <strong>Longpipe · getStats()</strong>
+      </div>
+      {rows.map(row => {
+        return (
+          <div key={row.label} css={metricsRowStyles}>
+            <details css={{flex: 1, minWidth: 0, maxWidth: '300px', marginRight: '12px'}}>
+              <summary css={[metricsLabelStyles, {cursor: 'pointer'}]} aria-label={`About ${row.label}`}>
+                {row.label}
+              </summary>
+              <p css={{margin: '6px 0 12px', lineHeight: 1.5}}>{row.description}</p>
+            </details>
+            <span css={metricsValueStyles}>{formatValue(row.value, row.unit)}</span>
+          </div>
+        );
       })}
     </div>
   );
 };
 
-const qualitySelectOptions = QUALITY_OPTIONS.map(option => {
-  return {
-    label: option.toUpperCase(),
-    value: option,
-  };
-});
-
 export const VideoBackgroundPerformancePanel: FunctionComponent<PerformancePanelProps> = ({
   backgroundEffectsHandler,
-}: PerformancePanelProps) => {
+}) => {
   const {translate} = useApplicationContext();
-  const isPerformancePanelEnabled = useBackgroundEffectsStore(state => {
+  const enabled = useBackgroundEffectsStore(state => {
     return state.isPerformancePanelEnabled;
   });
-
-  const [selectedQuality, setSelectedQuality] = useState<QualityMode>(() => {
-    return backgroundEffectsHandler.getQuality();
-  });
   const [isPanelOpen, setIsPanelOpen] = useState(false);
-  const [capabilityInfo, setCapabilityInfo] = useState<CapabilityInfo | null>(null);
-
-  const selectedOption = useMemo(() => {
-    return (
-      qualitySelectOptions.find(option => {
-        return option.value === selectedQuality;
-      }) ?? null
-    );
-  }, [selectedQuality]);
+  const [quality, setQuality] = useState<QualityMode>(backgroundEffectsHandler.getQuality());
 
   useEffect(() => {
-    if (!isPerformancePanelEnabled || !isPanelOpen) {
-      setCapabilityInfo(null);
+    if (!enabled || !isPanelOpen) {
       return;
     }
-
-    setCapabilityInfo(backgroundEffectsHandler.getCapabilityInfo());
-  }, [backgroundEffectsHandler, isPerformancePanelEnabled, isPanelOpen]);
-
-  // Quality polling (fallback for non-reactive quality)
-  useEffect((): void | (() => void) => {
-    if (!isPerformancePanelEnabled || !isPanelOpen) {
-      return;
-    }
-
     const interval = setInterval(() => {
-      const current = backgroundEffectsHandler.getQuality();
-
-      setSelectedQuality(prev => {
-        return prev !== current ? current : prev;
-      });
-    }, POLLING_INTERVAL);
-
+      setQuality(backgroundEffectsHandler.getQuality());
+    }, POLLING_INTERVAL_MS);
     return () => {
       clearInterval(interval);
     };
-  }, [backgroundEffectsHandler, isPerformancePanelEnabled, isPanelOpen]);
+  }, [backgroundEffectsHandler, enabled, isPanelOpen]);
 
-  // Capability polling (controller updates these after pipeline start)
-  useEffect((): void | (() => void) => {
-    if (!isPerformancePanelEnabled || !isPanelOpen) {
-      setCapabilityInfo(null);
-      return;
-    }
-
-    const syncCapabilities = (): void => {
-      const current = backgroundEffectsHandler.getCapabilityInfo();
-      setCapabilityInfo(prev => {
-        return areCapabilityInfosEqual(Maybe.of(prev), Maybe.of(current)) ? prev : current;
-      });
-    };
-
-    syncCapabilities();
-
-    const interval = setInterval(syncCapabilities, POLLING_INTERVAL);
-
-    return () => {
-      clearInterval(interval);
-    };
-  }, [backgroundEffectsHandler, isPerformancePanelEnabled, isPanelOpen]);
-
-  // Auto close if disabled
   useEffect(() => {
-    if (!isPerformancePanelEnabled && isPanelOpen) {
+    if (!enabled) {
       setIsPanelOpen(false);
     }
-  }, [isPerformancePanelEnabled, isPanelOpen]);
+  }, [enabled]);
 
-  const togglePerformancePanel = (): void => {
-    setIsPanelOpen(prev => {
-      return !prev;
-    });
-  };
-
-  const handleQualityChange = useCallback(
-    (quality: Option) => {
-      if (quality === undefined || quality === null) {
-        return;
-      }
-
-      const nextQuality = quality.value as QualityMode;
-      setSelectedQuality(nextQuality);
-      backgroundEffectsHandler.applyQuality(nextQuality);
-    },
-    [backgroundEffectsHandler],
-  );
-
-  const handleResetQuality = useCallback(() => {
-    const defaultQuality: QualityMode = 'auto';
-    setSelectedQuality(defaultQuality);
-    backgroundEffectsHandler.applyQuality(defaultQuality);
-  }, [backgroundEffectsHandler]);
-
-  if (!isPerformancePanelEnabled) {
+  if (!enabled) {
     return null;
   }
-
   return (
     <div css={performancePanelContainerStyles}>
       <button
         type="button"
-        onClick={togglePerformancePanel}
+        onClick={() => {
+          setIsPanelOpen(!isPanelOpen);
+        }}
         css={[buttonBaseStyles, buttonNeutralStyles]}
         aria-expanded={isPanelOpen}
         aria-haspopup="dialog"
       >
         Performance
       </button>
-
       {isPanelOpen && (
         <div css={performancePanelStyles} role="dialog" aria-label={translate('videoCallBackgroundsPerformancePanel')}>
           <div css={performancePanelHeaderStyles}>
@@ -285,36 +280,37 @@ export const VideoBackgroundPerformancePanel: FunctionComponent<PerformancePanel
               type="button"
               className="icon-button"
               css={performancePanelCloseButtonStyles}
-              onClick={togglePerformancePanel}
+              onClick={() => {
+                setIsPanelOpen(false);
+              }}
               aria-label={translate('modalCloseButton')}
             >
               <CloseIcon width={12} height={12} />
             </button>
           </div>
-
+          <label htmlFor="background-effects-quality">Output resolution (Auto adapts to FPS)</label>
           <Select
             id="background-effects-quality"
             inputId="background-effects-quality"
             dataUieName="background-effects-quality"
-            aria-label="Background effects quality"
-            value={selectedOption}
-            options={qualitySelectOptions}
-            isSearchable={true}
+            aria-label="Background effects output resolution"
+            value={
+              qualityOptions.find(option => {
+                return option.value === quality;
+              }) ?? null
+            }
+            options={qualityOptions}
+            isSearchable={false}
             menuPlacement="auto"
-            onChange={handleQualityChange}
+            onChange={option => {
+              if (option !== null && option !== undefined) {
+                const next = option.value as QualityMode;
+                setQuality(next);
+                backgroundEffectsHandler.applyQuality(next);
+              }
+            }}
           />
-
-          <div css={performancePanelResetButtonContainerStyles}>
-            <Button
-              css={performancePanelResetButtonStyles}
-              variant={ButtonVariant.TERTIARY}
-              onClick={handleResetQuality}
-            >
-              Reset (Auto)
-            </Button>
-          </div>
-
-          {!isNullOrUndefined(capabilityInfo) && <MetricsDisplay capabilityInfo={capabilityInfo} />}
+          <MetricsDisplay />
         </div>
       )}
     </div>

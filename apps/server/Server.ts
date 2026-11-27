@@ -36,6 +36,7 @@ import path from 'path';
 import type {BuildMetadata} from './configuration/buildMetadata';
 import type {ClientConfig} from './configuration/client.config';
 import type {ServerConfig} from './configuration/server.config';
+import {cacheLongpipeModels} from './http/cacheLongpipeModels';
 import {createResponseCompression} from './http/responseCompression';
 import {AppleAssociationRoute} from './routes/appleassociation/appleAssociationRoute';
 import {createClientVersionCheckRoute} from './routes/clientVersionCheck/clientVersionCheckRoute';
@@ -113,18 +114,20 @@ class Server {
 
   private initCaching(application: express.Express): void {
     if (this.config.DEVELOPMENT) {
-      application.use(nocache());
+      application.use(cacheLongpipeModels(nocache()));
     } else {
-      application.use((req, res, next) => {
-        // If the user agent adds a v param, it means that its requesting a particular version of the file and that could be cached forever since the file will never change.
-        const hasCacheVersionParam = isString(req.query.v);
-        const oneYear = 31536000;
-        const maxAge = hasCacheVersionParam ? oneYear : this.config.CACHE_DURATION_SECONDS;
-        const milliSeconds = 1000;
-        res.header('Cache-Control', `public, max-age=${maxAge}`);
-        res.header('Expires', new Date(Date.now() + maxAge * milliSeconds).toUTCString());
-        next();
-      });
+      application.use(
+        cacheLongpipeModels((req, res, next) => {
+          // If the user agent adds a v param, it means that its requesting a particular version of the file and that could be cached forever since the file will never change.
+          const hasCacheVersionParam = isString(req.query.v);
+          const oneYear = 31536000;
+          const maxAge = hasCacheVersionParam ? oneYear : this.config.CACHE_DURATION_SECONDS;
+          const milliSeconds = 1000;
+          res.header('Cache-Control', `public, max-age=${maxAge}`);
+          res.header('Expires', new Date(Date.now() + maxAge * milliSeconds).toUTCString());
+          next();
+        }),
+      );
     }
   }
 

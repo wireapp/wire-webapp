@@ -17,18 +17,24 @@
  *
  */
 
-import {isNan, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
+import {isNullOrUndefined} from '@sindresorhus/is';
+import type {BackgroundInput, PipelineStats} from 'longpipe';
+import {noop} from 'noop-esm';
 
-import {detectCapabilities, Metrics, QualityMode} from './backgroundEffects';
-import {BackgroundEffectsController} from './backgroundEffects/backgroundEffectsController';
-import {CapabilityInfo} from './backgroundEffects/backgroundEffectsWorkerTypes';
-import {defaultOpts} from './backgroundEffects/pipe/options';
-import {deriveModelConfig} from './backgroundEffects/qualityTierMapping';
-import {BackgroundEffectsQuality, backgroundEffectsStore, RenderMetrics} from './useBackgroundEffectsStore';
+import {BACKGROUND_RESOLUTIONS, type QualityMode} from './backgroundEffectsResolution';
+import {isBackgroundEffectsSupported} from './backgroundEffectsSupport';
+import {
+  createLongpipeBackgroundSession,
+  type BackgroundEffectsSession,
+  type BackgroundSessionOptions,
+  type BackgroundFrameSizes,
+  type BackgroundFpsDiagnostics,
+} from './longpipeBackgroundEffects';
+import {preloadLongpipeModels} from './longpipeModelResources';
+import {BackgroundEffectsQuality, backgroundEffectsStore} from './useBackgroundEffectsStore';
 import {
   BackgroundEffectSelection,
   BackgroundSource,
-  BLUR_STRENGTHS,
   DEFAULT_BACKGROUND_EFFECT,
   DEFAULT_BUILTIN_BACKGROUND_ID,
   loadBackgroundSource,
@@ -37,43 +43,17 @@ import {
 import {getStorage} from '../../util/localStorage';
 import {getLogger, Logger} from '../../util/logger';
 
-const millisecondsPerSecond = 1000;
-const percentageScale = 100;
-const maximumDisplayedUtilizationPercentage = 999;
 type BackgroundEffectApplicationResult = {applied: boolean; media: ReleasableMediaStream};
 
-export const TARGET_FPS = 15;
 export const DEBOUNCE_TIMER = 500;
 
 const VIDEO_BACKGROUND_EFFECT_STORAGE_KEY = 'video-background-effects';
 export const VIDEO_BACKGROUND_EFFECTS_PERFORMANCE_PANEL_STORAGE_KEY = 'video-background-effects-feature-enabled';
 const VIDEO_BACKGROUND_LAST_VIRTUAL_ID_STORAGE_KEY = 'video-background-effects-last-virtual-id';
-
-const isVirtualEffect = (effect: BackgroundEffectSelection): boolean => {
-  return effect.type === 'virtual' || effect.type === 'custom';
-};
-
-const getBlurStrength = (effect: BackgroundEffectSelection): number => {
-  return effect.type === 'blur' ? BLUR_STRENGTHS[effect.level] : BLUR_STRENGTHS.high;
-};
-
-const computeRenderMetrics = (metrics: Metrics): RenderMetrics => {
-  const budget = millisecondsPerSecond / TARGET_FPS;
-  const total = metrics.avgTotalMs !== 0 && !isNan(metrics.avgTotalMs) ? metrics.avgTotalMs : 0;
-  const utilShare =
-    budget > 0 ? Math.min(maximumDisplayedUtilizationPercentage, (total / budget) * percentageScale) : 0;
-  const mlShare = total > 0 ? (metrics.avgSegmentationMs / total) * percentageScale : 0;
-  const webglShare = total > 0 ? (metrics.avgGpuMs / total) * percentageScale : 0;
-  const ml = isNonEmptyString(metrics.segmentationDelegate) ? `ML(${metrics.segmentationDelegate})` : 'ML';
-
-  return {
-    ...metrics,
-    webglShare,
-    utilShare,
-    mlShare,
-    budget,
-    ml,
-  } as RenderMetrics;
+const QUALITY_RESOLUTION_LIMITS = {
+  privacy: BACKGROUND_RESOLUTIONS.fhd.width,
+  balanced: BACKGROUND_RESOLUTIONS.hd.width,
+  performance: BACKGROUND_RESOLUTIONS.nhd.width,
 };
 
 const parseStoredPreferredEffect = (stored: string | null): BackgroundEffectSelection => {
@@ -102,13 +82,22 @@ export class BackgroundEffectsHandler {
   private customBackground: BackgroundSource | null = null;
   private saveDebounceTimer: ReturnType<typeof setTimeout> | null = null;
   private currentReleasableStream: ReleasableMediaStream | undefined = undefined;
+  private currentInputTrack: MediaStreamTrack | undefined;
+  private currentSession: BackgroundEffectsSession | undefined;
+  private quality: QualityMode = 'auto';
+  private applicationQueue: Promise<unknown> = Promise.resolve();
 
-  constructor(private readonly controller: BackgroundEffectsController) {
+  constructor(
+    private readonly createSession: (
+      input: MediaStreamTrack,
+      options: BackgroundSessionOptions,
+    ) => Promise<BackgroundEffectsSession> = createLongpipeBackgroundSession,
+  ) {
     this.storage = getStorage();
     backgroundEffectsStore.getState().setIsPerformancePanelEnabled(this.readPerformancePanelEnabledFromStore());
 
     const storedEffect = this.readPreferredBackgroundEffectFromStore();
-    const isWebGLAvailable = detectCapabilities().webgl2;
+    const isWebGLAvailable = isBackgroundEffectsSupported();
     const effectToApply = !isWebGLAvailable && storedEffect.type !== 'none' ? DEFAULT_BACKGROUND_EFFECT : storedEffect;
 
     if (!isWebGLAvailable && storedEffect.type !== 'none') {
@@ -136,6 +125,14 @@ export class BackgroundEffectsHandler {
   }
 
   public async applyBackgroundEffect(originalVideoStream: MediaStream): Promise<BackgroundEffectApplicationResult> {
+    const result = this.applicationQueue.then(() => {
+      return this.applyEffect(originalVideoStream);
+    });
+    this.applicationQueue = result.catch(noop);
+    return result;
+  }
+
+  private async applyEffect(originalVideoStream: MediaStream): Promise<BackgroundEffectApplicationResult> {
     const {preferredEffect} = backgroundEffectsStore.getState();
 
     if (preferredEffect.type === 'none') {
@@ -148,46 +145,49 @@ export class BackgroundEffectsHandler {
       return {applied: false, media: new ReleasableMediaStream(originalVideoStream)};
     }
 
-    const isVirtual = isVirtualEffect(preferredEffect);
-    const blurStrength = getBlurStrength(preferredEffect);
-    const backgroundSource = isVirtual ? await this.loadBackgroundSource(preferredEffect) : null;
-
-    if (this.controller.isProcessing() && !isNullOrUndefined(this.currentReleasableStream)) {
-      if (isVirtual) {
-        this.controller.setMode('virtual');
-        if (!isNullOrUndefined(backgroundSource)) {
-          await this.controller.setBackgroundSource(backgroundSource);
-        }
-      } else {
-        this.controller.setMode('blur');
-        this.controller.setBlurStrength(blurStrength);
-      }
-      return {applied: true, media: this.currentReleasableStream};
-    }
-
     try {
-      const {qualityTier} = backgroundEffectsStore.getState();
-      const {modelPath, enhancePerformance} = deriveModelConfig(qualityTier);
-      const outputTrack = await this.controller.start(videoTrack, {
-        ...defaultOpts,
-        modelPath,
-        enhancePerformance,
-        mode: isVirtual ? 'virtual' : 'blur',
-        blurStrength,
-        quality: 'auto',
-        backgroundSource,
-        onMetrics: this.onMetrics,
-        onModelChange: this.onModelChange,
+      const background = await this.getLongpipeBackground(preferredEffect);
+      if (
+        this.currentInputTrack === videoTrack &&
+        this.currentSession !== undefined &&
+        this.currentReleasableStream !== undefined
+      ) {
+        await this.currentSession.setBackground(background);
+        return {applied: true, media: this.currentReleasableStream};
+      }
+      const session = await this.createSession(videoTrack, {
+        background,
+        quality: this.quality,
+        maximumLongEdge: QUALITY_RESOLUTION_LIMITS[backgroundEffectsStore.getState().qualityTier],
+        onStats: (stats, frameSizes, fps) => {
+          if (this.currentSession === session) {
+            this.onStats(stats, frameSizes, fps);
+          }
+        },
       });
-      const processedStream = new MediaStream([outputTrack]);
-      this.currentReleasableStream = new ReleasableMediaStream(processedStream, () => {
-        this.currentReleasableStream = undefined;
-        outputTrack.stop();
+      const media = new ReleasableMediaStream(session.stream, () => {
+        session.release();
+        if (this.currentSession === session) {
+          this.currentSession = undefined;
+          this.currentInputTrack = undefined;
+          this.currentReleasableStream = undefined;
+          backgroundEffectsStore.getState().setLongpipeStats(undefined);
+          backgroundEffectsStore.getState().setFrameSizes(undefined);
+          backgroundEffectsStore.getState().setFpsDiagnostics(undefined);
+        }
       });
-
-      return {applied: true, media: this.currentReleasableStream};
+      session.onTrackChanged = () => {
+        media.onTrackChanged?.();
+      };
+      this.currentSession = session;
+      this.currentInputTrack = videoTrack;
+      this.currentReleasableStream = media;
+      backgroundEffectsStore.getState().setLongpipeStats(undefined);
+      backgroundEffectsStore.getState().setFrameSizes(undefined);
+      backgroundEffectsStore.getState().setFpsDiagnostics(undefined);
+      return {applied: true, media};
     } catch (error) {
-      this.logger.warn('BackgroundEffectsController failed with error:', {error});
+      this.logger.warn('Longpipe failed to apply background effects', {error});
       return {applied: false, media: new ReleasableMediaStream(originalVideoStream)};
     }
   }
@@ -245,22 +245,36 @@ export class BackgroundEffectsHandler {
   }
 
   public applyQuality(quality: QualityMode): void {
-    this.controller.setQuality(quality);
+    this.quality = quality;
+    void this.currentSession?.setQuality(quality).catch((error: unknown) => {
+      this.logger.warn('Could not change background output resolution', {error});
+    });
   }
 
   public getQuality(): QualityMode {
-    return this.controller.getQuality();
+    return this.quality;
   }
 
   public setQualityTier(quality: BackgroundEffectsQuality): void {
     backgroundEffectsStore.getState().setQualityTier(quality);
-    const {modelPath, enhancePerformance} = deriveModelConfig(quality);
-    this.controller.setModelPath(modelPath);
-    this.controller.setEnhancePerformance(enhancePerformance);
+    void this.currentSession?.setMaximumLongEdge(QUALITY_RESOLUTION_LIMITS[quality]).catch((error: unknown) => {
+      this.logger.warn('Could not update background resolution limit', {error});
+    });
   }
 
-  public getCapabilityInfo(): CapabilityInfo {
-    return this.controller.getCapabilityInfo();
+  private async getLongpipeBackground(effect: BackgroundEffectSelection): Promise<BackgroundInput> {
+    if (effect.type === 'blur') {
+      return {blur: {strength: effect.level}};
+    }
+    const source = await this.loadBackgroundSource(effect);
+    if (source === null) {
+      throw new Error('No virtual background image available');
+    }
+    const media = source.media;
+    if (media instanceof HTMLImageElement || (typeof ImageBitmap !== 'undefined' && media instanceof ImageBitmap)) {
+      return media;
+    }
+    return {image: source.url};
   }
 
   private async loadBackgroundSource(effect: BackgroundEffectSelection): Promise<BackgroundSource | null> {
@@ -334,21 +348,21 @@ export class BackgroundEffectsHandler {
     }
   }
 
-  private onMetrics = (metrics: Metrics): void => {
-    backgroundEffectsStore.getState().setMetrics(computeRenderMetrics(metrics));
-  };
-
-  private onModelChange = (modelPath: string): void => {
-    const model = modelPath.split('/').pop();
-    backgroundEffectsStore.getState().setModel(model);
+  private onStats = (stats: PipelineStats, frameSizes: BackgroundFrameSizes, fps: BackgroundFpsDiagnostics): void => {
+    const state = backgroundEffectsStore.getState();
+    state.setLongpipeStats(stats);
+    state.setFrameSizes(frameSizes);
+    state.setFpsDiagnostics(fps);
   };
 
   public async preloadResources(): Promise<void> {
-    const {wasmLoaderPath, wasmBinaryPath, modelPath} = defaultOpts;
-    // preload media pipe resources
-    this.prefetch(wasmLoaderPath);
-    this.prefetch(wasmBinaryPath);
-    this.prefetch(modelPath);
+    if (!isBackgroundEffectsSupported()) {
+      return;
+    }
+    await Promise.all([preloadLongpipeModels(), this.preloadBackgroundImages()]);
+  }
+
+  private async preloadBackgroundImages(): Promise<void> {
     // preload default bg image
     await loadBackgroundSource(DEFAULT_BUILTIN_BACKGROUND_ID);
 
@@ -357,22 +371,10 @@ export class BackgroundEffectsHandler {
       await loadBackgroundSource(preferredEffect.backgroundId);
     }
   }
-
-  private prefetch(url: string): void {
-    const existingPrefetchLink = document.head.querySelector<HTMLLinkElement>(`link[rel="prefetch"][href="${url}"]`);
-
-    if (existingPrefetchLink !== null) {
-      return;
-    }
-
-    const link = document.createElement('link');
-    link.rel = 'prefetch';
-    link.href = url;
-    document.head.appendChild(link);
-  }
 }
 
 export class ReleasableMediaStream {
+  public onTrackChanged: (() => void) | undefined;
   constructor(
     public stream: MediaStream,
     public release: () => void = () => {

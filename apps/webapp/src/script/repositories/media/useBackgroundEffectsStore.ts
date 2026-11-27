@@ -17,46 +17,37 @@
  *
  */
 
+import type {PipelineStats} from 'longpipe';
 import {useStore} from 'zustand';
 import {immer} from 'zustand/middleware/immer';
 import {createStore} from 'zustand/vanilla';
 
-import {Metrics, QualityTier} from './backgroundEffects';
-import {SELFIE_MULTICLASS_MODEL_PATH, SELFIE_SEGMENTER_MODEL_PATH} from './backgroundEffects/pipe/options';
+import type {BackgroundFrameSizes, BackgroundFpsDiagnostics} from './longpipeBackgroundEffects';
 import {
   BackgroundEffectSelection,
   DEFAULT_BACKGROUND_EFFECT,
   DEFAULT_BUILTIN_BACKGROUND_ID,
 } from './VideoBackgroundEffects';
 
-export interface RenderMetrics extends Metrics {
-  budget: number;
-  utilShare: number;
-  mlShare: number;
-  webglShare: number;
-  ml: 'ML(CPU)' | 'ML(GPU)' | 'ML';
-  tier: QualityTier;
-}
-
 export type BackgroundEffectsQuality = 'privacy' | 'balanced' | 'performance';
 
 export type BackgroundEffectsState = {
   isPerformancePanelEnabled: boolean;
   preferredEffect: BackgroundEffectSelection;
-  metrics: RenderMetrics | undefined;
-  model: string;
+  longpipeStats: PipelineStats | undefined;
+  frameSizes: BackgroundFrameSizes | undefined;
+  fpsDiagnostics: BackgroundFpsDiagnostics | undefined;
   lastVirtualBackgroundId: string;
   qualityTier: BackgroundEffectsQuality;
-  effectiveQualityTier: BackgroundEffectsQuality;
   isInitializing: boolean;
 
   setIsPerformancePanelEnabled(value: boolean): void;
   setPreferredEffect(effect: BackgroundEffectSelection): void;
   setLastVirtualBackgroundId(backgroundId: string): void;
-  setMetrics(metrics: RenderMetrics | undefined): void;
-  setModel(model: string | undefined): void;
+  setLongpipeStats(stats: PipelineStats | undefined): void;
+  setFrameSizes(sizes: BackgroundFrameSizes | undefined): void;
+  setFpsDiagnostics(fps: BackgroundFpsDiagnostics | undefined): void;
   setQualityTier(tier: BackgroundEffectsQuality): void;
-  setEffectiveQualityTier(tier: BackgroundEffectsQuality): void;
   setIsInitializing(value: boolean): void;
 };
 
@@ -65,11 +56,11 @@ export const backgroundEffectsStore = createStore<BackgroundEffectsState>()(
     return {
       isPerformancePanelEnabled: false,
       preferredEffect: DEFAULT_BACKGROUND_EFFECT,
-      metrics: undefined,
-      model: 'unknown',
+      longpipeStats: undefined,
+      frameSizes: undefined,
+      fpsDiagnostics: undefined,
       lastVirtualBackgroundId: DEFAULT_BUILTIN_BACKGROUND_ID,
       qualityTier: 'privacy',
-      effectiveQualityTier: 'privacy',
 
       setIsPerformancePanelEnabled: value => {
         return set(state => {
@@ -88,36 +79,25 @@ export const backgroundEffectsStore = createStore<BackgroundEffectsState>()(
         });
       },
 
-      setMetrics: metrics => {
+      setLongpipeStats: stats => {
         return set(state => {
-          state.metrics = metrics;
+          state.longpipeStats = stats;
         });
       },
-
-      setModel: model => {
+      setFrameSizes: sizes => {
         return set(state => {
-          switch (model) {
-            case SELFIE_SEGMENTER_MODEL_PATH:
-              state.model = 'selfie-segmenter';
-              break;
-            case SELFIE_MULTICLASS_MODEL_PATH:
-              state.model = 'selfie-multiclass';
-              break;
-            default:
-              state.model = 'unknown';
-          }
+          state.frameSizes = sizes;
+        });
+      },
+      setFpsDiagnostics: fps => {
+        return set(state => {
+          state.fpsDiagnostics = fps;
         });
       },
 
       setQualityTier: tier => {
         return set(state => {
           state.qualityTier = tier;
-        });
-      },
-
-      setEffectiveQualityTier: tier => {
-        return set(state => {
-          state.effectiveQualityTier = tier;
         });
       },
 

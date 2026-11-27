@@ -18,477 +18,169 @@
  */
 
 import {BackgroundEffectsHandler, ReleasableMediaStream} from './backgroundEffectsHandler';
+import type {BackgroundEffectsSession, BackgroundSessionOptions} from './longpipeBackgroundEffects';
 import {backgroundEffectsStore} from './useBackgroundEffectsStore';
-import {DEFAULT_BUILTIN_BACKGROUND_ID} from './VideoBackgroundEffects';
-import {SELFIE_MULTICLASS_MODEL_PATH, SELFIE_SEGMENTER_MODEL_PATH} from './backgroundEffects/pipe/options';
-import {detectCapabilities} from './backgroundEffects';
+import {DEFAULT_BUILTIN_BACKGROUND_ID, loadBackgroundSource} from './VideoBackgroundEffects';
+import {isBackgroundEffectsSupported} from './backgroundEffectsSupport';
 
-// Mocks
-jest.mock('../../util/localStorage', () => {
+jest.mock('./backgroundEffectsSupport', () => {
   return {
-    getStorage: jest.fn(),
+    isBackgroundEffectsSupported: jest.fn(() => {
+      return true;
+    }),
   };
 });
-
 jest.mock('./VideoBackgroundEffects', () => {
   return {
-    BLUR_STRENGTHS: {high: 10},
     DEFAULT_BACKGROUND_EFFECT: {type: 'none'},
     DEFAULT_BUILTIN_BACKGROUND_ID: 'default-id',
     loadBackgroundSource: jest.fn(),
   };
 });
 
-jest.mock('./backgroundEffects', () => {
-  return {
-    detectCapabilities: jest.fn(),
-  };
-});
-
-describe('BackgroundEffectsHandler', () => {
-  let mockController: any;
-  let mockStorage: any;
-
-  afterEach(() => {
-    backgroundEffectsStore.getState().setIsPerformancePanelEnabled(false);
-    backgroundEffectsStore.getState().setPreferredEffect({type: 'none'});
-    backgroundEffectsStore.getState().setMetrics(undefined);
-    backgroundEffectsStore.getState().setLastVirtualBackgroundId(DEFAULT_BUILTIN_BACKGROUND_ID);
-    backgroundEffectsStore.getState().setQualityTier('privacy');
-  });
-
-  beforeEach(() => {
-    mockController = {
-      isProcessing: jest.fn().mockReturnValue(false),
-      start: jest.fn(),
-      stop: jest.fn(),
-      setMode: jest.fn(),
-      setBlurStrength: jest.fn(),
-      setBackgroundSource: jest.fn(),
-      setModelPath: jest.fn(),
-      setEnhancePerformance: jest.fn(),
-    };
-
-    mockStorage = {
-      getItem: jest.fn(),
-      setItem: jest.fn(),
-    };
-
-    const {getStorage} = require('../../util/localStorage');
-    getStorage.mockReturnValue(mockStorage);
-    (detectCapabilities as jest.Mock).mockReturnValue({webgl2: true});
-  });
-
-  function createMockStream(withTrack = true): MediaStream {
+describe('BackgroundEffectsHandler with Longpipe', () => {
+  const tracks: MediaStreamTrack[] = [];
+  const createStream = (): MediaStream => {
+    const track = {kind: 'video', stop: jest.fn()} as unknown as MediaStreamTrack;
+    tracks.push(track);
     return {
       getVideoTracks: () => {
-        return withTrack
-          ? [
-              {
-                stop: jest.fn(),
-              },
-            ]
-          : [];
+        return [track];
+      },
+      getTracks: () => {
+        return [track];
       },
     } as unknown as MediaStream;
-  }
+  };
+  const createSession = jest.fn<Promise<BackgroundEffectsSession>, [MediaStreamTrack, BackgroundSessionOptions]>();
+  let session: BackgroundEffectsSession;
+  let handler: BackgroundEffectsHandler;
 
-  it('returns original stream if effect is none', async () => {
-    const handler = new BackgroundEffectsHandler(mockController);
+  beforeEach(() => {
+    jest.clearAllMocks();
+    jest.useFakeTimers();
+    localStorage.clear();
+    backgroundEffectsStore.setState(backgroundEffectsStore.getInitialState(), true);
+    (isBackgroundEffectsSupported as jest.Mock).mockReturnValue(true);
+    session = {
+      stream: createStream(),
+      onTrackChanged: undefined,
+      setBackground: jest.fn().mockResolvedValue(undefined),
+      setQuality: jest.fn().mockResolvedValue(undefined),
+      setMaximumLongEdge: jest.fn().mockResolvedValue(undefined),
+      release: jest.fn(),
+    };
+    createSession.mockResolvedValue(session);
+    handler = new BackgroundEffectsHandler(createSession);
+  });
+  afterEach(() => {
+    tracks.splice(0).forEach(track => {
+      track.stop();
+    });
+    jest.clearAllTimers();
+    jest.useRealTimers();
+  });
 
-    const stream = createMockStream();
+  it('returns the original stream with effects off or no camera track', async () => {
+    const stream = createStream();
+    expect((await handler.applyBackgroundEffect(stream)).media.stream).toBe(stream);
+    handler.setPreferredBackgroundEffect({type: 'blur', level: 'low'});
+    expect((await handler.applyBackgroundEffect(new MediaStream())).applied).toBe(false);
+    expect(createSession).not.toHaveBeenCalled();
+  });
 
-    const result = await handler.applyBackgroundEffect(stream);
-
-    expect(result.applied).toBe(false);
+  it.each(['low', 'high'] as const)('preserves the %s blur selection and starts adaptive resolution', async level => {
+    handler.setPreferredBackgroundEffect({type: 'blur', level});
+    const result = await handler.applyBackgroundEffect(createStream());
+    expect(result.applied).toBe(true);
     expect(result.media).toBeInstanceOf(ReleasableMediaStream);
-  });
-
-  it('returns original stream if no video track exists', async () => {
-    const handler = new BackgroundEffectsHandler(mockController);
-
-    const stream = createMockStream(false);
-
-    const result = await handler.applyBackgroundEffect(stream);
-
-    expect(result.applied).toBe(false);
-  });
-
-  it('applies blur effect successfully', async () => {
-    const handler = new BackgroundEffectsHandler(mockController);
-
-    handler.setPreferredBackgroundEffect({type: 'blur', level: 'high'});
-
-    const outputTrack = {stop: jest.fn()};
-
-    mockController.start.mockResolvedValue({
-      outputTrack,
-      stop: jest.fn(),
-    });
-
-    const stream = createMockStream();
-
-    const result = await handler.applyBackgroundEffect(stream);
-
-    expect(result.applied).toBe(true);
-    expect(mockController.start).toHaveBeenCalledWith(
+    expect(result.media.stream).toBe(session.stream);
+    expect(createSession).toHaveBeenCalledWith(
       expect.anything(),
-      expect.objectContaining({
-        mode: 'blur',
-      }),
-    );
-    expect(mockController.setMode).not.toHaveBeenCalled();
-    expect(mockController.setBlurStrength).not.toHaveBeenCalled();
-  });
-
-  it('applies virtual background successfully', async () => {
-    const {loadBackgroundSource} = require('./VideoBackgroundEffects');
-
-    loadBackgroundSource.mockResolvedValue('mock-bg');
-
-    const handler = new BackgroundEffectsHandler(mockController);
-
-    handler.setPreferredBackgroundEffect({
-      type: 'virtual',
-      backgroundId: 'bg1',
-    });
-
-    const outputTrack = {stop: jest.fn()};
-
-    mockController.start.mockResolvedValue({
-      outputTrack,
-      stop: jest.fn(),
-    });
-
-    const stream = createMockStream();
-
-    const result = await handler.applyBackgroundEffect(stream);
-
-    expect(result.applied).toBe(true);
-    expect(loadBackgroundSource).toHaveBeenCalledWith('bg1');
-    expect(mockController.start).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        mode: 'virtual',
-      }),
-    );
-    expect(mockController.setMode).not.toHaveBeenCalled();
-    expect(mockController.setBackgroundSource).not.toHaveBeenCalled();
-  });
-
-  it('handles controller error gracefully', async () => {
-    const handler = new BackgroundEffectsHandler(mockController);
-
-    handler.setPreferredBackgroundEffect({type: 'blur', level: 'high'});
-
-    mockController.start.mockRejectedValue(new Error('fail'));
-
-    const stream = createMockStream();
-
-    const result = await handler.applyBackgroundEffect(stream);
-
-    expect(result.applied).toBe(false);
-  });
-
-  it('falls back to default virtual when custom has no source', () => {
-    const handler = new BackgroundEffectsHandler(mockController);
-
-    handler.setPreferredBackgroundEffect({type: 'custom'});
-
-    expect(backgroundEffectsStore.getState().preferredEffect.type).toBe('virtual');
-  });
-
-  it('saves the performance panel preference to the existing storage key', () => {
-    const handler = new BackgroundEffectsHandler(mockController);
-
-    handler.savePerformancePanelEnabledStateInStore(true);
-
-    expect(mockStorage.setItem).toHaveBeenCalledWith('video-background-effects-feature-enabled', 'true');
-    expect(backgroundEffectsStore.getState().isPerformancePanelEnabled).toBe(true);
-  });
-
-  it('reads the performance panel preference from storage', () => {
-    mockStorage.getItem.mockReturnValue('true');
-
-    const handler = new BackgroundEffectsHandler(mockController);
-    handler.setPreferredBackgroundEffect({type: 'blur', level: 'high'});
-
-    expect(handler.isBackgroundEffectEnabled()).toBe(true);
-    expect(backgroundEffectsStore.getState().isPerformancePanelEnabled).toBe(true);
-  });
-
-  it('releases processed stream correctly', async () => {
-    const handler = new BackgroundEffectsHandler(mockController);
-    handler.setPreferredBackgroundEffect({type: 'blur', level: 'high'});
-
-    const outputTrack = {stop: jest.fn()};
-    const stop = jest.fn();
-
-    mockController.start.mockResolvedValue({outputTrack, stop});
-
-    const stream = createMockStream();
-    const result = await handler.applyBackgroundEffect(stream);
-
-    result.media.release();
-
-    expect(stop).toHaveBeenCalled();
-  });
-
-  it('applies the requested quality tier when processing is restarted', async () => {
-    const handler = new BackgroundEffectsHandler(mockController);
-    handler.setPreferredBackgroundEffect({type: 'blur', level: 'high'});
-    handler.setQualityTier('performance');
-
-    let isProcessing = false;
-    mockController.isProcessing.mockImplementation(() => {
-      return isProcessing;
-    });
-    mockController.start.mockImplementation(async () => {
-      isProcessing = true;
-      return {
-        stop: jest.fn(() => {
-          return (isProcessing = false);
-        }),
-      };
-    });
-
-    const stream = createMockStream();
-    const firstResult = await handler.applyBackgroundEffect(stream);
-    firstResult.media.release();
-    const secondResult = await handler.applyBackgroundEffect(stream);
-
-    expect(secondResult.applied).toBe(true);
-    expect(mockController.start).toHaveBeenLastCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        modelPath: SELFIE_SEGMENTER_MODEL_PATH,
-        enhancePerformance: true,
-      }),
-    );
-    expect(backgroundEffectsStore.getState().qualityTier).toBe('performance');
-  });
-
-  it('restores requested privacy configuration when restarted during degradation', async () => {
-    const handler = new BackgroundEffectsHandler(mockController);
-    handler.setPreferredBackgroundEffect({type: 'blur', level: 'high'});
-    handler.setQualityTier('privacy');
-    backgroundEffectsStore.getState().setEffectiveQualityTier('balanced');
-    mockController.start.mockResolvedValue({stop: jest.fn()});
-
-    const result = await handler.applyBackgroundEffect(createMockStream());
-
-    expect(result.applied).toBe(true);
-    expect(mockController.start).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        modelPath: SELFIE_MULTICLASS_MODEL_PATH,
-        enhancePerformance: false,
-      }),
+      expect.objectContaining({background: {blur: {strength: level}}, quality: 'auto'}),
     );
   });
 
-  it('reads preferred effect from storage on init', () => {
-    mockStorage.getItem.mockImplementation((key: string) => {
-      if (key === 'video-background-effects') {
-        return JSON.stringify({type: 'virtual', backgroundId: 'bg1'});
-      }
-      return null;
-    });
-
-    new BackgroundEffectsHandler(mockController);
-
-    expect(backgroundEffectsStore.getState().preferredEffect).toEqual({
-      type: 'virtual',
-      backgroundId: 'bg1',
-    });
+  it('updates effects on the same camera without recreating the session', async () => {
+    const stream = createStream();
+    handler.setPreferredBackgroundEffect({type: 'blur', level: 'low'});
+    const first = await handler.applyBackgroundEffect(stream);
+    handler.setPreferredBackgroundEffect({type: 'blur', level: 'high'});
+    const second = await handler.applyBackgroundEffect(stream);
+    expect(second.media).toBe(first.media);
+    expect(createSession).toHaveBeenCalledTimes(1);
+    expect(session.setBackground).toHaveBeenCalledWith({blur: {strength: 'high'}});
   });
 
-  it('falls back to default preferred effect when stored value is invalid', () => {
-    mockStorage.getItem.mockImplementation((key: string) => {
-      if (key === 'video-background-effects') {
-        return '{invalid-json';
-      }
-      return null;
-    });
-
-    new BackgroundEffectsHandler(mockController);
-
-    expect(backgroundEffectsStore.getState().preferredEffect).toEqual({type: 'none'});
-  });
-
-  it('returns false when saving feature flag fails', () => {
-    mockStorage.setItem.mockImplementation(() => {
-      throw new Error('storage failed');
-    });
-
-    const handler = new BackgroundEffectsHandler(mockController);
-    const result = handler.savePerformancePanelEnabledStateInStore(true);
-
-    expect(result).toBe(false);
-  });
-
-  it('restores last virtual background ID from storage on init', () => {
-    mockStorage.getItem.mockImplementation((key: string) => {
-      if (key === 'video-background-effects-last-virtual-id') {
-        return 'office-1';
-      }
-      return null;
-    });
-
-    new BackgroundEffectsHandler(mockController);
-
+  it('loads the selected background image for Longpipe', async () => {
+    const image = new Image();
+    (loadBackgroundSource as jest.Mock).mockResolvedValue({type: 'image', media: image, url: '/bg.png'});
+    handler.setPreferredBackgroundEffect({type: 'virtual', backgroundId: 'office-1'});
+    await handler.applyBackgroundEffect(createStream());
+    expect(loadBackgroundSource).toHaveBeenCalledWith('office-1');
+    expect(createSession).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({background: image}));
     expect(backgroundEffectsStore.getState().lastVirtualBackgroundId).toBe('office-1');
   });
 
-  it('saves last virtual background ID when a virtual effect is selected', () => {
-    const handler = new BackgroundEffectsHandler(mockController);
-
-    handler.setPreferredBackgroundEffect({type: 'virtual', backgroundId: 'office-2'});
-
-    expect(mockStorage.setItem).toHaveBeenCalledWith('video-background-effects-last-virtual-id', 'office-2');
-    expect(backgroundEffectsStore.getState().lastVirtualBackgroundId).toBe('office-2');
+  it('preserves custom background images', async () => {
+    const image = new Image();
+    handler.setPreferredBackgroundEffect({type: 'custom'}, {type: 'image', url: '/custom.png', media: image});
+    await handler.applyBackgroundEffect(createStream());
+    expect(createSession).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({background: image}));
   });
 
-  it('does not overwrite last virtual background ID when a non-virtual effect is selected', () => {
-    const handler = new BackgroundEffectsHandler(mockController);
-
-    handler.setPreferredBackgroundEffect({type: 'virtual', backgroundId: 'office-2'});
-    handler.setPreferredBackgroundEffect({type: 'blur', level: 'high'});
-
-    // lastVirtualBackgroundId in the store should still point to the last virtual one
-    expect(backgroundEffectsStore.getState().lastVirtualBackgroundId).toBe('office-2');
-
-    // setItem for the virtual ID key should have been called exactly once — only for the virtual selection, not for blur
-    const virtualIdCalls = (mockStorage.setItem as jest.Mock).mock.calls.filter(([key]) => {
-      return key === 'video-background-effects-last-virtual-id';
-    });
-    expect(virtualIdCalls).toHaveLength(1);
-    expect(virtualIdCalls[0][1]).toBe('office-2');
-  });
-
-  it('writes the requested quality tier to the store even if the controller throws', () => {
-    const handler = new BackgroundEffectsHandler(mockController);
-    mockController.setModelPath.mockImplementation(() => {
-      throw new Error('controller failed');
-    });
-
-    expect(() => {
-      return handler.setQualityTier('performance');
-    }).toThrow('controller failed');
-    expect(backgroundEffectsStore.getState().qualityTier).toBe('performance');
-  });
-
-  it('sets privacy quality by switching to multiclass model and updating store', () => {
-    const handler = new BackgroundEffectsHandler(mockController);
-
-    handler.setQualityTier('privacy');
-
-    expect(mockController.setModelPath).toHaveBeenCalledWith(SELFIE_MULTICLASS_MODEL_PATH);
-    expect(mockController.setEnhancePerformance).toHaveBeenCalledWith(false);
-    expect(backgroundEffectsStore.getState().qualityTier).toBe('privacy');
-  });
-
-  it('sets balanced quality by switching to segmenter model and updating store', () => {
-    const handler = new BackgroundEffectsHandler(mockController);
-
-    handler.setQualityTier('balanced');
-
-    expect(mockController.setModelPath).toHaveBeenCalledWith(SELFIE_SEGMENTER_MODEL_PATH);
-    expect(mockController.setEnhancePerformance).toHaveBeenCalledWith(false);
-    expect(backgroundEffectsStore.getState().qualityTier).toBe('balanced');
-  });
-
-  it('sets performance quality by switching to segmenter model, enabling performance enhancement and updating store', () => {
-    const handler = new BackgroundEffectsHandler(mockController);
-
-    handler.setQualityTier('performance');
-
-    expect(mockController.setModelPath).toHaveBeenCalledWith(SELFIE_SEGMENTER_MODEL_PATH);
-    expect(mockController.setEnhancePerformance).toHaveBeenCalledWith(true);
-    expect(backgroundEffectsStore.getState().qualityTier).toBe('performance');
-  });
-
-  it('keeps stored preferred effect when WebGL is available', () => {
-    mockStorage.getItem.mockImplementation((key: string) => {
-      if (key === 'video-background-effects') {
-        return JSON.stringify({type: 'blur', level: 'high'});
-      }
-      return null;
-    });
-
-    new BackgroundEffectsHandler(mockController);
-
-    expect(detectCapabilities).toHaveBeenCalled();
+  it('uses the default image when a custom background has no source', () => {
+    handler.setPreferredBackgroundEffect({type: 'custom'});
     expect(backgroundEffectsStore.getState().preferredEffect).toEqual({
-      type: 'blur',
-      level: 'high',
+      type: 'virtual',
+      backgroundId: DEFAULT_BUILTIN_BACKGROUND_ID,
     });
   });
 
-  it('falls back to none and persists it when WebGL is unavailable and stored effect is enabled', () => {
-    (detectCapabilities as jest.Mock).mockReturnValue({webgl2: false});
-
-    mockStorage.getItem.mockImplementation((key: string) => {
-      if (key === 'video-background-effects') {
-        return JSON.stringify({type: 'blur', level: 'high'});
-      }
-      return null;
-    });
-
-    new BackgroundEffectsHandler(mockController);
-
-    expect(backgroundEffectsStore.getState().preferredEffect).toEqual({type: 'none'});
-    expect(mockStorage.setItem).toHaveBeenCalledWith('video-background-effects', JSON.stringify({type: 'none'}));
-  });
-
-  it('does not persist fallback when WebGL is unavailable but stored effect is already none', () => {
-    (detectCapabilities as jest.Mock).mockReturnValue({webgl2: false});
-
-    mockStorage.getItem.mockImplementation((key: string) => {
-      if (key === 'video-background-effects') {
-        return JSON.stringify({type: 'none'});
-      }
-      return null;
-    });
-
-    new BackgroundEffectsHandler(mockController);
-
-    expect(backgroundEffectsStore.getState().preferredEffect).toEqual({type: 'none'});
-
-    const preferredEffectWrites = (mockStorage.setItem as jest.Mock).mock.calls.filter(([key]) => {
-      return key === 'video-background-effects';
-    });
-
-    expect(preferredEffectWrites).toHaveLength(0);
-  });
-
-  it('always enables background effects independently of debug storage', () => {
-    mockStorage.getItem.mockImplementation((key: string) => {
-      if (key === 'video-background-effects-feature-enabled') {
-        return 'true';
-      }
-      return null;
-    });
-
-    const handler = new BackgroundEffectsHandler(mockController);
+  it('does not reuse an old camera session or let its release clear the new session', async () => {
     handler.setPreferredBackgroundEffect({type: 'blur', level: 'high'});
-
-    expect(handler.isBackgroundEffectEnabled()).toBe(true);
-    expect(backgroundEffectsStore.getState().isPerformancePanelEnabled).toBe(true);
+    const first = await handler.applyBackgroundEffect(createStream());
+    const nextSession = {...session, stream: createStream(), release: jest.fn()};
+    createSession.mockResolvedValue(nextSession);
+    const nextStream = createStream();
+    const second = await handler.applyBackgroundEffect(nextStream);
+    first.media.release();
+    expect(session.release).toHaveBeenCalledTimes(1);
+    expect((await handler.applyBackgroundEffect(nextStream)).media).toBe(second.media);
+    expect(createSession).toHaveBeenCalledTimes(2);
   });
 
-  it('keeps the performance panel disabled when its stored preference is false', () => {
-    mockStorage.getItem.mockImplementation((key: string) => {
-      if (key === 'video-background-effects-feature-enabled') {
-        return 'false';
-      }
-      return null;
-    });
+  it('forwards replacement tracks to the calling integration', async () => {
+    handler.setPreferredBackgroundEffect({type: 'blur', level: 'low'});
+    const result = await handler.applyBackgroundEffect(createStream());
+    result.media.onTrackChanged = jest.fn();
+    session.onTrackChanged?.();
+    expect(result.media.onTrackChanged).toHaveBeenCalled();
+    result.media.release();
+    expect(session.release).toHaveBeenCalled();
+  });
 
-    const handler = new BackgroundEffectsHandler(mockController);
+  it('falls back to the original camera if Longpipe cannot initialize', async () => {
     handler.setPreferredBackgroundEffect({type: 'blur', level: 'high'});
+    createSession.mockRejectedValue(new Error('No backend'));
+    const stream = createStream();
+    expect((await handler.applyBackgroundEffect(stream)).media.stream).toBe(stream);
+  });
 
-    expect(handler.isBackgroundEffectEnabled()).toBe(true);
-    expect(backgroundEffectsStore.getState().isPerformancePanelEnabled).toBe(false);
+  it('persists the performance panel and effect selection using the existing keys', () => {
+    handler.savePerformancePanelEnabledStateInStore(true);
+    handler.setPreferredBackgroundEffect({type: 'blur', level: 'high'});
+    jest.advanceTimersByTime(500);
+    expect(localStorage.getItem('video-background-effects-feature-enabled')).toBe('true');
+    expect(JSON.parse(localStorage.getItem('video-background-effects') ?? '{}')).toEqual({type: 'blur', level: 'high'});
+  });
+
+  it('routes existing quality preferences to output resolution limits', async () => {
+    handler.setPreferredBackgroundEffect({type: 'blur', level: 'high'});
+    await handler.applyBackgroundEffect(createStream());
+    handler.setQualityTier('performance');
+    expect(session.setMaximumLongEdge).toHaveBeenCalledWith(640);
+    expect(handler.getQuality()).toBe('auto');
+    expect(backgroundEffectsStore.getState().qualityTier).toBe('performance');
   });
 });

@@ -17,11 +17,11 @@
  *
  */
 
-export function createRestartQueue(restart: () => Promise<void>) {
-  let queue: Promise<void> = Promise.resolve();
+export type QualityMode = 'auto' | keyof typeof BACKGROUND_RESOLUTIONS;
 
-  return function enqueueRestart() {
-    queue = queue.then(restart, restart);
-    return queue;
-  };
-}
+export const BACKGROUND_RESOLUTIONS = {
+  fhd: {width: 1920, height: 1080},
+  hd: {width: 1280, height: 720},
+  qhd: {width: 960, height: 540},
+  nhd: {width: 640, height: 360},
+} as const;

@@ -1,6 +1,5 @@
 import {backgroundEffectsStore} from './useBackgroundEffectsStore';
 import {DEFAULT_BUILTIN_BACKGROUND_ID} from './VideoBackgroundEffects';
-import {SELFIE_MULTICLASS_MODEL_PATH, SELFIE_SEGMENTER_MODEL_PATH} from './backgroundEffects/pipe/options';
 
 describe('backgroundEffectsStore:lastVirtualBackgroundId', () => {
   beforeEach(() => {
@@ -41,53 +40,12 @@ describe('backgroundEffectsStore:lastVirtualBackgroundId', () => {
     expect(backgroundEffectsStore.getState().qualityTier).toBe('privacy');
   });
 
-  it('keeps the model indicator separate from the explicitly set quality tier', () => {
-    backgroundEffectsStore.getState().setQualityTier('privacy');
-
-    // Adaptive quality temporarily switches from multiclass to segmenter.
-    backgroundEffectsStore.getState().setModel(SELFIE_SEGMENTER_MODEL_PATH);
-
-    expect(backgroundEffectsStore.getState().qualityTier).toBe('privacy');
-    expect(backgroundEffectsStore.getState().model).toBe('selfie-segmenter');
-
-    // The high tier recovers and switches back to multiclass.
-    backgroundEffectsStore.getState().setModel(SELFIE_MULTICLASS_MODEL_PATH);
-
-    expect(backgroundEffectsStore.getState().qualityTier).toBe('privacy');
-    expect(backgroundEffectsStore.getState().model).toBe('selfie-multiclass');
-  });
-
   it('updates qualityTier when explicitly set', () => {
     backgroundEffectsStore.getState().setQualityTier('balanced');
     expect(backgroundEffectsStore.getState().qualityTier).toBe('balanced');
 
     backgroundEffectsStore.getState().setQualityTier('performance');
     expect(backgroundEffectsStore.getState().qualityTier).toBe('performance');
-  });
-
-  it('initializes effectiveQualityTier with privacy quality', () => {
-    expect(backgroundEffectsStore.getState().effectiveQualityTier).toBe('privacy');
-  });
-
-  it('updates effectiveQualityTier independently from qualityTier', () => {
-    backgroundEffectsStore.getState().setQualityTier('privacy');
-    backgroundEffectsStore.getState().setEffectiveQualityTier('balanced');
-
-    expect(backgroundEffectsStore.getState().qualityTier).toBe('privacy');
-    expect(backgroundEffectsStore.getState().effectiveQualityTier).toBe('balanced');
-  });
-
-  it('does not let setQualityTier affect effectiveQualityTier and vice versa', () => {
-    backgroundEffectsStore.getState().setEffectiveQualityTier('performance');
-    backgroundEffectsStore.getState().setQualityTier('balanced');
-
-    expect(backgroundEffectsStore.getState().effectiveQualityTier).toBe('performance');
-    expect(backgroundEffectsStore.getState().qualityTier).toBe('balanced');
-
-    backgroundEffectsStore.getState().setQualityTier('privacy');
-
-    expect(backgroundEffectsStore.getState().effectiveQualityTier).toBe('performance');
-    expect(backgroundEffectsStore.getState().qualityTier).toBe('privacy');
   });
 
   it('initializes performance panel as disabled', () => {

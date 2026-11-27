@@ -17,14 +17,9 @@
  *
  */
 
-/**
- * Performance sample containing timing measurements for a single frame.
- */
-export interface PerformanceSample {
-  /** Total processing time in milliseconds (segmentation + GPU rendering). */
-  totalMs: number;
-  /** Time spent on ML segmentation in milliseconds. */
-  segmentationMs: number;
-  /** Time spent on GPU rendering operations in milliseconds. */
-  gpuMs: number;
-}
+export const isBackgroundEffectsSupported = (): boolean => {
+  if (typeof navigator !== 'undefined' && 'gpu' in navigator) {
+    return true;
+  }
+  return typeof document !== 'undefined' && document.createElement('canvas').getContext('webgl2') !== null;
+};

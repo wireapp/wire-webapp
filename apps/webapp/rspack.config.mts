@@ -23,7 +23,7 @@ import cssnano from 'cssnano';
 import dotenv from 'dotenv-extended';
 import HtmlRspackPlugin from 'html-rspack-plugin';
 
-import {readFileSync} from 'node:fs';
+import {existsSync, readFileSync} from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 
@@ -110,6 +110,17 @@ function createEnvironmentUrls(environment: Env): EnvironmentUrls {
 const templateParameters = createTemplateParameters();
 
 function createRspackConfiguration(mode: 'development' | 'production' = 'production'): Configuration {
+  const modelDirectory = path.resolve(configDirectoryPath, 'assets/longpipe/models/v0.0.5');
+  for (const model of ['xs', 'small', 'medium', 'large']) {
+    for (const suffix of ['.f16.bin', '.bin']) {
+      const modelPath = path.join(modelDirectory, `model_${model}${suffix}`);
+      if (!existsSync(modelPath)) {
+        throw new Error(
+          `Missing Longpipe weights: ${modelPath}. Run sh tools/longpipe/downloadModels.sh to import the models before building.`,
+        );
+      }
+    }
+  }
   const isDevelopment = mode === 'development';
   const outputPath = path.resolve(
     rootPath,
@@ -265,11 +276,6 @@ function createRspackConfiguration(mode: 'development' | 'production' = 'product
       }),
       new rspack.CopyRspackPlugin({
         patterns: [
-          {
-            context: path.resolve(rootPath, 'node_modules/@mediapipe/tasks-vision/wasm'),
-            from: '*',
-            to: 'min/mediapipe/wasm',
-          },
           {
             context: path.resolve(configDirectoryPath, 'resource'),
             from: '**/*',

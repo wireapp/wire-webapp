@@ -3943,6 +3943,32 @@ describe('set background effect', () => {
       expect(result).toBe(processedStream);
     });
 
+    it('replaces the AVS track after an active effect session changes resolution', async () => {
+      const inputStream = createMediaStream('inputStream');
+      const processedStream = createMediaStream('processedStream');
+      const processedMedia = new ReleasableMediaStream(processedStream);
+      jest.spyOn(callState, 'joinedCall').mockImplementation(
+        ko.pureComputed<Call | undefined>(() => {
+          return activeCall;
+        }),
+      );
+      jest
+        .spyOn(backgroundEffectsHandler, 'applyBackgroundEffect')
+        .mockResolvedValue({applied: true, media: processedMedia});
+
+      await callingRepository['applyCurrentBackgroundEffectOnSelfParticipant'](inputStream, true);
+      jest.spyOn(selfParticipant, 'processedVideoStream').mockReturnValue(processedMedia);
+      const replace = jest.spyOn(callingRepository, 'changeMediaSource');
+      replace.mockClear();
+      processedMedia.onTrackChanged?.();
+      expect(replace).toHaveBeenCalledWith(processedStream, MediaType.VIDEO, false, activeCall);
+
+      replace.mockClear();
+      jest.spyOn(selfParticipant, 'processedVideoStream').mockReturnValue(undefined);
+      processedMedia.onTrackChanged?.();
+      expect(replace).not.toHaveBeenCalled();
+    });
+
     it('does not assign the original stream again when it is already stored', async () => {
       const inputStream = createMediaStream('inputStream');
       const processedStream = createMediaStream('processedStream');
