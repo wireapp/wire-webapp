@@ -3232,12 +3232,12 @@ export class MessageRepository {
   // Pending state of a message
 
   /**
-   * `pending` while the message waits to be sent, `sending` while a send is in flight, and `undefined` when the
-   * outbox doesn't have the message or isn't enabled.
+   * `pending` while the message waits to be sent, `sending` while a send is in flight, `not-in-outbox` when the
+   * outbox doesn't have the message, and `outbox-disabled` when there is no outbox.
    */
-  public getOutboxState(messageId: string): 'pending' | 'sending' | undefined {
+  public getOutboxState(messageId: string): 'pending' | 'sending' | 'not-in-outbox' | 'outbox-disabled' {
     if (this.outbox === undefined) {
-      return undefined;
+      return 'outbox-disabled';
     }
     return this.pendingStateOf(this.findPendingMessage(messageId));
   }
@@ -3251,7 +3251,7 @@ export class MessageRepository {
     return pending !== undefined && this.pendingStateOf(pending) === 'pending' && !this.isUnconfirmed(pending);
   }
 
-  private pendingStateOf(pending: OperationView<MessagePayload> | undefined): 'pending' | 'sending' | undefined {
+  private pendingStateOf(pending: OperationView<MessagePayload> | undefined): 'pending' | 'sending' | 'not-in-outbox' {
     return match(pending?.state)
       .with('queued', 'on-hold', () => {
         return 'pending' as const;
@@ -3260,7 +3260,7 @@ export class MessageRepository {
         return 'sending' as const;
       })
       .otherwise(() => {
-        return undefined;
+        return 'not-in-outbox' as const;
       });
   }
 

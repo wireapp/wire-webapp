@@ -118,7 +118,7 @@ describe.each([THEME_ID.LIGHT, THEME_ID.DARK])('content message with the outbox 
         <ContentMessageComponent
           {...params}
           getOutboxState={() => {
-            return undefined;
+            return 'not-in-outbox';
           }}
         />,
         {wrapper: createWrapper(true)},
@@ -296,7 +296,15 @@ describe.each([THEME_ID.LIGHT, THEME_ID.DARK])('content message with the outbox 
     it('offers neither on a sending message with the toggle off', () => {
       message.status(StatusType.SENDING);
 
-      const {container} = render(<ContentMessageComponent {...params} />, {wrapper: createWrapper(false)});
+      const {container} = render(
+        <ContentMessageComponent
+          {...params}
+          getOutboxState={() => {
+            return 'outbox-disabled';
+          }}
+        />,
+        {wrapper: createWrapper(false)},
+      );
 
       expect(replyButton(container)).not.toBeInTheDocument();
     });

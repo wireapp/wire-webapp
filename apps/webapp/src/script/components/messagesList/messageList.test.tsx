@@ -19,7 +19,7 @@
 
 import type {ComponentProps} from 'react';
 
-import {render, waitFor, act} from '@testing-library/react';
+import {render, waitFor} from '@testing-library/react';
 import ko from 'knockout';
 import {noop} from 'noop-esm';
 
@@ -40,10 +40,9 @@ import {User} from '../../repositories/entity/User';
 import {THEME_ID} from '../../uiKit/identity/theme/theme';
 import {StyledApp} from '../../uiKit/layout/styledApp/styledApp';
 import {translateForTest} from '../../util/test/translateForTest';
-import {hideWarning, showWarning} from '../../view_model/WarningsContainer/WarningsState';
-import {TYPE} from '../../view_model/WarningsContainer/WarningsTypes';
 
 import {MessagesList} from './messageList';
+import {OfflineNotice} from './offlineNotice';
 
 const baseTimestamp = 1_000_000;
 const messageSpacing = 1000;
@@ -87,7 +86,7 @@ function createMessageListProperties(): ComponentProps<typeof MessagesList> {
     showUserDetails: noop,
     updateConversationLastRead: noop,
     isOutboxEnabled: true,
-    offlineNotice: 'outboxOfflineNotice',
+    offlineNotice: null,
   };
 }
 
@@ -129,12 +128,6 @@ describe.each([THEME_ID.LIGHT, THEME_ID.DARK])('MessagesList with the outbox in 
     properties = createMessageListProperties();
   });
 
-  afterEach(() => {
-    act(() => {
-      hideWarning(TYPE.NO_INTERNET);
-    });
-  });
-
   async function renderLoadedList(isOutboxEnabled = true): Promise<ReturnType<typeof render>> {
     const renderedList = render(<MessagesList {...properties} isOutboxEnabled={isOutboxEnabled} />, {
       wrapper: createWrapper(isOutboxEnabled, themeId),
@@ -146,9 +139,7 @@ describe.each([THEME_ID.LIGHT, THEME_ID.DARK])('MessagesList with the outbox in 
   }
 
   function goOffline(): void {
-    act(() => {
-      showWarning(TYPE.NO_INTERNET);
-    });
+    properties.offlineNotice = <OfflineNotice label="outboxOfflineNotice" />;
   }
 
   it('puts the offline notice right above the first pending message', async () => {
@@ -202,16 +193,6 @@ describe.each([THEME_ID.LIGHT, THEME_ID.DARK])('MessagesList with the outbox in 
     conversation.messages_unordered([createMessage('pending', StatusType.SENDING, 0, selfUser)]);
 
     const {queryByRole} = await renderLoadedList();
-
-    expect(queryByRole('status')).not.toBeInTheDocument();
-  });
-
-  it('shows no notice with the toggle off', async () => {
-    const {conversation, selfUser} = properties;
-    conversation.messages_unordered([createMessage('pending', StatusType.SENDING, 0, selfUser)]);
-    goOffline();
-
-    const {queryByRole} = await renderLoadedList(false);
 
     expect(queryByRole('status')).not.toBeInTheDocument();
   });

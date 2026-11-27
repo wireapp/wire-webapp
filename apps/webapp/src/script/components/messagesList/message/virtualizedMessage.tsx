@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useLayoutEffect, useRef, useEffect, type FunctionComponent} from 'react';
+import React, {useLayoutEffect, useRef, useEffect, type FunctionComponent, type ReactElement} from 'react';
 
 import {isNull} from '@sindresorhus/is';
 import cx from 'classnames';
@@ -40,7 +40,6 @@ import type {UserRepository} from '../../../repositories/user/userRepository';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {getAllFocusableElements, setElementsTabIndex} from '../../../util/focusUtil';
 import {isTabKey} from '../../../util/keyboardUtil';
-import {OfflineNotice} from '../offlineNotice';
 
 interface MessageActions {
   onClickAvatar: (user: User | ServiceEntity) => void;
@@ -84,10 +83,9 @@ interface MessageParams extends MessageActions {
   measureElement?: (element: HTMLElement | null) => void;
   index?: number;
   /**
-   * Puts the offline notice with this text right above the message, inside the measured element so that the row keeps
-   * its height
+   * Puts this offline notice right above the message, inside the measured element so that the row keeps its height
    */
-  offlineNotice?: string;
+  offlineNotice?: ReactElement | null;
 }
 
 export const Message: FunctionComponent<MessageParams> = (props: MessageParams) => {
@@ -176,7 +174,7 @@ export const Message: FunctionComponent<MessageParams> = (props: MessageParams) 
         return handleFocus(message.id);
       }}
     >
-      {offlineNotice !== undefined && <OfflineNotice label={offlineNotice} />}
+      {offlineNotice}
       <MessageWrapper
         {...props}
         hideHeader={hideHeader}

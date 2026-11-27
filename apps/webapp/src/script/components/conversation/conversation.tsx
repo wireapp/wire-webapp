@@ -67,6 +67,7 @@ import {
 } from '../../featureToggles/startupFeatureToggleNames';
 import {isMouseRightClickEvent, isAuxRightClickEvent} from '../../guards/Mouse';
 import {isServiceEntity} from '../../guards/Service';
+import {useOffline} from '../../hooks/useOffline';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {RightSidebarParams} from '../../page/appMain';
 import {PanelState} from '../../page/rightSidebar';
@@ -98,6 +99,7 @@ import {Giphy} from '../giphy';
 import {InputBar} from '../inputBar';
 import {ElementType, MessageDetails} from '../messagesList/message/contentMessage/asset/textMessageRenderer';
 import {MessageListWrapper} from '../messagesList/messageListWrapper';
+import {OfflineNotice} from '../messagesList/offlineNotice';
 import {showDetailViewModal} from '../Modals/DetailViewModal';
 import {PrimaryModal} from '../Modals/PrimaryModal';
 import {showUserModal} from '../Modals/UserModal';
@@ -143,6 +145,8 @@ function ConversationContent({
 
   const mainViewModel = useMainViewModel();
   const {fireAndForgetInvoker, translate, clock, isFeatureToggleEnabled} = useApplicationContext();
+  const isOffline = useOffline(isFeatureToggleEnabled(pendingOfflineMessagesFeatureToggleName));
+  const offlineNotice = isOffline ? <OfflineNotice label={translate('outboxOfflineNotice')} /> : null;
   const {content: contentViewModel} = mainViewModel;
   const {conversationRepository, repositories} = contentViewModel;
   const sharedDriveUploadController = useMemo(() => {
@@ -869,7 +873,7 @@ function ConversationContent({
                 updateConversationLastRead={updateConversationLastRead}
                 cancelPendingReadReceiptsForConversation={cancelPendingReadReceiptsForConversation}
                 isOutboxEnabled={isFeatureToggleEnabled(pendingOfflineMessagesFeatureToggleName)}
-                offlineNotice={translate('outboxOfflineNotice')}
+                offlineNotice={offlineNotice}
               />
 
               {showViewerPermission && !isFileTabActive && (

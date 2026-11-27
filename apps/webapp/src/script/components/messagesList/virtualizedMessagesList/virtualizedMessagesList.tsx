@@ -17,7 +17,16 @@
  *
  */
 
-import {useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type FunctionComponent} from 'react';
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type FunctionComponent,
+  type ReactElement,
+} from 'react';
 
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isNonEmptyArray, isNumber, isUndefined} from '@sindresorhus/is';
@@ -27,8 +36,6 @@ import cx from 'classnames';
 import {useLoadMessages} from './useLoadMessages';
 import {useScrollMessages} from './useScrollMessages';
 
-import {pendingOfflineMessagesFeatureToggleName} from '../../../featureToggles/startupFeatureToggleNames';
-import {useOutboxOffline} from '../../../hooks/useOutboxOffline';
 import {useRoveFocus} from '../../../hooks/useRoveFocus';
 import {useApplicationContext} from '../../../page/rootProvider';
 import {MessageRepository} from '../../../repositories/conversation/MessageRepository';
@@ -37,7 +44,6 @@ import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {MarkerComponent} from '../message/marker';
 import {Message} from '../message/virtualizedMessage';
 import {MessagesListParams} from '../messageList.types';
-import {OfflineNotice} from '../offlineNotice';
 import {UploadAssets} from '../uploadAssets';
 import {verticallyCenterMessage} from '../utils/helpers';
 import {filterMessages} from '../utils/messagesFilter';
@@ -61,6 +67,10 @@ const MARKER_ESTIMATE = 56;
 interface Props extends Omit<MessagesListParams, 'isRightSidebarOpen' | 'onLoading'> {
   parentElement: HTMLDivElement;
   onLoading: (isLoading: boolean) => void;
+  /** Shown above the first message that waits to be sent, or at the end of the list; `null` while there is none */
+  offlineNotice: ReactElement | null;
+  /** Messages in another sending state than the one before them start a group of their own */
+  splitBySendingState: boolean;
 }
 
 type LoadMessagesForTimestampSelectionOptions = {
@@ -112,9 +122,10 @@ export const VirtualizedMessagesList: FunctionComponent<Props> = ({
   updateConversationLastRead,
   onLoading,
   isConversationLoaded,
+  offlineNotice,
+  splitBySendingState,
 }: Props) => {
-  const {fireAndForgetInvoker, isFeatureToggleEnabled, translate} = useApplicationContext();
-  const offlineNotice = translate('outboxOfflineNotice');
+  const {fireAndForgetInvoker} = useApplicationContext();
   const {
     messages: allMessages,
     lastDeliveredMessage,
@@ -148,17 +159,15 @@ export const VirtualizedMessagesList: FunctionComponent<Props> = ({
     hasManualUnreadMarker,
   } = useConversationReadBoundary(conversation);
 
-  const isOutboxEnabled = isFeatureToggleEnabled(pendingOfflineMessagesFeatureToggleName);
-  const isOffline = useOutboxOffline(isOutboxEnabled);
-  const firstPendingMessage = isOffline ? findFirstPendingMessage(filteredMessages) : undefined;
+  const firstPendingMessage = offlineNotice === null ? undefined : findFirstPendingMessage(filteredMessages);
   const groupedMessages = useMemo(() => {
     return groupMessagesBySenderAndTime({
       messages: filteredMessages,
       lastReadTimestamp: conversationLastReadTimestamp,
       includeInitialUnreadSeparator: hasManualUnreadMarker,
-      splitBySendingState: isOutboxEnabled,
+      splitBySendingState,
     });
-  }, [conversationLastReadTimestamp, filteredMessages, hasManualUnreadMarker, isOutboxEnabled]);
+  }, [conversationLastReadTimestamp, filteredMessages, hasManualUnreadMarker, splitBySendingState]);
 
   const [highlightedMessage, setHighlightedMessage] = useState<string | undefined>(conversation.initialMessage()?.id);
 
@@ -398,7 +407,7 @@ export const VirtualizedMessagesList: FunctionComponent<Props> = ({
                   index={virtualItem.index}
                   message={item.message}
                   hideHeader={item.shouldGroup}
-                  offlineNotice={item.message === firstPendingMessage ? offlineNotice : undefined}
+                  offlineNotice={item.message === firstPendingMessage ? offlineNotice : null}
                   messageActions={messageActions}
                   conversation={conversation}
                   cancelPendingReadReceiptsForConversation={cancelPendingReadReceiptsForConversation}
@@ -441,7 +450,7 @@ export const VirtualizedMessagesList: FunctionComponent<Props> = ({
           );
         })}
 
-        {isOffline && firstPendingMessage === undefined && (
+        {offlineNotice !== null && firstPendingMessage === undefined && (
           <div
             key={`offline-notice-${conversation.id}`}
             ref={virtualizer.measureElement}
@@ -451,7 +460,7 @@ export const VirtualizedMessagesList: FunctionComponent<Props> = ({
               transform: `translateY(${virtualizer.getTotalSize()}px)`,
             }}
           >
-            <OfflineNotice label={offlineNotice} />
+            {offlineNotice}
           </div>
         )}
 

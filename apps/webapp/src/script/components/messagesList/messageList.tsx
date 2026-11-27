@@ -17,7 +17,7 @@
  *
  */
 
-import React, {FC, Fragment, useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react';
+import React, {FC, Fragment, ReactElement, useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react';
 
 import {isNonEmptyString, isNullOrUndefined, isNumber, isUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
@@ -26,7 +26,6 @@ import {JumpToLastMessageButton} from './jumpToLastMessageButton';
 import {Message, MessageActions} from './message';
 import {MarkerComponent} from './message/marker';
 import {ScrollToElement} from './message/types';
-import {OfflineNotice} from './offlineNotice';
 import {UploadAssets} from './uploadAssets';
 import {filterMessages} from './utils/messagesFilter';
 import {groupMessagesBySenderAndTime, isMarker} from './utils/messagesGroup';
@@ -34,7 +33,6 @@ import {updateScroll, FocusedElement} from './utils/scrollUpdater';
 import {findFirstPendingMessage} from './utils/sendingState';
 import {useConversationReadBoundary} from './utils/useConversationReadBoundary';
 
-import {useOutboxOffline} from '../../hooks/useOutboxOffline';
 import {useRoveFocus} from '../../hooks/useRoveFocus';
 import {AssetRepository} from '../../repositories/assets/assetRepository';
 import {ConversationRepository} from '../../repositories/conversation/ConversationRepository';
@@ -87,8 +85,8 @@ interface MessagesListParams {
   updateConversationLastRead: (conversation: Conversation) => void;
   /** Passed in, like the notice, so that the list stays out of the import cycle of the app context */
   isOutboxEnabled: boolean;
-  /** The translated notice shown while offline */
-  offlineNotice: string;
+  /** Shown above the first message that waits to be sent, or at the end of the list; `null` while there is none */
+  offlineNotice: ReactElement | null;
 }
 
 export const MessagesList: FC<MessagesListParams> = ({
@@ -150,8 +148,7 @@ export const MessagesList: FC<MessagesListParams> = ({
   const filteredMessages = filterMessages(allMessages);
   const filteredMessagesLength = filteredMessages.length;
 
-  const isOffline = useOutboxOffline(isOutboxEnabled);
-  const firstPendingMessage = isOffline ? findFirstPendingMessage(filteredMessages) : undefined;
+  const firstPendingMessage = offlineNotice === null ? undefined : findFirstPendingMessage(filteredMessages);
 
   const groupedMessages = groupMessagesBySenderAndTime({
     messages: filteredMessages,
@@ -361,7 +358,7 @@ export const MessagesList: FC<MessagesListParams> = ({
 
               return (
                 <Fragment key={key}>
-                  {message === firstPendingMessage && <OfflineNotice label={offlineNotice} />}
+                  {message === firstPendingMessage && offlineNotice}
                   <Message
                     onVisible={visibleCallback}
                     onVisibilityLost={lastMessageInvisibleCallback}
@@ -423,7 +420,7 @@ export const MessagesList: FC<MessagesListParams> = ({
             });
           })}
 
-          {isOffline && firstPendingMessage === undefined && <OfflineNotice label={offlineNotice} />}
+          {firstPendingMessage === undefined && offlineNotice}
 
           <UploadAssets assetRepository={assetRepository} conversationId={conversation.id} />
         </div>

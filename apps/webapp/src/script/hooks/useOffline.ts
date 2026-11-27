@@ -20,10 +20,10 @@
 import {useNoInternetState} from '../view_model/WarningsContainer/noInternetState';
 
 /**
- * Whether the app is offline with the outbox on; always `false` with the outbox off, so that nothing changes there.
- * It takes the toggle instead of reading the application context, which would tie every caller to a module cycle.
+ * Whether the app is offline; always `false` while the `pendingOfflineMessages` toggle is off, so that nothing changes
+ * there. It takes the toggle instead of reading the application context, which would tie every caller to a module cycle.
  */
-export const useOutboxOffline = (isOutboxEnabled: boolean): boolean => {
+export const useOffline = (isOutboxEnabled: boolean): boolean => {
   const hasNoInternet = useNoInternetState(state => {
     return state.hasNoInternet;
   });

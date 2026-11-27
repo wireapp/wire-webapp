@@ -17,7 +17,7 @@
  *
  */
 
-import type {FunctionComponent} from 'react';
+import type {FunctionComponent, ReactElement} from 'react';
 
 import {MessagesList} from './messageList';
 import {MessagesListParams} from './messageList.types';
@@ -26,9 +26,10 @@ import {VirtualizedMessageListWrapper} from './virtualizedMessageListWrapper';
 import {Config} from '../../Config';
 
 type MessageListWrapperProps = MessagesListParams & {
-  /** For the non-virtualized list only, which gets them passed in to stay out of the import cycle of the app context */
+  /** Passed in, like the notice, so that the lists stay out of the import cycle of the app context */
   isOutboxEnabled: boolean;
-  offlineNotice: string;
+  /** Shown while offline; `null` while there is none */
+  offlineNotice: ReactElement | null;
 };
 
 export const MessageListWrapper: FunctionComponent<MessageListWrapperProps> = ({
@@ -88,6 +89,8 @@ export const MessageListWrapper: FunctionComponent<MessageListWrapperProps> = ({
         setMsgElementsFocusable={setMsgElementsFocusable}
         isRightSidebarOpen={isRightSidebarOpen}
         updateConversationLastRead={updateConversationLastRead}
+        offlineNotice={offlineNotice}
+        splitBySendingState={isOutboxEnabled}
       />
     );
   }

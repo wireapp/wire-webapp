@@ -82,8 +82,7 @@ export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetS
   is1to1?: boolean;
   isFileShareRestricted: boolean;
   loadUsersByIdsFromDb: (userIds: QualifiedId[]) => Promise<User[]>;
-  /** Where the message is in the outbox; leaving it out treats every message as not being in it */
-  getOutboxState?: (messageId: string) => 'pending' | 'sending' | undefined;
+  getOutboxState: (messageId: string) => 'pending' | 'sending' | 'not-in-outbox' | 'outbox-disabled';
 }
 
 /** A message sent at least this long after it was written says when it was written */
@@ -182,7 +181,7 @@ export const ContentMessageComponent: FunctionComponent<ContentMessageProps> = (
   const timeAgo = useRelativeTimestamp(message.timestamp(), false, relativeTimestampFormatter);
 
   const isFailed = [StatusType.FAILED, StatusType.FEDERATION_ERROR].includes(status);
-  const outboxState = isOutboxEnabled ? getOutboxState?.(message.id) : undefined;
+  const outboxState = getOutboxState(message.id);
   // A message restored after a reload has no outbox state until the outbox started, but it already waits
   const isWaitingForConnection = isOutboxEnabled && status === StatusType.SENDING && outboxState !== 'sending';
   const isPendingInOutbox = outboxState === 'pending' && status === StatusType.SENDING;

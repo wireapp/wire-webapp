@@ -17,7 +17,7 @@
  *
  */
 
-import type {ComponentProps} from 'react';
+import type {ComponentProps, ReactElement} from 'react';
 
 import {act, fireEvent, render} from '@testing-library/react';
 import type {useVirtualizer as useVirtualizerFunction, Virtualizer} from '@tanstack/react-virtual';
@@ -38,10 +38,8 @@ import {
   createRootProviderWrapperForTest,
   requireValueForTest,
 } from '../../../page/testSupport/rootContextTestSupport';
-import {pendingOfflineMessagesFeatureToggleName} from '../../../featureToggles/startupFeatureToggleNames';
 import {translateForTest} from '../../../util/test/translateForTest';
-import {hideWarning, showWarning} from '../../../view_model/WarningsContainer/WarningsState';
-import {TYPE} from '../../../view_model/WarningsContainer/WarningsTypes';
+import {OfflineNotice} from '../offlineNotice';
 
 import {VirtualizedMessagesList} from './virtualizedMessagesList';
 
@@ -78,6 +76,8 @@ function createMessageListProperties(): ComponentProps<typeof VirtualizedMessage
     showParticipants: noop,
     showUserDetails: noop,
     updateConversationLastRead: noop,
+    offlineNotice: null,
+    splitBySendingState: false,
   };
 }
 
@@ -105,47 +105,24 @@ describe('VirtualizedMessagesList', () => {
     jest.restoreAllMocks();
   });
   describe('offline notice', () => {
-    afterEach(() => {
-      act(() => {
-        hideWarning(TYPE.NO_INTERNET);
-      });
-    });
-
-    function renderLoadedList(isOutboxEnabled: boolean): ReturnType<typeof render> {
+    function renderLoadedList(offlineNotice: ReactElement | null): ReturnType<typeof render> {
       const properties = createMessageListProperties();
       properties.isConversationLoaded = true;
+      properties.offlineNotice = offlineNotice;
       const rootProviderWrapper = createRootProviderWrapperForTest(
-        createRootContextValueForTest({
-          translate: translateForTest,
-          isFeatureToggleEnabled: featureName => {
-            return isOutboxEnabled && featureName === pendingOfflineMessagesFeatureToggleName;
-          },
-        }),
+        createRootContextValueForTest({translate: translateForTest}),
       );
       return render(withThemeAndRootContext(<VirtualizedMessagesList {...properties} />, rootProviderWrapper));
     }
 
     it('shows the notice at the end of the list when nothing is pending', () => {
-      act(() => {
-        showWarning(TYPE.NO_INTERNET);
-      });
+      const {getByRole} = renderLoadedList(<OfflineNotice label="outboxOfflineNotice" />);
 
-      const {getByRole} = renderLoadedList(true);
       expect(getByRole('status')).toHaveTextContent('outboxOfflineNotice');
     });
 
-    it('shows no notice while online', () => {
-      const {queryByRole} = renderLoadedList(true);
-
-      expect(queryByRole('status')).not.toBeInTheDocument();
-    });
-
-    it('shows no notice with the toggle off', () => {
-      act(() => {
-        showWarning(TYPE.NO_INTERNET);
-      });
-
-      const {queryByRole} = renderLoadedList(false);
+    it('shows no notice without one', () => {
+      const {queryByRole} = renderLoadedList(null);
 
       expect(queryByRole('status')).not.toBeInTheDocument();
     });

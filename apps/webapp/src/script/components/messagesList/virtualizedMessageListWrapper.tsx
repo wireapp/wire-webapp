@@ -17,7 +17,7 @@
  *
  */
 
-import {useRef, type FunctionComponent} from 'react';
+import {useRef, type ComponentProps, type FunctionComponent} from 'react';
 
 import {isNull} from '@sindresorhus/is';
 import cx from 'classnames';
@@ -27,7 +27,10 @@ import {VirtualizedMessagesList} from './virtualizedMessagesList/virtualizedMess
 
 import {TabIndex} from '../../uiKit/utils/enums';
 
-export const VirtualizedMessageListWrapper: FunctionComponent<MessagesListParams> = ({
+type VirtualizedMessageListWrapperProps = MessagesListParams &
+  Pick<ComponentProps<typeof VirtualizedMessagesList>, 'offlineNotice' | 'splitBySendingState'>;
+
+export const VirtualizedMessageListWrapper: FunctionComponent<VirtualizedMessageListWrapperProps> = ({
   assetRepository,
   conversation,
   cancelPendingReadReceiptsForConversation,
@@ -52,7 +55,9 @@ export const VirtualizedMessageListWrapper: FunctionComponent<MessagesListParams
   isRightSidebarOpen = false,
   isConversationLoaded,
   updateConversationLastRead,
-}: MessagesListParams) => {
+  offlineNotice,
+  splitBySendingState,
+}: VirtualizedMessageListWrapperProps) => {
   const parentRef = useRef<HTMLDivElement | null>(null);
 
   return (
@@ -96,6 +101,8 @@ export const VirtualizedMessageListWrapper: FunctionComponent<MessagesListParams
           updateConversationLastRead={updateConversationLastRead}
           onLoading={onLoading}
           isConversationLoaded={isConversationLoaded}
+          offlineNotice={offlineNotice}
+          splitBySendingState={splitBySendingState}
         />
       )}
     </div>
