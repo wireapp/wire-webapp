@@ -24,6 +24,7 @@ import {createUuid} from '../../util/uuid';
 
 import {SearchRepository} from './searchRepository';
 
+import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
 import {randomInt} from '../../auth/util/randomUtil';
 import {generateUsers} from '../../auth/util/test/testUtil';
 import {APIClient} from '../../service/apiClientSingleton';
@@ -38,6 +39,7 @@ function buildSearchRepository(): readonly [
     readonly userRepository: jest.Mocked<UserRepository>;
     readonly core: jest.Mocked<Core>;
     readonly apiClient: jest.Mocked<APIClient>;
+    readonly teamRepository: {getTeamSupportedProtocols: jest.Mock<CONVERSATION_PROTOCOL[]>};
   },
 ] {
   const userRepository = {
@@ -45,10 +47,15 @@ function buildSearchRepository(): readonly [
       return [];
     }),
   } as unknown as jest.Mocked<UserRepository>;
-  const core = {backendFeatures: {isFederated: false}} as unknown as jest.Mocked<Core>;
+  const core = {backendFeatures: {isFederated: false, domain: 'local.example'}} as unknown as jest.Mocked<Core>;
   const apiClient = {api: {user: {getSearchContacts: jest.fn()}}} as unknown as jest.Mocked<APIClient>;
-  const searchRepository = new SearchRepository(userRepository, core, apiClient);
-  return [searchRepository, {userRepository, core, apiClient}] as const;
+  const teamRepository = {
+    getTeamSupportedProtocols: jest.fn(() => {
+      return [CONVERSATION_PROTOCOL.PROTEUS];
+    }),
+  };
+  const searchRepository = new SearchRepository(userRepository, teamRepository, core, apiClient);
+  return [searchRepository, {userRepository, core, apiClient, teamRepository}] as const;
 }
 
 describe('SearchRepository', () => {
@@ -191,6 +198,81 @@ describe('SearchRepository', () => {
   });
 
   describe('searchByName', () => {
+    it.each(['alice@remote.example', '@alice@remote.example', ' ALICE@REMOTE.EXAMPLE '])(
+      'does not request remote contacts for a Proteus-only team: %s',
+      async query => {
+        const [searchRepository, {apiClient, core, userRepository}] = buildSearchRepository();
+        core.backendFeatures.isFederated = true;
+
+        await expect(searchRepository.searchByName(query, 'team-id')).resolves.toEqual([]);
+
+        expect(apiClient.api.user.getSearchContacts).not.toHaveBeenCalled();
+        expect(userRepository.getUsersById).not.toHaveBeenCalled();
+      },
+    );
+
+    it.each(['alice', 'alice@local.example', '@alice@local.example'])(
+      'keeps local contacts and excludes remote contacts for a Proteus-only team: %s',
+      async query => {
+        const [searchRepository, {apiClient, core, userRepository}] = buildSearchRepository();
+        core.backendFeatures.isFederated = true;
+        const localUser = generateUser({id: 'local-user', domain: 'local.example'});
+        const legacyUser = generateUser({id: 'legacy-user', domain: ''});
+        jest.spyOn(apiClient.api.user, 'getSearchContacts').mockResolvedValue({
+          response: {
+            documents: [
+              {id: localUser.id, qualified_id: localUser.qualifiedId},
+              {id: 'remote-user', qualified_id: {id: 'remote-user', domain: 'remote.example'}},
+              {id: legacyUser.id},
+            ],
+          },
+        } as any);
+        userRepository.getUsersById.mockResolvedValue([localUser, legacyUser]);
+
+        const results = await searchRepository.searchByName(query, 'team-id');
+
+        expect(results).toHaveLength(2);
+        expect(results).toEqual(expect.arrayContaining([localUser, legacyUser]));
+
+        expect(apiClient.api.user.getSearchContacts).toHaveBeenCalledWith(
+          'alice',
+          30,
+          query.includes('local.example') ? 'local.example' : undefined,
+        );
+        expect(userRepository.getUsersById).toHaveBeenCalledWith([localUser.qualifiedId, legacyUser.qualifiedId]);
+      },
+    );
+
+    it.each([[CONVERSATION_PROTOCOL.MLS], [CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS]])(
+      'allows federated search for an MLS-capable team (%s)',
+      async (...protocols) => {
+        const [searchRepository, {apiClient, core, userRepository, teamRepository}] = buildSearchRepository();
+        core.backendFeatures.isFederated = true;
+        teamRepository.getTeamSupportedProtocols.mockReturnValue(protocols);
+        const remoteUser = generateUser({id: 'remote-user', domain: 'remote.example'});
+        jest.spyOn(apiClient.api.user, 'getSearchContacts').mockResolvedValue({
+          response: {documents: [{id: remoteUser.id, qualified_id: remoteUser.qualifiedId}]},
+        } as any);
+        userRepository.getUsersById.mockResolvedValue([remoteUser]);
+
+        await expect(searchRepository.searchByName('alice@remote.example', 'team-id')).resolves.toEqual([remoteUser]);
+
+        expect(apiClient.api.user.getSearchContacts).toHaveBeenCalledWith('alice', 30, 'remote.example');
+        expect(userRepository.getUsersById).toHaveBeenCalledWith([remoteUser.qualifiedId]);
+      },
+    );
+
+    it('keeps federated search available outside teams', async () => {
+      const [searchRepository, {apiClient, core, teamRepository}] = buildSearchRepository();
+      core.backendFeatures.isFederated = true;
+      jest.spyOn(apiClient.api.user, 'getSearchContacts').mockResolvedValue({response: {documents: []}} as any);
+
+      await searchRepository.searchByName('alice@remote.example');
+
+      expect(apiClient.api.user.getSearchContacts).toHaveBeenCalledWith('alice', 30, 'remote.example');
+      expect(teamRepository.getTeamSupportedProtocols).not.toHaveBeenCalled();
+    });
+
     it('returns empty array if no users are found', async () => {
       const [searchRepository, {apiClient}] = buildSearchRepository();
       jest.spyOn(apiClient.api.user, 'getSearchContacts').mockResolvedValue({response: {documents: []}} as any);

@@ -321,7 +321,6 @@ export class App {
       this.translate,
     );
     repositories.event = new EventRepository(this.service.event, this.service.notification, serverTimeHandler);
-    repositories.search = new SearchRepository(repositories.user);
 
     repositories.team = new TeamRepository(
       repositories.user,
@@ -332,6 +331,8 @@ export class App {
       teamService,
       this.translate,
     );
+
+    repositories.search = new SearchRepository(repositories.user, repositories.team);
 
     repositories.message = new MessageRepository(
       /*

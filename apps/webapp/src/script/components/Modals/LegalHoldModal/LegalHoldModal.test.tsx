@@ -118,7 +118,11 @@ const defaultProps = (): DefaultPropsResult => {
         return Promise.resolve();
       },
     } as MessageRepository,
-    searchRepository: new SearchRepository(userRepository),
+    searchRepository: new SearchRepository(userRepository, {
+      getTeamSupportedProtocols: () => {
+        return [];
+      },
+    }),
     teamRepository: {
       isSelfConnectedTo: function isSelfConnectedTo(): boolean {
         return false;
