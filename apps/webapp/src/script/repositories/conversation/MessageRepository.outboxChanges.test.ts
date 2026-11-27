@@ -225,10 +225,10 @@ describe('MessageRepository routes changes through the outbox', () => {
       await react(createMessage(parts, 'sent-1', 'text', StatusType.SENT), '👍');
 
       expect(snapshotOf(parts.store, 'pending-1:reaction')).toEqual(
-        expect.objectContaining({validUntil: 1_000_000 + TIME_IN_MILLIS.WEEK}),
+        expect.objectContaining({expiry: {state: 'expires-at', serverTime: 1_000_000 + TIME_IN_MILLIS.WEEK}}),
       );
       expect(snapshotOf(parts.store, 'sent-1:reaction')).toEqual(
-        expect.objectContaining({validUntil: 1_000_000 + TIME_IN_MILLIS.MINUTE}),
+        expect.objectContaining({expiry: {state: 'expires-at', serverTime: 1_000_000 + TIME_IN_MILLIS.MINUTE}}),
       );
     });
 
@@ -695,8 +695,8 @@ describe('MessageRepository routes changes through the outbox', () => {
         createStoredSnapshot({
           kind: 'message',
           id: 'operation-asset',
-          correlationKey: 'asset-1',
-          orderingKey: CONVERSATION_ID.id,
+          correlation: {state: 'correlated', correlationKey: 'asset-1'},
+          lane: {state: 'in-lane', laneKey: CONVERSATION_ID.id},
           queuedSeq: 4,
           payload: {
             type: 'asset',
@@ -704,15 +704,15 @@ describe('MessageRepository routes changes through the outbox', () => {
             messageId: 'asset-1',
             asImage: false,
           },
-          validUntil: 1_000_000 + TIME_IN_MILLIS.WEEK,
+          expiry: {state: 'expires-at', serverTime: 1_000_000 + TIME_IN_MILLIS.WEEK},
         }),
       );
       parts.store.seed(
         createStoredSnapshot({
           kind: 'message',
           id: 'operation-reaction',
-          correlationKey: 'message-1:reaction',
-          orderingKey: CONVERSATION_ID.id,
+          correlation: {state: 'correlated', correlationKey: 'message-1:reaction'},
+          lane: {state: 'in-lane', laneKey: CONVERSATION_ID.id},
           queuedSeq: 5,
           payload: {
             type: 'reaction',
@@ -720,17 +720,17 @@ describe('MessageRepository routes changes through the outbox', () => {
             targetMessageId: 'message-1',
             reactions: '👍',
           },
-          validUntil: 1_000_000 + TIME_IN_MILLIS.WEEK,
+          expiry: {state: 'expires-at', serverTime: 1_000_000 + TIME_IN_MILLIS.WEEK},
         }),
       );
       parts.store.seed(
         createStoredSnapshot({
           kind: 'message-change',
           id: 'operation-hide',
-          correlationKey: 'sent-1:hide',
-          orderingKey: CHANGES_LANE,
+          correlation: {state: 'correlated', correlationKey: 'sent-1:hide'},
+          lane: {state: 'in-lane', laneKey: CHANGES_LANE},
           payload: {type: 'hide', conversationId: CONVERSATION_ID, targetMessageId: 'sent-1'},
-          validUntil: 1_000_000 + TIME_IN_MILLIS.WEEK,
+          expiry: {state: 'expires-at', serverTime: 1_000_000 + TIME_IN_MILLIS.WEEK},
         }),
       );
       await startOutbox(parts);
@@ -1196,7 +1196,7 @@ describe('MessageRepository routes changes through the outbox', () => {
         parts.conversation,
         createMessage(parts, 'message-1', 'old', StatusType.FAILED),
       );
-      expect(parts.outbox.findByCorrelationKey('message-1:reaction').type).toBe('operation-not-found');
+      expect(parts.outbox.findByCorrelationKey('message-1:reaction').outcome).toBe('operation-not-found');
 
       await retryReply();
       await parts.clock.advance(1_000);

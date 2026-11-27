@@ -89,7 +89,7 @@ describe('the message kinds of MessageRepository', () => {
     const find = parts.handles.message.find.bind(parts.handles.message);
     jest.spyOn(parts.handles.message, 'find').mockImplementation(key => {
       return key === messageId
-        ? {type: 'operation-found', operation: {state: 'dead-lettered'} as OperationView<MessagePayload>}
+        ? {outcome: 'operation-found', operation: {state: 'dead-lettered'} as OperationView<MessagePayload>}
         : find(key);
     });
   }
@@ -607,7 +607,16 @@ describe('the message kinds of MessageRepository', () => {
 
     describe('the count of pending messages', () => {
       function change(id: string, payload: MessagePayload, state: OperationState): void {
-        parts.kinds.message.onChanged?.({id, kind: 'message', payload, queuedAt: 0, state, attempts: 0});
+        parts.kinds.message.onChanged?.({
+          id,
+          kind: 'message',
+          payload,
+          correlation: {state: 'uncorrelated'},
+          lane: {state: 'no-lane'},
+          queuedAt: 0,
+          state,
+          attempts: 0,
+        });
       }
 
       it('counts text and file messages that wait, are on hold or are being sent', () => {

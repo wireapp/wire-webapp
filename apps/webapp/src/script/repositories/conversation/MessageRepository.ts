@@ -296,8 +296,8 @@ function referencedMessageId(payload: MessagePayload): string | undefined {
 }
 
 /** An enqueue with the key of a running attempt answers how that attempt ended, whichever way it ended. */
-function endsRunningAttempt(outcome: EnqueueOutcome<unknown>): boolean {
-  return outcome.type === 'operation-succeeded' || outcome.type === 'operation-dropped';
+function endsRunningAttempt(enqueueResult: EnqueueOutcome<unknown>): boolean {
+  return enqueueResult.outcome === 'operation-succeeded' || enqueueResult.outcome === 'operation-dropped';
 }
 
 export class MessageRepository {
@@ -2147,13 +2147,13 @@ export class MessageRepository {
       if (payload.type === 'text' && !(await this.hasFailedWithGenericReason(payload))) {
         continue;
       }
-      const outcome = await this.outboxKinds.message.enqueue({
+      const enqueueResult = await this.outboxKinds.message.enqueue({
         payload,
         correlationKey: messageCorrelationKey(payload),
-        orderingKey: laneOfMessages(payload.conversationId),
+        laneKey: laneOfMessages(payload.conversationId),
       });
       this.logger.info('The outbox answered sending again an operation that failed with its target', {
-        outcome: outcome.type,
+        outcome: enqueueResult.outcome,
       });
     }
   }
@@ -2177,7 +2177,7 @@ export class MessageRepository {
       case 'reaction':
         // A reaction has no Retry of its own, so it fails with its target and goes out again with the target's Retry.
         if (this.hasFailedInOutbox(payload.targetMessageId)) {
-          return {type: 'operation-dead-lettered'};
+          return {outcome: 'attempt-dead-lettered'};
         }
         return this.performChangeOperation({payload});
       case 'edit':
@@ -2972,15 +2972,15 @@ export class MessageRepository {
             messageCorrelationKey({...payload, originalMessageId: replacedMessageId}),
           ),
     ];
-    for (const found of candidates) {
+    for (const findResult of candidates) {
       if (
-        found?.type === 'operation-found' &&
-        found.operation.payload.type === 'edit' &&
-        this.isUnsent(found.operation) &&
-        (found.operation.payload.messageId === payload.originalMessageId ||
-          found.operation.payload.originalMessageId === payload.originalMessageId)
+        findResult?.outcome === 'operation-found' &&
+        findResult.operation.payload.type === 'edit' &&
+        this.isUnsent(findResult.operation) &&
+        (findResult.operation.payload.messageId === payload.originalMessageId ||
+          findResult.operation.payload.originalMessageId === payload.originalMessageId)
       ) {
-        return found.operation.payload.previousEvent;
+        return findResult.operation.payload.previousEvent;
       }
     }
     return undefined;
@@ -2988,11 +2988,11 @@ export class MessageRepository {
 
   /** What the self user's reactions to the message were before the reaction that still waits to be sent */
   private unsentReactionBase(correlationKey: string): string | undefined {
-    const found = this.outboxKinds.messageChange.find(correlationKey);
-    if (found.type !== 'operation-found' || found.operation.payload.type !== 'reaction') {
+    const findResult = this.outboxKinds.messageChange.find(correlationKey);
+    if (findResult.outcome !== 'operation-found' || findResult.operation.payload.type !== 'reaction') {
       return undefined;
     }
-    return this.isUnsent(found.operation) ? found.operation.payload.previousReactions : undefined;
+    return this.isUnsent(findResult.operation) ? findResult.operation.payload.previousReactions : undefined;
   }
 
   /** An attempt in flight may never have reached the receiver, so its change isn't confirmed either. */
