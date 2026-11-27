@@ -46,6 +46,7 @@ interface InputBarEditorProps {
   onUpdate: (content: MessageContent) => void;
   onSend: () => void;
   getMentionCandidates: (search?: string | null) => User[];
+  isEveryoneMentionAvailable?: boolean;
   saveDraftState: (editorState: string, plainMessage: string, replyId?: string) => void;
   loadDraftState: () => Promise<DraftState>;
   disableMessagePreprocessing: boolean;
@@ -68,6 +69,7 @@ export const InputBarEditor: FunctionComponent<InputBarEditorProps> = ({
   onUpdate,
   onSend,
   getMentionCandidates,
+  isEveryoneMentionAvailable = false,
   saveDraftState,
   loadDraftState,
   disableMessagePreprocessing,
@@ -84,6 +86,7 @@ export const InputBarEditor: FunctionComponent<InputBarEditorProps> = ({
       onEscape={onEscape}
       onArrowUp={onArrowUp}
       getMentionCandidates={getMentionCandidates}
+      isEveryoneMentionAvailable={isEveryoneMentionAvailable}
       disableMessagePreprocessing={disableMessagePreprocessing}
       replaceEmojis={replaceEmojis}
       placeholder={inputPlaceholder}

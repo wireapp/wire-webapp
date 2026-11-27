@@ -34,6 +34,7 @@ import {
   troubleshooterFeatureToggleName,
   sendCallLogsFeatureToggleName,
   e2ePdfPreviewFeatureToggleName,
+  everyoneMentionFeatureToggleName,
   startupFeatureToggleNames,
   forTestsOnlyFeatureToggleName,
   previewDefaultEnabledStartupFeatureToggleNames,
@@ -52,6 +53,7 @@ const featureToggleNamesWithDedicatedExistenceTests = [
   troubleshooterFeatureToggleName,
   sendCallLogsFeatureToggleName,
   e2ePdfPreviewFeatureToggleName,
+  everyoneMentionFeatureToggleName,
 ] as const;
 
 describe('startupFeatureToggles', function () {
@@ -92,6 +94,17 @@ describe('startupFeatureToggles', function () {
     expect(disabled.isFeatureToggleEnabled(e2ePdfPreviewFeatureToggleName)).toBe(false);
     expect(enabled.isFeatureToggleEnabled(e2ePdfPreviewFeatureToggleName)).toBe(true);
     expect(enabled.enabledFeatureToggleNames).toEqual([e2ePdfPreviewFeatureToggleName]);
+  });
+
+  it('keeps the mention of everyone disabled for release builds, enabled for preview builds, and allows explicit opt-in', () => {
+    const disabled = createStartupFeatureTogglesFromLocationSearch('');
+    const enabled = createStartupFeatureTogglesFromLocationSearch(
+      `?enabled-features=${everyoneMentionFeatureToggleName}`,
+    );
+
+    expect(disabled.isFeatureToggleEnabled(everyoneMentionFeatureToggleName)).toBe(false);
+    expect(previewDefaultEnabledStartupFeatureToggleNames).toContain(everyoneMentionFeatureToggleName);
+    expect(enabled.isFeatureToggleEnabled(everyoneMentionFeatureToggleName)).toBe(true);
   });
 
   it('keeps Mark as unread disabled by default for release builds and allows explicit opt-in', () => {
@@ -297,6 +310,7 @@ describe('startupFeatureToggles', function () {
       troubleshooterFeatureToggleName,
       sendCallLogsFeatureToggleName,
       e2ePdfPreviewFeatureToggleName,
+      everyoneMentionFeatureToggleName,
     ]);
   });
 
