@@ -16,6 +16,7 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  */
 
+import {expect} from '@playwright/test';
 import {CONVERSATION_CELLS_STATE} from '../../../src/script/apiClient/conversation/conversation';
 import {getRequiredUserId} from '../data/user';
 import type {User} from '../data/user';
@@ -26,20 +27,6 @@ export const DRIVE_READINESS_TIMEOUT_MS = 60_000;
 const DEFAULT_POLL_INTERVAL_MS = 1_000;
 
 type CellsStateReader = (conversationId: string, timeoutMs: number) => Promise<CONVERSATION_CELLS_STATE>;
-
-type WaitOptions = {
-  timeoutMs?: number;
-  deadlineMs?: number;
-  pollIntervalMs?: number;
-  now?: () => number;
-  pause?: (durationMs: number) => Promise<void>;
-};
-
-const pause = (durationMs: number): Promise<void> => {
-  return new Promise(resolve => {
-    return setTimeout(resolve, durationMs);
-  });
-};
 
 export const waitForDriveConversationReady = async (
   api: ApiManagerE2E,
@@ -84,45 +71,40 @@ export const waitForDriveConversationReady = async (
     (id, timeoutMs) => {
       return api.conversation.getCellsState(owner.token, id, timeoutMs);
     },
-    {deadlineMs},
+    deadlineMs,
   );
 };
 
-export const waitForCellsReady = async (
+const waitForCellsReady = async (
   conversationId: string,
   readState: CellsStateReader,
-  options: WaitOptions = {},
+  deadlineMs: number,
 ): Promise<void> => {
-  const timeoutMs = options.timeoutMs ?? DRIVE_READINESS_TIMEOUT_MS;
-  const pollIntervalMs = options.pollIntervalMs ?? DEFAULT_POLL_INTERVAL_MS;
-  const now = options.now ?? Date.now;
-  const wait = options.pause ?? pause;
-  const deadline = options.deadlineMs ?? now() + timeoutMs;
   let lastKnownState: CONVERSATION_CELLS_STATE | undefined;
   const timeoutError = (): Error => {
     return new Error(
       `Timed out waiting for Cells readiness for conversation ${conversationId}; last known state: ${lastKnownState ?? 'unknown'}.`,
     );
   };
+  const timeoutMs = deadlineMs - Date.now();
+  if (timeoutMs <= 0) throw timeoutError();
 
-  while (true) {
-    const remainingMs = deadline - now();
-    if (remainingMs <= 0) throw timeoutError();
+  await expect
+    .poll(
+      async () => {
+        const requestTimeoutMs = deadlineMs - Date.now();
+        if (requestTimeoutMs <= 0) throw timeoutError();
 
-    try {
-      lastKnownState = await readState(conversationId, remainingMs);
-    } catch (error) {
-      if (now() >= deadline) throw timeoutError();
-      const detail = error instanceof Error ? ` ${error.message}` : '';
-      throw new Error(
-        `Failed to read Cells state for conversation ${conversationId}; last known state: ${lastKnownState ?? 'unknown'}.${detail}`,
-      );
-    }
+        lastKnownState = await readState(conversationId, requestTimeoutMs);
+        if (deadlineMs - Date.now() <= 0) throw timeoutError();
 
-    const remainingAfterReadMs = deadline - now();
-    if (remainingAfterReadMs <= 0) throw timeoutError();
-    if (lastKnownState === CONVERSATION_CELLS_STATE.READY) return;
-
-    await wait(Math.min(pollIntervalMs, remainingAfterReadMs));
-  }
+        return lastKnownState;
+      },
+      {
+        timeout: timeoutMs,
+        intervals: [DEFAULT_POLL_INTERVAL_MS],
+        message: `Timed out waiting for Cells readiness for conversation ${conversationId}; last state is shown in the poll result.`,
+      },
+    )
+    .toBe(CONVERSATION_CELLS_STATE.READY);
 };
