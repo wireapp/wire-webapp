@@ -19,10 +19,11 @@
 
 import {createGroupConversationData, createGroupConversationDataParams} from './conversationRepository.mocks';
 
+import {CONVERSATION_CELLS_STATE} from '../../../../src/script/apiClient/conversation/conversation';
 import {BackendClientE2E} from '../backendClient.e2e';
 
 type Conversation = {
-  qualified_id: {id: string};
+  qualified_id: {id: string; domain?: string};
   members: {
     others: {
       conversation_role: string;
@@ -44,16 +45,30 @@ export class ConversationRepositoryE2E extends BackendClientE2E {
     };
   }
 
-  private async listAllConversations(token: string): Promise<Conversation[]> {
-    const {data: idData} = await this.axiosInstance.post('conversations/list-ids', {}, this.getAuthHeaders(token));
+  private async listAllConversations(token: string, getRemainingTimeoutMs?: () => number): Promise<Conversation[]> {
+    const idRequestTimeoutMs = getRemainingTimeoutMs?.();
+    if (idRequestTimeoutMs !== undefined && idRequestTimeoutMs <= 0) {
+      throw new Error('Conversation lookup exceeded its readiness deadline');
+    }
+
+    const {data: idData} = await this.axiosInstance.post(
+      'conversations/list-ids',
+      {},
+      {...this.getAuthHeaders(token), ...(idRequestTimeoutMs === undefined ? {} : {timeout: idRequestTimeoutMs})},
+    );
 
     const qualifiedIds = idData.qualified_conversations;
     if (!qualifiedIds) throw new Error('No qualified conversations found');
 
+    const listRequestTimeoutMs = getRemainingTimeoutMs?.();
+    if (listRequestTimeoutMs !== undefined && listRequestTimeoutMs <= 0) {
+      throw new Error('Conversation lookup exceeded its readiness deadline');
+    }
+
     const {data: listData} = await this.axiosInstance.post(
       'conversations/list',
       {qualified_ids: qualifiedIds},
-      this.getAuthHeaders(token),
+      {...this.getAuthHeaders(token), ...(listRequestTimeoutMs === undefined ? {} : {timeout: listRequestTimeoutMs})},
     );
 
     return listData.found as Conversation[];
@@ -119,5 +134,35 @@ export class ConversationRepositoryE2E extends BackendClientE2E {
     return conversations.find(conv => {
       return conv.name === conversationName;
     })?.qualified_id.id;
+  }
+
+  async getQualifiedGroupConversation(
+    token: string,
+    conversationName: string,
+    memberId: string,
+    getRemainingTimeoutMs: () => number,
+  ): Promise<string | undefined> {
+    const conversations = await this.listAllConversations(token, getRemainingTimeoutMs);
+    const conversation = conversations.find(conv => {
+      return (
+        conv.name === conversationName &&
+        conv.members.others.some(member => {
+          return member.id === memberId;
+        })
+      );
+    });
+
+    if (!conversation) return undefined;
+
+    const {domain, id} = conversation.qualified_id;
+    return domain ? `${domain}/${id}` : id;
+  }
+
+  async getCellsState(token: string, conversationId: string, timeoutMs: number): Promise<CONVERSATION_CELLS_STATE> {
+    const response = await this.axiosInstance.get<{cells_state: CONVERSATION_CELLS_STATE}>(
+      `conversations/${conversationId}`,
+      {...this.getAuthHeaders(token), timeout: timeoutMs},
+    );
+    return response.data.cells_state;
   }
 }
