@@ -32,7 +32,7 @@ import {createDexieOutboxStore} from './createDexieOutboxStore';
 
 function snapshotOf(id: string, seq: number, overrides: Partial<OperationSnapshot> = {}): OperationSnapshot {
   return {
-    schemaVersion: 2,
+    schemaVersion: 3,
     id,
     seq,
     trigger: 'operation-queued',
@@ -43,6 +43,7 @@ function snapshotOf(id: string, seq: number, overrides: Partial<OperationSnapsho
     lane: {state: 'no-lane'},
     expiry: {state: 'never-expires'},
     limits: {attemptTimeout: {state: 'never-times-out'}},
+    cascade: {state: 'none'},
     queuedSeq: 1,
     queuedAt: 1000,
     state: 'queued',
