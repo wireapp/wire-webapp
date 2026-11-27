@@ -316,7 +316,7 @@ describe.each([THEME_ID.LIGHT, THEME_ID.DARK])('content message with the outbox 
       const {container} = render(<ContentMessageComponent {...params} />, {wrapper: createWrapper(true)});
 
       expect(thumbsUp(container)).toHaveAttribute('aria-disabled', 'true');
-      expect(thumbsUp(container)).toHaveAttribute('aria-label', 'outboxNotAvailableOffline');
+      expect(thumbsUp(container)).toHaveAttribute('aria-label', 'featureNotAvailableOffline');
       expect(thumbsUp(container)).not.toHaveAttribute('disabled');
       expect(container.querySelector('[data-uie-name="reactwith-emoji-message"]')).toHaveAttribute(
         'aria-disabled',

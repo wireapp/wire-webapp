@@ -37,7 +37,7 @@ export const GiphyButton: FunctionComponent<GiphyButtonProps> = ({onGifClick}: G
   });
   const isOffline = isFeatureToggleEnabled(pendingOfflineMessagesFeatureToggleName) && hasNoInternet;
   const label = isOffline
-    ? translate('outboxNotAvailableOffline', {feature: translate('extensionsBubbleButtonGif')})
+    ? translate('featureNotAvailableOffline', {feature: translate('extensionsBubbleButtonGif')})
     : translate('extensionsBubbleButtonGif');
 
   return (

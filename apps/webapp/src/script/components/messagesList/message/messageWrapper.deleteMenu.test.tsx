@@ -163,9 +163,9 @@ describe('MessageWrapper delete menu', () => {
           return [label, isDisabled, title];
         }),
       ).toEqual([
-        ['conversationContextMenuEdit', true, 'outboxNotAvailableOffline'],
-        ['conversationContextMenuDelete', true, 'outboxNotAvailableOffline'],
-        ['conversationContextMenuDeleteEveryone', true, 'outboxNotAvailableOffline'],
+        ['conversationContextMenuEdit', true, 'featureNotAvailableOffline'],
+        ['conversationContextMenuDelete', true, 'featureNotAvailableOffline'],
+        ['conversationContextMenuDeleteEveryone', true, 'featureNotAvailableOffline'],
       ]);
       expect(messageActions.deleteMessage).not.toHaveBeenCalled();
     });

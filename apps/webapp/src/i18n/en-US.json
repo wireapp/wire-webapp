@@ -1908,7 +1908,7 @@
   "outboxFailedGeneric": "Message could not be sent.",
   "outboxFailedRejected": "Message was rejected and could not be sent.",
   "outboxFailedRemoved": "Message could not be sent as you are no longer in this conversation.",
-  "outboxNotAvailableOffline": "{feature}, not available offline",
+  "featureNotAvailableOffline": "{feature}, not available offline",
   "outboxOfflineNotice": "You are offline. Your messages will be sent once you are online again.",
   "outboxWaitingForConnection": "Waiting for connection",
   "outboxWrittenTimeAgo": "(written {time})",

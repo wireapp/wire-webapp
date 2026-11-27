@@ -385,7 +385,7 @@ describe('TitleBar', () => {
     it('stays focusable, explains why and starts nothing with the outbox on', () => {
       const {getByRole} = renderOffline(true);
 
-      const callButton = getByRole('button', {name: 'outboxNotAvailableOffline'});
+      const callButton = getByRole('button', {name: 'featureNotAvailableOffline'});
       callButton.focus();
       fireEvent.click(callButton);
 

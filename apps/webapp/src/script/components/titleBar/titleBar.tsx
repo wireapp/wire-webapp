@@ -148,7 +148,7 @@ export const TitleBar: FunctionComponent<TitleBarProps> = ({
   });
   const isOffline = isFeatureToggleEnabled(pendingOfflineMessagesFeatureToggleName) && hasNoInternet;
   const callLabel = isOffline
-    ? translate('outboxNotAvailableOffline', {feature: translate('tooltipConversationCall')})
+    ? translate('featureNotAvailableOffline', {feature: translate('tooltipConversationCall')})
     : translate('tooltipConversationCall');
 
   const badgeTranslationKey = useMemo(() => {

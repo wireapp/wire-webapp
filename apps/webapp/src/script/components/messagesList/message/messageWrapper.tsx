@@ -165,7 +165,7 @@ export const MessageWrapper: FunctionComponent<MessageParams> = ({
     const isChangeRefused = message.isChangeRefusedOffline(isOffline);
     const refusedOfflineEntry = (label: string): Partial<ContextMenuEntry> => {
       return isChangeRefused
-        ? {isDisabled: true, title: translate('outboxNotAvailableOffline', {feature: label.replace(/…$/, '')})}
+        ? {isDisabled: true, title: translate('featureNotAvailableOffline', {feature: label.replace(/…$/, '')})}
         : {};
     };
 

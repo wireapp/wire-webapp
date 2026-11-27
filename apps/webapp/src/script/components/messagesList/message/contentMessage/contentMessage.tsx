@@ -141,7 +141,7 @@ export const ContentMessageComponent: FunctionComponent<ContentMessageProps> = (
   const isOffline = isOutboxEnabled && hasNoInternet;
   const isChangeDisabled = message.isChangeRefusedOffline(isOffline);
   const getOfflineButtonLabel = (feature: string): string => {
-    return translate('outboxNotAvailableOffline', {feature});
+    return translate('featureNotAvailableOffline', {feature});
   };
 
   // check if current message is focused and its elements focusable

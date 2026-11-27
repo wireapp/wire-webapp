@@ -169,7 +169,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
     if (!isDisabled) {
       return {'aria-label': actionLabel};
     }
-    const disabledLabel = translate('outboxNotAvailableOffline', {feature: actionLabel});
+    const disabledLabel = translate('featureNotAvailableOffline', {feature: actionLabel});
     return {'aria-label': disabledLabel, 'aria-disabled': true, title: disabledLabel};
   };
   return (

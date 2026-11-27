@@ -100,7 +100,7 @@ describe('MessageActions', () => {
     fireEvent.keyDown(emojiButton, {key: 'Enter'});
 
     expect(thumbsUpButton).toHaveAttribute('aria-disabled', 'true');
-    expect(thumbsUpButton).toHaveAttribute('title', 'outboxNotAvailableOffline');
+    expect(thumbsUpButton).toHaveAttribute('title', 'featureNotAvailableOffline');
     expect(emojiButton).toHaveAttribute('aria-disabled', 'true');
     expect(handleReactionClick).not.toHaveBeenCalled();
     expect(getByTestId('do-reply-message')).not.toHaveAttribute('aria-disabled');

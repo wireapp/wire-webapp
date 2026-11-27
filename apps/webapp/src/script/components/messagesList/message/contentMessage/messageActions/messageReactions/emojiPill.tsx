@@ -182,7 +182,7 @@ export const EmojiPill = ({
       ? translate('accessibility.messageReactionDetailsPlural', {emojiCount: emojiCount.toString(), emojiName})
       : translate('accessibility.messageReactionDetailsSingular', {emojiCount: emojiCount.toString(), emojiName});
 
-  const disabledLabel = translate('outboxNotAvailableOffline', {feature: detailsLabel});
+  const disabledLabel = translate('featureNotAvailableOffline', {feature: detailsLabel});
 
   const content = replaceReactComponents(caption, [
     {

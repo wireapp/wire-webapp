@@ -38,7 +38,7 @@ export const PingButton: FunctionComponent<PingButtonProps> = ({isDisabled, onCl
   });
   const isOffline = isFeatureToggleEnabled(pendingOfflineMessagesFeatureToggleName) && hasNoInternet;
   const label = isOffline
-    ? translate('outboxNotAvailableOffline', {feature: translate('tooltipConversationPing')})
+    ? translate('featureNotAvailableOffline', {feature: translate('tooltipConversationPing')})
     : translate('tooltipConversationPing');
 
   return (
