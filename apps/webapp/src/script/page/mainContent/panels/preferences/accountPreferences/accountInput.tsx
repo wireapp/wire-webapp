@@ -22,7 +22,7 @@ import {FC, InputHTMLAttributes, useEffect, useRef, useState} from 'react';
 import {isEmptyString, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 
 import * as Icon from '../../../../../components/icon';
-import {TextInput} from '../../../../../components/TextInput';
+import {TextInput} from '../../../../../components/textInput';
 import {MotionDuration} from '../../../../../motion/motionDuration';
 import {IconButton, IconButtonVariant} from '../../../../../uiKit/inputs/iconButton/iconButton';
 import {isEnterKey, isTabKey} from '../../../../../util/keyboardUtil';

@@ -22,7 +22,7 @@ import {useState, type FunctionComponent} from 'react';
 import {containerStyles, imageStyles} from './imageAssetSmall.styles';
 
 import {useApplicationContext} from '../../../../../../../../page/rootProvider';
-import {FileFullscreenModal} from '../../../../../../../FileFullscreenModal/FileFullscreenModal';
+import {FileFullscreenModal} from '../../../../../../../fileFullscreenModal/fileFullscreenModal';
 import {MediaFilePreviewCard} from '../../common/mediaFilePreviewCard/mediaFilePreviewCard';
 
 interface ImageAssetSmallProps {

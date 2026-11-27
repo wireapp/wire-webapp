@@ -27,8 +27,8 @@ import {useApplicationContext} from '../../../../page/rootProvider';
 import {TeamState} from '../../../../repositories/team/TeamState';
 import {useKoSubscribableChildren} from '../../../../util/componentUtil';
 import {checkAppsFeatureAvailability} from '../../../../util/featureUtil';
-import {AppsDisabledNote} from '../../../Note/AppsDisabledNote/AppsDisabledNote';
-import {InfoToggle} from '../../../toggle/InfoToggle';
+import {AppsDisabledNote} from '../../../note/appsDisabledNote/appsDisabledNote';
+import {InfoToggle} from '../../../toggle/infoToggle';
 import {useCreateConversationModal} from '../hooks/useCreateConversationModal';
 import {getSharedDrivePermissionHint} from '../utils';
 

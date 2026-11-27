@@ -22,7 +22,7 @@ import {useState, type FunctionComponent} from 'react';
 import {iconWrapperStyles, videoStyles} from './videoAssetSmall.styles';
 
 import {useApplicationContext} from '../../../../../../../../page/rootProvider';
-import {FileFullscreenModal} from '../../../../../../../FileFullscreenModal/FileFullscreenModal';
+import {FileFullscreenModal} from '../../../../../../../fileFullscreenModal/fileFullscreenModal';
 import {FilePreviewPlayButton} from '../../common/filePreviewPlayButton/filePreviewPlayButton';
 import {MediaFilePreviewCard} from '../../common/mediaFilePreviewCard/mediaFilePreviewCard';
 import {hollowWrapperButtonStyles} from '../../multipartAssets.styles';

@@ -39,7 +39,7 @@ import {waitForDocumentContentLoaded} from './waitForDocumentContentLoaded';
 
 import {SIGN_OUT_REASON} from '../auth/signOutReason';
 import {AppContainer} from '../components/appContainer/appContainer';
-import {FileFullscreenModal} from '../components/FileFullscreenModal/FileFullscreenModal';
+import {FileFullscreenModal} from '../components/fileFullscreenModal/fileFullscreenModal';
 import {
   ChatPdfModalToken,
   type ChatPdfModalComponent,

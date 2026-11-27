@@ -35,7 +35,7 @@ import {Label} from '../../../uiKit/typography/label/label';
 import {CellsTableLoader} from '../../conversation/conversationCells/common/cellsTableLoader/cellsTableLoader';
 import {CopyToClipboardButton} from '../../copyToClipboardButton/copyToClipboardButton';
 import * as Icon from '../../icon';
-import {PasswordGeneratorButton} from '../../PasswordGeneratorButton';
+import {PasswordGeneratorButton} from '../../passwordGeneratorButton';
 
 type PublicLinkStatus = 'idle' | 'loading' | 'error' | 'success';
 

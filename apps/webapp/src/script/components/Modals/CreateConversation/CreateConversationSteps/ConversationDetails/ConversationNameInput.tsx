@@ -24,7 +24,7 @@ import {isEmptyString, isNonEmptyString} from '@sindresorhus/is';
 import {useApplicationContext} from '../../../../../page/rootProvider';
 import {ConversationRepository} from '../../../../../repositories/conversation/ConversationRepository';
 import {handleEnterDown} from '../../../../../util/keyboardUtil';
-import {TextInput} from '../../../../TextInput';
+import {TextInput} from '../../../../textInput';
 import {useCreateConversationModal} from '../../hooks/useCreateConversationModal';
 import {ConversationType} from '../../types';
 

@@ -32,7 +32,7 @@ import {UserBlockedBadge, UserVerificationBadges} from '../badge';
 import {UserClassifiedBar} from '../classifiedBar/classifiedBar';
 import {ErrorFallback} from '../errorFallback';
 import * as Icon from '../icon';
-import {UserInfo} from '../UserInfo';
+import {UserInfo} from '../userInfo';
 
 interface UserDetailsProps {
   badge?: string;

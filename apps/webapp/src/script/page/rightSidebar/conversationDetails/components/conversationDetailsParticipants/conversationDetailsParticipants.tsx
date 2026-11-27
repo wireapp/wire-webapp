@@ -22,7 +22,7 @@ import type {FunctionComponent} from 'react';
 import {isNonEmptyArray} from '@sindresorhus/is';
 
 import * as Icon from '../../../../../components/icon';
-import {ServiceList} from '../../../../../components/ServiceList';
+import {ServiceList} from '../../../../../components/serviceList';
 import {UserList} from '../../../../../components/userList';
 import {ConversationRepository} from '../../../../../repositories/conversation/ConversationRepository';
 import {Conversation} from '../../../../../repositories/entity/Conversation';

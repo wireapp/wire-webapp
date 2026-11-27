@@ -46,9 +46,9 @@ import {splitFingerprint} from '../../../util/stringUtil';
 import {toError} from '../../../util/toError';
 import {isErrorWithCode} from '../../../util/typePredicateUtil';
 import * as Icon from '../../icon';
-import {LegalHoldDot} from '../../LegalHoldDot';
+import {LegalHoldDot} from '../../legalHoldDot';
 import {UserDevicesState, UserDevices} from '../../userDevices';
-import {UserSearchableList} from '../../UserSearchableList';
+import {UserSearchableList} from '../../userSearchableList';
 import {ModalComponent} from '../ModalComponent';
 
 const DISABLE_SUBMIT_TEXT_LENGTH = 1;

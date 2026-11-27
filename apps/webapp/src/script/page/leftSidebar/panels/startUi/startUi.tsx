@@ -30,7 +30,7 @@ import {CONVERSATION_PROTOCOL} from '../../../../apiClient/team/feature/featureL
 import {showInviteModal} from '../../../../components/Modals/InviteModal';
 import {showServiceModal} from '../../../../components/Modals/ServiceModal';
 import {showUserModal} from '../../../../components/Modals/UserModal';
-import {SearchInput} from '../../../../components/SearchInput';
+import {SearchInput} from '../../../../components/searchInput';
 import {Config} from '../../../../Config';
 import {ConversationRepository} from '../../../../repositories/conversation/ConversationRepository';
 import {ConversationState} from '../../../../repositories/conversation/ConversationState';

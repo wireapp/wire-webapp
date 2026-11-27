@@ -44,7 +44,7 @@ import {BlurLowIcon} from '../../../../uiKit/dataDisplay/icon/blurLowIcon';
 import {CircleIcon} from '../../../../uiKit/dataDisplay/icon/circleIcon';
 import {FadingScrollbar} from '../../../fadingScrollbar';
 import * as Icon from '../../../icon';
-import {RadioGroup} from '../../../Radio';
+import {RadioGroup} from '../../../radio';
 
 interface VideoBackgroundSettingsProps {
   selectedEffect: BackgroundEffectSelection;

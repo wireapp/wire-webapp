@@ -24,7 +24,7 @@ import {isNonEmptyString} from '@sindresorhus/is';
 import {getFileTypeFromExtension} from '../../../../util/getFileTypeFromExtension/getFileTypeFromExtension';
 import {CellsSelfUserDriveRoleProvider} from '../../../conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import {sortTagsAlphabetically} from '../../../conversation/conversationCells/common/sortTagsAlphabetically/sortTagsAlphabetically';
-import {FileFullscreenModal} from '../../../FileFullscreenModal/FileFullscreenModal';
+import {FileFullscreenModal} from '../../../fileFullscreenModal/fileFullscreenModal';
 import {useCellsFilePreviewModal} from '../common/cellsFilePreviewModalContext/cellsFilePreviewModalContext';
 
 // This component is duplicated across global view and conversation view

@@ -38,7 +38,7 @@ import {getCurrentDate} from '../../util/timeUtil';
 import {downloadBlob} from '../../util/util';
 import {WebAppEvents} from '../../webAppEvents';
 import {PrimaryModal} from '../Modals/PrimaryModal';
-import {ProgressBar} from '../ProgressBar/ProgressBar';
+import {ProgressBar} from '../progressBar/progressBar';
 
 enum ExportState {
   COMPRESSING = 'ExportState.STATE.COMPRESSING',

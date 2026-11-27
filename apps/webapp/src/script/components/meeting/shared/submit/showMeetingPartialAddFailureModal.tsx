@@ -31,7 +31,7 @@ import type {
   PrimaryModalTranslatedTranslation,
   PrimaryModalTranslatedValue,
 } from '../../../Modals/PrimaryModal/PrimaryModalTypes';
-import {getUserNameWithTranslate} from '../../../UserName';
+import {getUserNameWithTranslate} from '../../../userName';
 
 const singularTranslationKeyByReason = {
   [AddUsersFailureReasons.NON_FEDERATING_BACKENDS]: 'failedToAddParticipantSingularNonFederatingBackends',

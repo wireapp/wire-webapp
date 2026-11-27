@@ -41,7 +41,7 @@ import type {ReactTranslationMarker} from '../../../util/localizerUtil/reactLoca
 import {createReactTranslationMarker, renderReactTranslation} from '../../../util/localizerUtil/reactLocalizerUtil';
 import {matchQualifiedIds} from '../../../util/qualifiedId';
 import * as Icon from '../../icon';
-import {getUserNameWithTranslate} from '../../UserName';
+import {getUserNameWithTranslate} from '../../userName';
 
 interface FailedToAddUsersMessageProps {
   isMessageFocused: boolean;

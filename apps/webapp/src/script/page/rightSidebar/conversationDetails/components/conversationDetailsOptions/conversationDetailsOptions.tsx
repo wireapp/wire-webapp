@@ -32,7 +32,7 @@ import {
 } from '../../../../../components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import * as Icon from '../../../../../components/icon';
 import {PanelActions} from '../../../../../components/panel/panelActions';
-import {ReceiptModeToggle} from '../../../../../components/toggle/ReceiptModeToggle';
+import {ReceiptModeToggle} from '../../../../../components/toggle/receiptModeToggle';
 import {driveOffboardingFeatureToggleName} from '../../../../../featureToggles/startupFeatureToggleNames';
 import {ConversationRepository} from '../../../../../repositories/conversation/ConversationRepository';
 import {ConversationRoleRepository} from '../../../../../repositories/conversation/ConversationRoleRepository';

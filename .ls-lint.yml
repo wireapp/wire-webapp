@@ -78,6 +78,16 @@ ls:
     .styles.tsx: camelCase
     .test.ts: camelCase
     .test.tsx: camelCase
+  apps/webapp/src/script/components/{FileFullscreenModal,fileFullscreenModal,LegalHoldDot,legalHoldDot,LoadingBar,loadingBar,Note,note,PasswordFields,passwordFields,PasswordGeneratorButton,passwordGeneratorButton,ProgressBar,progressBar,Radio,radio,SearchInput,searchInput,SelectText,selectText,ServiceList,serviceList,TextInput,textInput,UserInfo,userInfo,UserName,userName,UserSearchableList,userSearchableList,VerificationIcon,verificationIcon,ZoomableImage,zoomableImage,asset,toggle,userDevices}/**:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .style.ts: camelCase
+    .styles.ts: camelCase
+    .styles.tsx: camelCase
+    .test.ts: camelCase
+    .test.tsx: camelCase
+    .types.tsx: camelCase
   apps/webapp/src/script/util/connectionQualityHandler:
     .dir: camelCase
     .ts: camelCase

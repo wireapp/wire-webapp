@@ -41,7 +41,7 @@ jest.mock('./FileHistoryContent', () => {
     },
   };
 });
-jest.mock('../../FileFullscreenModal/FileLoader/FileLoader', () => {
+jest.mock('../../fileFullscreenModal/fileLoader/fileLoader', () => {
   return {
     FileLoader: () => {
       return <div data-uie-name="file-loader">Loading...</div>;

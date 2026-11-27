@@ -20,7 +20,7 @@
 import {useMemo, FC} from 'react';
 
 import {FadingScrollbar} from '../../../components/fadingScrollbar';
-import {RadioGroup} from '../../../components/Radio';
+import {RadioGroup} from '../../../components/radio';
 import {NOTIFICATION_STATE, getNotificationText} from '../../../repositories/conversation/NotificationSetting';
 import {Conversation} from '../../../repositories/entity/Conversation';
 import {TabIndex} from '../../../uiKit/utils/enums';

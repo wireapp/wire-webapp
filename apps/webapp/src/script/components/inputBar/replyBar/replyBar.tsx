@@ -24,7 +24,7 @@ import {ContentMessage} from '../../../repositories/entity/message/contentMessag
 import {TabIndex} from '../../../uiKit/utils/enums';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {renderMessage} from '../../../util/messageRenderer';
-import {RestrictedVideo} from '../../asset/RestrictedVideo';
+import {RestrictedVideo} from '../../asset/restrictedVideo';
 import {ParticipantMicOnIcon} from '../../calling/participantMicOnIcon';
 import * as Icon from '../../icon';
 import {AssetImage} from '../../image';

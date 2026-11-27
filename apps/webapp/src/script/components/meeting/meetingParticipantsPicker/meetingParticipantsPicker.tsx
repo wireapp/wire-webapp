@@ -51,7 +51,7 @@ import {ChevronDownIcon} from '../../../uiKit/dataDisplay/icon/chevronDownIcon';
 import {SearchIcon} from '../../../uiKit/dataDisplay/icon/searchIcon';
 import {InputLabel} from '../../../uiKit/inputs/inputLabel/inputLabel';
 import {getOverlayPortalContainer} from '../../../uiKit/utils/overlayPortal';
-import {UserSearchableList} from '../../UserSearchableList';
+import {UserSearchableList} from '../../userSearchableList';
 
 export interface MeetingParticipantsPickerProps {
   id: string;

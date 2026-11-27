@@ -34,7 +34,7 @@ import {useKoSubscribableChildren} from '../../../../util/componentUtil';
 import {AVATAR_SIZE, Avatar} from '../../../avatar';
 import {UserBlockedBadge} from '../../../badge';
 import * as Icon from '../../../icon';
-import {UserName} from '../../../UserName';
+import {UserName} from '../../../userName';
 
 type MessageHeaderParams = {
   message: ContentMessage | DeleteMessage;

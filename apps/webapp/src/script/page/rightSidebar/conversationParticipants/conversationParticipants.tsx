@@ -22,8 +22,8 @@ import {FC, useMemo, useState} from 'react';
 import {isNullOrUndefined} from '@sindresorhus/is';
 
 import {FadingScrollbar} from '../../../components/fadingScrollbar';
-import {SearchInput} from '../../../components/SearchInput';
-import {UserSearchableList} from '../../../components/UserSearchableList';
+import {SearchInput} from '../../../components/searchInput';
+import {UserSearchableList} from '../../../components/userSearchableList';
 import {isServiceEntity} from '../../../guards/service';
 import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
 import {Conversation} from '../../../repositories/entity/Conversation';

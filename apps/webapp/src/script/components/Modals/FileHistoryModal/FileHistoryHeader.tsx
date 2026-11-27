@@ -33,7 +33,7 @@ import {FileInfo} from './types';
 
 import {useApplicationContext} from '../../../page/rootProvider';
 import {FileTypeIcon} from '../../conversation/common/fileTypeIcon/fileTypeIcon';
-import {FileLoader} from '../../FileFullscreenModal/FileLoader/FileLoader';
+import {FileLoader} from '../../fileFullscreenModal/fileLoader/fileLoader';
 import * as Icon from '../../icon';
 
 export const FileHistoryHeader: FunctionComponent<{file?: FileInfo}> = ({file}: {file?: FileInfo}) => {

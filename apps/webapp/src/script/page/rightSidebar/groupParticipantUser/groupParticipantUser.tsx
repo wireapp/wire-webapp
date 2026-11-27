@@ -28,7 +28,7 @@ import * as Icon from '../../../components/icon';
 import {EnrichedFields} from '../../../components/panel/enrichedFields';
 import {UserActions, Actions} from '../../../components/panel/userActions';
 import {UserDetails} from '../../../components/panel/userDetails';
-import {BaseToggle} from '../../../components/toggle/BaseToggle';
+import {BaseToggle} from '../../../components/toggle/baseToggle';
 import {ConversationRoleRepository} from '../../../repositories/conversation/ConversationRoleRepository';
 import {MemberLeaveEvent, TeamMemberLeaveEvent} from '../../../repositories/conversation/EventBuilder';
 import {Conversation} from '../../../repositories/entity/Conversation';

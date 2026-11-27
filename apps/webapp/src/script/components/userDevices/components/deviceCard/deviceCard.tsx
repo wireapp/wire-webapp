@@ -30,7 +30,7 @@ import {handleKeyDown, KEY} from '../../../../util/keyboardUtil';
 import {splitFingerprint} from '../../../../util/stringUtil';
 import {DeviceVerificationBadges} from '../../../badge';
 import * as Icon from '../../../icon';
-import {LegalHoldDot} from '../../../LegalHoldDot';
+import {LegalHoldDot} from '../../../legalHoldDot';
 import {useMessageFocusedTabIndex} from '../../../messagesList/message/util';
 
 interface DeviceCardProps {
