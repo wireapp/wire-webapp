@@ -522,7 +522,10 @@ describe('MessageRepository.getOutboxState', () => {
     expect(buildWithFoundOperation(outboxState).getOutboxState('message-id')).toBe(expected);
   });
 
-  it('has no outbox state without an outbox', () => {
-    expect(buildMessageRepository().getOutboxState('message-id')).toBeUndefined();
+  it('has no outbox state, and no message that was never attempted, without an outbox', () => {
+    const repository = buildMessageRepository();
+
+    expect(repository.getOutboxState('message-id')).toBeUndefined();
+    expect(repository.isPendingAndNeverAttempted('message-id')).toBe(false);
   });
 });

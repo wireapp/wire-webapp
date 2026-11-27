@@ -42,10 +42,7 @@ import {VerificationMessage} from './verificationMessage';
 
 import {CONVERSATION_CELLS_STATE} from '../../../apiClient/conversation/conversation';
 import {ReactionType} from '../../../core/conversation';
-import {
-  markAsUnreadFeatureToggleName,
-  pendingOfflineMessagesFeatureToggleName,
-} from '../../../featureToggles/startupFeatureToggleNames';
+import {markAsUnreadFeatureToggleName} from '../../../featureToggles/startupFeatureToggleNames';
 import {QuoteEntity} from '../../../message/quoteEntity';
 import {useApplicationContext} from '../../../page/rootProvider';
 import {AssetRepository} from '../../../repositories/assets/assetRepository';
@@ -151,10 +148,7 @@ export const MessageWrapper: FunctionComponent<MessageParams> = ({
     const canDelete = message.user().isMe && !conversation.isSelfUserRemoved() && message.isDeletable();
 
     // Nobody can have the message yet, so one delete is all there is to offer
-    const isPendingDelete =
-      canDelete &&
-      isFeatureToggleEnabled(pendingOfflineMessagesFeatureToggleName) &&
-      messageRepository.isPendingAndNeverAttempted(message.id);
+    const isPendingDelete = canDelete && messageRepository.isPendingAndNeverAttempted(message.id);
 
     const canEdit = message.isEditable() && !conversation.isSelfUserRemoved();
 

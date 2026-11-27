@@ -21,7 +21,6 @@ import {render} from '@testing-library/react';
 import type {ComponentProps} from 'react';
 
 import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
-import {pendingOfflineMessagesFeatureToggleName} from '../../../featureToggles/startupFeatureToggleNames';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
@@ -48,11 +47,10 @@ jest.mock('./contentMessage', () => {
 });
 
 type Setup = {
-  messageRepository: {isPendingAndNeverAttempted: jest.Mock};
   messageActions: {deleteMessage: jest.Mock; deleteMessageEveryone: jest.Mock};
 };
 
-const renderMenu = (isOutboxEnabled: boolean, isNeverAttempted: boolean): Setup => {
+const renderMenu = (isNeverAttempted: boolean): Setup => {
   const conversation = new Conversation(
     createUuid(),
     'test.wire.link',
@@ -78,17 +76,10 @@ const renderMenu = (isOutboxEnabled: boolean, isNeverAttempted: boolean): Setup 
   } as unknown as ComponentProps<typeof MessageWrapper>;
 
   render(<MessageWrapper {...props} />, {
-    wrapper: createRootProviderWrapperForTest(
-      createRootContextValueForTest({
-        translate: translateForTest,
-        isFeatureToggleEnabled: featureName => {
-          return isOutboxEnabled && featureName === pendingOfflineMessagesFeatureToggleName;
-        },
-      }),
-    ),
+    wrapper: createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest})),
   });
 
-  return {messageRepository, messageActions};
+  return {messageActions};
 };
 
 const labels = (): (string | undefined)[] => {
@@ -103,7 +94,7 @@ describe('MessageWrapper delete menu', () => {
   });
 
   it('offers one "Delete…" for a pending message nobody can have', () => {
-    renderMenu(true, true);
+    renderMenu(true);
 
     expect(labels()).not.toContain('conversationContextMenuDelete');
     expect(labels()).not.toContain('conversationContextMenuDeleteEveryone');
@@ -111,7 +102,7 @@ describe('MessageWrapper delete menu', () => {
   });
 
   it('deletes through the same action, which asks to confirm', () => {
-    const {messageActions} = renderMenu(true, true);
+    const {messageActions} = renderMenu(true);
 
     latestEntries
       .find(({label}) => {
@@ -123,22 +114,12 @@ describe('MessageWrapper delete menu', () => {
     expect(messageActions.deleteMessageEveryone).not.toHaveBeenCalled();
   });
 
-  it('offers "Delete for me" and "Delete for everyone" for an unconfirmed message', () => {
-    renderMenu(true, false);
+  it('offers "Delete for me" and "Delete for everyone" for any other message', () => {
+    renderMenu(false);
 
     expect(labels()).toEqual(
       expect.arrayContaining(['conversationContextMenuDelete', 'conversationContextMenuDeleteEveryone']),
     );
     expect(labels()).not.toContain('outboxDeletePending');
-  });
-
-  it('offers both deletes, without asking the outbox, when the outbox is off', () => {
-    const {messageRepository} = renderMenu(false, true);
-
-    expect(labels()).toEqual(
-      expect.arrayContaining(['conversationContextMenuDelete', 'conversationContextMenuDeleteEveryone']),
-    );
-    expect(labels()).not.toContain('outboxDeletePending');
-    expect(messageRepository.isPendingAndNeverAttempted).not.toHaveBeenCalled();
   });
 });
