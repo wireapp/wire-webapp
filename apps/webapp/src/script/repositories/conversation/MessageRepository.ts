@@ -1862,6 +1862,8 @@ export class MessageRepository {
           messageEntity.timestamp(timestamp);
           conversationEntity.updateTimestampServer(timestamp, true);
           conversationEntity.updateTimestamps(messageEntity);
+          // A message that is not loaded is mapped from its record, without its sender: updateTimestamps can't tell it is ours
+          conversationEntity.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.LAST_READ);
         }
       }
       this.conversationRepositoryProvider().checkMessageTimer(messageEntity);

@@ -40,7 +40,7 @@ describe('a message that is sent while its conversation is not loaded', () => {
     testFactory.dispose();
   });
 
-  it('is loaded when the conversation is opened', async () => {
+  it('marks the conversation as read up to it and is loaded when the conversation is opened', async () => {
     const conversationRepository = requireValueForTest(testFactory.conversation_repository);
     const messageRepository = requireValueForTest(testFactory.message_repository);
     const selfUser = generateUser();
@@ -68,6 +68,7 @@ describe('a message that is sent while its conversation is not loaded', () => {
     await messageRepository['updateMessageAsSent'](conversation, event.id, sentAt);
     const loaded = await conversationRepository.getPrecedingMessages(conversation);
 
+    expect(conversation.last_read_timestamp()).toBe(new Date(sentAt).getTime());
     expect(
       loaded.map(({id}) => {
         return id;
