@@ -2133,9 +2133,8 @@ export class MessageRepository {
 
   /**
    * The replies and reactions that failed with the message go out again behind it, in the order they were queued, so
-   * that the first one doesn't go out alone and ahead of the others. A reply counts only when it failed with the
-   * generic reason, which is the one of a reply that waited for its target or went with a message in front of it. A
-   * reply that was rejected or declined on its own stays failed.
+   * that the first one doesn't go out alone and ahead of the others. A reply that was rejected or declined on its own
+   * stays failed.
    */
   private async enqueueDependentsAgain(messageId: string): Promise<void> {
     const inQueueOrder = [...this.referrers.values()].toSorted((earlier, later) => {
@@ -2145,7 +2144,7 @@ export class MessageRepository {
       if (state !== 'dead-lettered' || referencedMessageId(payload) !== messageId) {
         continue;
       }
-      if (payload.type === 'text' && !(await this.hasFailedWithGenericReason(payload))) {
+      if (payload.type === 'text' && !(await this.hasFailedWithItsTarget(payload))) {
         continue;
       }
       const enqueueResult = await this.outboxKinds.message.enqueue({
@@ -2159,11 +2158,11 @@ export class MessageRepository {
     }
   }
 
-  private async hasFailedWithGenericReason({conversationId, messageId}: OutboxTextPayload): Promise<boolean> {
+  private async hasFailedWithItsTarget({conversationId, messageId}: OutboxTextPayload): Promise<boolean> {
     const conversation = this.conversationState.findConversation(conversationId);
     const record =
       conversation === undefined ? undefined : await this.eventService.loadEvent(conversation.id, messageId);
-    return record?.failed_reason === 'generic';
+    return record?.failed_reason === 'target-failed';
   }
 
   private readonly attemptMessageOperation = async (
@@ -2195,7 +2194,7 @@ export class MessageRepository {
     await this.ensureShown(conversation, payload);
     // The receiver would see a quote of a message it never got, so the reply fails and goes out after its target.
     if (payload.quote !== undefined && this.hasFailedInOutbox(payload.quote.messageId)) {
-      await this.markMessage(conversation, payload.messageId, StatusType.FAILED, 'generic');
+      await this.markMessage(conversation, payload.messageId, StatusType.FAILED, 'target-failed');
       return {outcome: 'attempt-dead-lettered'};
     }
     if (this.isDegraded(conversation)) {
@@ -2297,7 +2296,7 @@ export class MessageRepository {
           await this.ensureShown(conversation, payload);
           return this.showAsSending(conversation, payload.messageId);
         case 'dead-lettered':
-          return this.showAsFailedUnlessItIs(conversation, payload.messageId, queuedAt);
+          return this.showAsFailedUnlessItIs(conversation, payload, queuedAt);
         case 'deleted':
           await this.deleteMessageById(conversation, payload.messageId);
 
@@ -2315,15 +2314,33 @@ export class MessageRepository {
 
   /**
    * A message that was given up without a reason of its own either expired, or waited behind a message that failed
-   * and went with it. Its age tells them apart, and only the first one says that it expired.
+   * and went with it. Its age tells them apart, and only the first one says that it expired. A reply that went with
+   * the message it quotes failed because of it.
    */
-  private async showAsFailedUnlessItIs(conversation: Conversation, messageId: string, queuedAt: number): Promise<void> {
-    const record = await this.eventService.loadEvent(conversation.id, messageId);
+  private async showAsFailedUnlessItIs(
+    conversation: Conversation,
+    payload: OutboxTextPayload | AssetMessagePayload,
+    queuedAt: number,
+  ): Promise<void> {
+    const quotesFailedMessage =
+      payload.type === 'text' && payload.quote !== undefined && this.hasFailedInOutbox(payload.quote.messageId);
+    const record = await this.eventService.loadEvent(conversation.id, payload.messageId);
     if (record === undefined || this.isFailedRecord(record)) {
       return;
     }
     const hasExpired = this.serverTimeHandler.toServerTimestamp() - queuedAt >= TIME_IN_MILLIS.WEEK;
-    await this.markMessage(conversation, messageId, StatusType.FAILED, hasExpired ? 'expired' : 'generic');
+    const reason = match({hasExpired, quotesFailedMessage})
+      .returnType<FailedReason>()
+      .with({hasExpired: true}, () => {
+        return 'expired';
+      })
+      .with({quotesFailedMessage: true}, () => {
+        return 'target-failed';
+      })
+      .otherwise(() => {
+        return 'generic';
+      });
+    await this.markMessage(conversation, payload.messageId, StatusType.FAILED, reason);
   }
 
   private isFailedRecord(record: EventRecord): boolean {

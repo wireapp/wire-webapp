@@ -1151,11 +1151,11 @@ describe('MessageRepository routes changes through the outbox', () => {
       return parts.repository.toggleReaction(parts.conversation, message, reaction, {id: 'selfid', domain: ''});
     }
 
-    it('are failed with the generic reason and send nothing', async () => {
+    it('fail with the message and send nothing', async () => {
       expect(sentIds()).toEqual([]);
       expect(snapshotOf(parts.store, replyId())).toEqual(expect.objectContaining({state: 'dead-lettered'}));
       expect(snapshotOf(parts.store, 'message-1:reaction')).toEqual(expect.objectContaining({state: 'dead-lettered'}));
-      expect(failedReasonOf(replyId())).toBe('generic');
+      expect(failedReasonOf(replyId())).toBe('target-failed');
     });
 
     it('go out after the message when it is sent again', async () => {
@@ -1190,7 +1190,7 @@ describe('MessageRepository routes changes through the outbox', () => {
 
       expect(sentIds()).toEqual([]);
       expect(snapshotOf(parts.store, replyId())).toEqual(expect.objectContaining({state: 'dead-lettered'}));
-      expect(failedReasonOf(replyId())).toBe('generic');
+      expect(failedReasonOf(replyId())).toBe('target-failed');
     });
 
     it('lose the reaction, and keep the reply with its Retry, when the message is deleted', async () => {

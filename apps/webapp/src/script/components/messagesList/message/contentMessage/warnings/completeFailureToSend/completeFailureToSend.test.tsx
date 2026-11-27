@@ -186,6 +186,8 @@ describe('CompleteFailureToSendWarning', () => {
     ['declined', 'Message was not sent because it was declined.'],
     ['removed', 'Message could not be sent as you are no longer in this conversation.'],
     ['rejected', 'Message was rejected and could not be sent.'],
+    ['generic', 'Message could not be sent.'],
+    ['target-failed', 'Message could not be sent.'],
   ] as const)('with the failed reason %s', (failedReason, expectedText) => {
     it(
       'replaces the connectivity text',

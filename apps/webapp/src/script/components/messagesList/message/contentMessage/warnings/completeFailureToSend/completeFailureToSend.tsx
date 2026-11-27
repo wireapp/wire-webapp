@@ -58,6 +58,7 @@ const failedReasonTranslationKeys = {
   generic: 'outboxFailedGeneric',
   rejected: 'outboxFailedRejected',
   removed: 'outboxFailedRemoved',
+  'target-failed': 'outboxFailedGeneric',
 } as const satisfies Record<FailedReason, TranslationKey>;
 
 function renderCompleteFailureToSendWarning(options: RenderCompleteFailureToSendWarningOptions): ReactNode {

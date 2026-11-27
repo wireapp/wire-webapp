@@ -243,7 +243,7 @@ describe('the message kinds of MessageRepository', () => {
         ).rejects.toThrow('quote');
       });
 
-      it('answers dead-lettered as generic, and sends nothing, for a reply to a message that failed', async () => {
+      it('answers dead-lettered as failed with its target, and sends nothing, for a reply to a message that failed', async () => {
         parts.records.set('message-1', sendingRecord());
         failInOutbox('quoted-1');
 
@@ -251,7 +251,10 @@ describe('the message kinds of MessageRepository', () => {
           parts.attempt('message', textPayload({quote: {messageId: 'quoted-1', userId: 'sender'}})),
         ).resolves.toEqual(deadLettered);
 
-        expect(parts.records.get('message-1')).toMatchObject({status: StatusType.FAILED, failed_reason: 'generic'});
+        expect(parts.records.get('message-1')).toMatchObject({
+          status: StatusType.FAILED,
+          failed_reason: 'target-failed',
+        });
         expect(parts.send).not.toHaveBeenCalled();
       });
 
@@ -544,6 +547,22 @@ describe('the message kinds of MessageRepository', () => {
         await parts.changed('message', textPayload(), 'dead-lettered', queuedAt);
 
         expect(parts.records.get('message-1')).toMatchObject({status: StatusType.FAILED, failed_reason: reason});
+      });
+
+      it('writes that a reply failed with its target when the message it quotes failed', async () => {
+        parts.records.set('message-1', sendingRecord());
+        failInOutbox('quoted-1');
+
+        await parts.changed(
+          'message',
+          textPayload({quote: {messageId: 'quoted-1', userId: 'sender'}}),
+          'dead-lettered',
+        );
+
+        expect(parts.records.get('message-1')).toMatchObject({
+          status: StatusType.FAILED,
+          failed_reason: 'target-failed',
+        });
       });
 
       it('removes a message that was deleted, and tolerates it being gone already', async () => {
