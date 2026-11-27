@@ -34,6 +34,7 @@ import {
   troubleshooterFeatureToggleName,
   sendCallLogsFeatureToggleName,
   e2ePdfPreviewFeatureToggleName,
+  pendingOfflineMessagesFeatureToggleName,
   startupFeatureToggleNames,
   forTestsOnlyFeatureToggleName,
   previewDefaultEnabledStartupFeatureToggleNames,
@@ -52,6 +53,7 @@ const featureToggleNamesWithDedicatedExistenceTests = [
   troubleshooterFeatureToggleName,
   sendCallLogsFeatureToggleName,
   e2ePdfPreviewFeatureToggleName,
+  pendingOfflineMessagesFeatureToggleName,
 ] as const;
 
 describe('startupFeatureToggles', function () {
@@ -92,6 +94,15 @@ describe('startupFeatureToggles', function () {
     expect(disabled.isFeatureToggleEnabled(e2ePdfPreviewFeatureToggleName)).toBe(false);
     expect(enabled.isFeatureToggleEnabled(e2ePdfPreviewFeatureToggleName)).toBe(true);
     expect(enabled.enabledFeatureToggleNames).toEqual([e2ePdfPreviewFeatureToggleName]);
+  });
+
+  it('keeps the outbox disabled by default and allows explicit opt-in', () => {
+    const disabled = createStartupFeatureTogglesFromLocationSearch('');
+    const enabled = createStartupFeatureTogglesFromLocationSearch('?enabled-features=pending-offline-messages');
+
+    expect(disabled.isFeatureToggleEnabled(pendingOfflineMessagesFeatureToggleName)).toBe(false);
+    expect(enabled.isFeatureToggleEnabled(pendingOfflineMessagesFeatureToggleName)).toBe(true);
+    expect(previewDefaultEnabledStartupFeatureToggleNames).not.toContain(pendingOfflineMessagesFeatureToggleName);
   });
 
   it('keeps Mark as unread disabled by default for release builds and allows explicit opt-in', () => {
@@ -297,6 +308,7 @@ describe('startupFeatureToggles', function () {
       troubleshooterFeatureToggleName,
       sendCallLogsFeatureToggleName,
       e2ePdfPreviewFeatureToggleName,
+      pendingOfflineMessagesFeatureToggleName,
     ]);
   });
 
