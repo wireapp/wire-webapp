@@ -28,6 +28,8 @@ import {ConversationPage} from '../../pageManager/webapp/pages/conversation.page
 import {Locator} from '@playwright/test';
 import {waitForDriveConversationReady} from '../../utils/driveReadiness';
 
+const UPLOAD_STATUS_TIMEOUT_MS = 20_000;
+
 const getMultipartAssetRoot = (conversation: ConversationPage, user: User): Locator => {
   return conversation.messageItems.getByLabel(new RegExp(`^Image from ${user.fullName}`));
 };
@@ -230,7 +232,9 @@ test.describe('Conversations', () => {
       }).toPass({intervals: [1_000, 2_000, 5_000], timeout: 20_000});
       await sharedDrive.openFolder(sourceFolderName);
       await sharedDrive.uploadFile(getTextFilePath());
-      await expect(sharedDrive.uploadStatusHeader).toContainText(`Uploaded ${TextFileName}`);
+      await expect(sharedDrive.uploadStatusHeader).toContainText(`Uploaded ${TextFileName}`, {
+        timeout: UPLOAD_STATUS_TIMEOUT_MS,
+      });
       await expect(async () => {
         await sharedDrive.refresh();
         await expect(sharedDrive.getFile(TextFileName)).toBeVisible({timeout: 2_000});

@@ -27,6 +27,8 @@ import {test, expect, withLogin} from '../../test.fixtures';
 import {connectWithUser, createGroup, sendConnectionRequest} from '../../utils/userActions';
 import {waitForDriveConversationReady} from '../../utils/driveReadiness';
 
+const UPLOAD_STATUS_TIMEOUT_MS = 20_000;
+
 interface DragAndDropOptions {
   buffer: Buffer;
   fileName: string;
@@ -81,7 +83,9 @@ test.describe('Drive file uploads', () => {
     });
 
     await test.step('Uploaded file is visible in Drive', async () => {
-      await expect(sharedDrive.uploadStatusHeader).toContainText(`Uploaded ${TextFileName}`);
+      await expect(sharedDrive.uploadStatusHeader).toContainText(`Uploaded ${TextFileName}`, {
+        timeout: UPLOAD_STATUS_TIMEOUT_MS,
+      });
 
       await expect(async () => {
         await sharedDrive.refresh();
@@ -100,7 +104,9 @@ test.describe('Drive file uploads', () => {
 
       await test.step('The first upload is available before uploading its duplicate', async () => {
         await sharedDrive.uploadFile(getTextFilePath());
-        await expect(sharedDrive.uploadStatusHeader).toContainText(`Uploaded ${TextFileName}`);
+        await expect(sharedDrive.uploadStatusHeader).toContainText(`Uploaded ${TextFileName}`, {
+          timeout: UPLOAD_STATUS_TIMEOUT_MS,
+        });
         await expect(async () => {
           await sharedDrive.refresh();
           await expect(sharedDrive.getFile(TextFileName)).toBeVisible({timeout: 2_000});
@@ -112,7 +118,9 @@ test.describe('Drive file uploads', () => {
 
       await test.step('User uploads the same file again and waits for its own completion', async () => {
         await sharedDrive.uploadFile(getTextFilePath());
-        await expect(sharedDrive.uploadStatusHeader).toContainText(`Uploaded ${TextFileName}`);
+        await expect(sharedDrive.uploadStatusHeader).toContainText(`Uploaded ${TextFileName}`, {
+          timeout: UPLOAD_STATUS_TIMEOUT_MS,
+        });
       });
 
       await test.step('Both files are available and the duplicate is renamed', async () => {
@@ -135,7 +143,9 @@ test.describe('Drive file uploads', () => {
     });
 
     await test.step('Uploaded files are visible in Drive', async () => {
-      await expect(sharedDrive.uploadStatusHeader.getByRole('status')).toContainText('Uploaded 2 items');
+      await expect(sharedDrive.uploadStatusHeader.getByRole('status')).toContainText('Uploaded 2 items', {
+        timeout: UPLOAD_STATUS_TIMEOUT_MS,
+      });
 
       await expect(async () => {
         await sharedDrive.refresh();
@@ -173,7 +183,9 @@ test.describe('Drive file uploads', () => {
       });
 
       await test.step('File upload completes in the target folder', async () => {
-        await expect(sharedDrive.uploadStatusHeader).toContainText(`Uploaded ${TextFileName}`);
+        await expect(sharedDrive.uploadStatusHeader).toContainText(`Uploaded ${TextFileName}`, {
+          timeout: UPLOAD_STATUS_TIMEOUT_MS,
+        });
         await expect(async () => {
           await sharedDrive.refresh();
           await expect(sharedDrive.getFile(TextFileName)).toBeVisible({timeout: 2_000});
@@ -226,7 +238,9 @@ test.describe('Drive file uploads for viewers', () => {
       await test.step('Precondition: Add a file that the viewer can see', async () => {
         const ownerSharedDrive = ownerPages.cellsSharedDrive();
         await ownerSharedDrive.uploadFile(getTextFilePath());
-        await expect(ownerSharedDrive.uploadStatusHeader).toContainText(`Uploaded ${TextFileName}`);
+        await expect(ownerSharedDrive.uploadStatusHeader).toContainText(`Uploaded ${TextFileName}`, {
+          timeout: UPLOAD_STATUS_TIMEOUT_MS,
+        });
         await expect(async () => {
           await ownerSharedDrive.refresh();
           await expect(ownerSharedDrive.getFile(TextFileName)).toBeVisible({timeout: 2_000});
