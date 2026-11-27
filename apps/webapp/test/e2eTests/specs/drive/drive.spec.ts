@@ -66,16 +66,9 @@ test.describe('Conversations', () => {
     userA = team.owner;
   });
 
-  test.skip(
+  test(
     'Uploading an file in a group conversation',
-    {
-      tag: ['@crit-flow-cells', '@regression', '@TC-8785'],
-      annotation: {
-        type: 'temporary-skip',
-        description:
-          'Temporarily skipped after failure in CI run 45994656201; no root cause confirmed. Re-enable when resolved: https://github.com/wireapp/wire-webapp/actions/runs/45994656201',
-      },
-    },
+    {tag: ['@crit-flow-cells', '@regression', '@TC-8785']},
     async ({api, createPage}, testInfo) => {
       const [userAPageManager, userBPageManager] = await Promise.all([
         PageManager.from(createPage(withLogin(userA))),
