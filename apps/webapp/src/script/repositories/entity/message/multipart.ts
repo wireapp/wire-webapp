@@ -26,8 +26,8 @@ import {Asset} from './asset';
 import type {LinkPreview} from './linkPreview';
 
 import {QualifiedId} from '../../../apiClient/user/qualifiedId';
-import type {MentionEntity} from '../../../message/mentionEntity';
-import {renderMessage} from '../../../util/messageRenderer';
+import type {MentionCheckOptions, MentionEntity} from '../../../message/mentionEntity';
+import {renderMessage, type RenderMessageOptions} from '../../../util/messageRenderer';
 import {AssetType} from '../../assets/assetType';
 import {containsOnlyLink} from '../../conversation/linkPreviews/helpers';
 import {mediaParser} from '../../media/MediaParser';
@@ -60,14 +60,24 @@ export class Multipart extends Asset {
   }
 
   // Process text before rendering it
-  render(selfId: QualifiedId, themeColor?: string): string {
-    const message = renderMessage(this.text, selfId, this.mentions());
+  render(selfId: QualifiedId, themeColor?: string, options: RenderMessageOptions = {}): string {
+    const message = renderMessage(this.text, selfId, this.mentions(), options);
     return isEmptyArray(this.previews()) ? mediaParser.renderMediaEmbeds(message, themeColor) : message;
   }
 
-  isUserMentioned(userId: QualifiedId): boolean {
-    return this.mentions().some(MentionEntity => {
-      return MentionEntity.targetsUser(userId);
+  /**
+   * @param userId The user id to check
+   * @param options.includeEveryone Whether a mention of everyone (`@all`) counts as mentioning the user
+   */
+  isUserMentioned(userId: QualifiedId, {includeEveryone = false}: MentionCheckOptions = {}): boolean {
+    return this.mentions().some(mentionEntity => {
+      return (includeEveryone && mentionEntity.isEveryone) || mentionEntity.targetsUser(userId);
+    });
+  }
+
+  hasEveryoneMention(): boolean {
+    return this.mentions().some(mentionEntity => {
+      return mentionEntity.isEveryone;
     });
   }
 

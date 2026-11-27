@@ -236,6 +236,52 @@ describe('Event Mapper', () => {
       expect(mentions.length).toBe(1);
     });
 
+    it('maps a mention of everyone', () => {
+      const text = 'Hey @all, lunch?';
+      const conversationEntity = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+      const everyoneMention = Mention.create({everyone: true, length: 4, start: text.indexOf('@')});
+
+      const event = createMessageAddEvent({
+        dataOverrides: {
+          content: text,
+          mentions: [arrayToBase64(Mention.encode(everyoneMention).finish())],
+          previews: [],
+        },
+      });
+
+      const messageEntity = eventMapper.mapJsonEvent(event, conversationEntity) as any;
+      const [mention] = messageEntity.getFirstAsset().mentions();
+
+      expect(messageEntity.getFirstAsset().mentions()).toHaveLength(1);
+      expect(mention.isEveryone).toBe(true);
+      expect(mention.startIndex).toBe(4);
+      expect(mention.length).toBe(4);
+    });
+
+    it('drops a mention of everyone that also has a user target, and keeps the text', () => {
+      const text = 'Hey @all, lunch?';
+      const conversationEntity = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+      const invalidMentions = [
+        Mention.create({everyone: true, length: 4, start: 4, userId: createUuid()}),
+        Mention.create({everyone: true, length: 4, start: 4, qualifiedUserId: {domain: 'wire.com', id: createUuid()}}),
+      ];
+
+      const event = createMessageAddEvent({
+        dataOverrides: {
+          content: text,
+          mentions: invalidMentions.map(mention => {
+            return arrayToBase64(Mention.encode(mention).finish());
+          }),
+          previews: [],
+        },
+      });
+
+      const messageEntity = eventMapper.mapJsonEvent(event, conversationEntity) as any;
+
+      expect(messageEntity.getFirstAsset().text).toBe(text);
+      expect(messageEntity.getFirstAsset().mentions()).toHaveLength(0);
+    });
+
     it('filters mentions that are overlapping', () => {
       const mandy = '@Mandy';
       const randy = '@Randy';
