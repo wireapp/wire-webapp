@@ -17,6 +17,7 @@
  */
 
 import {expect, type Locator, type Page} from '@playwright/test';
+import {differenceInCalendarMonths, format, parse} from 'date-fns';
 import {gunzipSync} from 'node:zlib';
 import {ConfirmModal} from '../modals/confirm.modal';
 import {
@@ -349,25 +350,44 @@ export class MeetingsPage {
   }
 
   async selectMeetingDate(dateLabel: string): Promise<void> {
+    const referenceDate = new Date();
+    const targetDate = parse(dateLabel, 'EEEE, MMMM d, yyyy', referenceDate);
+
     await this.startDateOpenCalendarButton().click();
 
-    // Wait until the calendar is displayed before inspecting its dates.
-    const calendar = this.page
-      .getByRole('dialog')
-      .filter({has: this.page.getByRole('button', {name: 'Next month', exact: true})});
+    const calendar = this.page.getByRole('dialog').filter({
+      has: this.page.getByRole('button', {name: 'Next month', exact: true}),
+    });
+    const heading = calendar.getByRole('heading');
 
-    await expect(calendar.getByRole('grid')).toBeVisible();
+    await expect(heading).toBeVisible();
 
-    // Allow additional accessible text, such as a selected-date annotation.
-    const dateButton = calendar.getByRole('button', {name: dateLabel, exact: false});
+    const displayedMonth = parse((await heading.innerText()).trim(), 'MMMM yyyy', referenceDate);
+    const monthsToMove = differenceInCalendarMonths(targetDate, displayedMonth);
 
-    // This scenario only uses tomorrow and the following day.
-    if (!(await dateButton.isVisible())) {
-      await calendar.getByRole('button', {name: 'Next month', exact: true}).click();
+    if (!Number.isInteger(monthsToMove) || Math.abs(monthsToMove) > 24) {
+      throw new Error(`Cannot navigate to calendar date "${dateLabel}".`);
     }
 
-    await expect(dateButton).toBeVisible();
+    const direction = monthsToMove > 0 ? 'Next month' : 'Previous month';
+
+    for (let month = 0; month < Math.abs(monthsToMove); month++) {
+      const previousHeading = await heading.innerText();
+
+      await calendar.getByRole('button', {name: direction, exact: true}).click();
+      await expect(heading).not.toHaveText(previousHeading);
+    }
+
+    await expect(heading).toHaveText(format(targetDate, 'MMMM yyyy'));
+
+    const dateButton = calendar.getByRole('button', {
+      name: dateLabel,
+      exact: false,
+    });
+
+    await expect(dateButton).toBeEnabled();
     await dateButton.click();
+    await expect(calendar).toBeHidden();
   }
 
   async openMeetingsAt(time: Date): Promise<void> {
