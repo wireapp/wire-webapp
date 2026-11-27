@@ -21,6 +21,7 @@ import {render} from '@testing-library/react';
 
 import {DeleteMessage as DeleteMessageEntity} from '../../../repositories/entity/message/deleteMessage';
 import {User} from '../../../repositories/entity/User';
+import type {Translate} from '../../../util/localizerUtil';
 import {translateForTest} from '../../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
@@ -50,5 +51,20 @@ describe('DeleteMessage', () => {
 
     expect(getByTestId('element-message-delete')).not.toBeNull();
     expect(getByText(sender.name())).not.toBeNull();
+  });
+
+  it('shows who deleted the message in the deletion label', () => {
+    const sender = new User(createUuid(), '', translateForTest);
+    sender.name('felix');
+    const message = createDeleteMessage(sender);
+
+    const translateWithName: Translate = (key, substitutions) => {
+      return `${key}:${substitutions?.name ?? ''}`;
+    };
+    const wrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateWithName}));
+
+    const {getByTestId} = render(<DeleteMessage message={message} />, {wrapper});
+
+    expect(getByTestId('item-message-delete-timestamp').textContent).toContain('conversationDeleteTimestampBy:felix');
   });
 });
