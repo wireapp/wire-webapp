@@ -1,6 +1,6 @@
 # webapp 1.4.0
 
-The next release after 1.3.0. The published Helm chart carries the application version and pulls the image from `quay.io/wire/wire-webapp`; see the chart notes before upgrading.
+The next release after 1.3.0. The Helm chart is now also published on `quay.io/wire/charts/stable` with the application version; see the chart notes before upgrading.
 
 - Shared Drive bulk actions with progress, restore and permanent delete that survive leaving the Bin.
 - PDF previews in an overlay, with thumbnails and a card action menu.
@@ -38,7 +38,7 @@ Changes since 1.3.0: https://github.com/wireapp/wire-webapp/compare/v1.3.0...v1.
 
 ### Chart
 
-The chart is published as `wire-webapp` version 1.4.0 on `quay.io/wire/charts/stable`, with `appVersion` 1.4.0 and `image.repository` set to `quay.io/wire/wire-webapp`. The image `quay.io/wire/wire-webapp:1.4.0` is built from the same application build as the Wire cloud deployment package and promoted by digest from the image verified during the release. The S3 chart repository keeps its own numbering for `wire-builds`. Set `image.repository` to pull from another source, for example a mirror.
+The chart is published as `webapp` version 1.4.0 on `quay.io/wire/charts/stable`, with `appVersion` 1.4.0; pre-releases are on `quay.io/wire/charts/dev`. The image `quay.io/wire/webapp:1.4.0` is built from the same application build as the Wire cloud deployment package and promoted by digest from the image verified during the release. The S3 chart repository keeps its own numbering for `wire-builds`. Set `image.repository` to pull from another source, for example a mirror.
 
 ### Compatibility
 

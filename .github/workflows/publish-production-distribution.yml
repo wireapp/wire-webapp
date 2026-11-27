@@ -52,8 +52,7 @@ permissions: {}
 env:
   CHART_REPOSITORY_NAME: charts-webapp
   CHART_REPOSITORY_URL: s3://public.wire.com/charts-webapp
-  DOCKER_REPOSITORY: quay.io/wire/wire-webapp
-  QUAY_CHART_NAME: wire-webapp
+  DOCKER_REPOSITORY: quay.io/wire/webapp
   QUAY_ROBOT: wire+gha_wire-webapp
   RM_COMPONENT: webapp
   DISTRIBUTION_CONTEXT_PATH: distribution-context
@@ -186,23 +185,11 @@ jobs:
           digest: ${{ steps.candidate_image.outputs.digest }}
           tag: ${{ steps.release.outputs.version }}
 
-      - name: Prepare the Quay chart
-        id: quay_chart
-        run: |
-          set -euo pipefail
-
-          chart_directory="${RUNNER_TEMP}/quay-chart/${QUAY_CHART_NAME}"
-          mkdir -p "${RUNNER_TEMP}/quay-chart"
-          cp -a selected-release/charts/webapp "${chart_directory}"
-          yq -i '.name = strenv(QUAY_CHART_NAME)' "${chart_directory}/Chart.yaml"
-          yq -i '.image.repository = strenv(DOCKER_REPOSITORY)' "${chart_directory}/values.yaml"
-          echo "chart_path=${chart_directory}" >> "$GITHUB_OUTPUT"
-
       - name: Publish or reuse the release Helm chart on Quay
         id: publish_oci_chart
         uses: wireapp/wire-rm-actions/publish-chart@9ff2112f54a312a66c579f6c815614e736e9791b
         with:
-          chart-path: ${{ steps.quay_chart.outputs.chart_path }}
+          chart-path: selected-release/charts/webapp
           version: ${{ steps.release.outputs.version }}
           channel: stable
           username: ${{ steps.quay.outputs.username }}
@@ -243,7 +230,6 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_SECRET_ACCESS_KEY }}
           DOCKER_IMAGE_TAG: ${{ steps.release.outputs.version }}
-          IMAGE_REPOSITORY: ${{ env.DOCKER_REPOSITORY }}
           CHART_REPOSITORY_NAME: ${{ env.CHART_REPOSITORY_NAME }}
           CHART_REPOSITORY_URL: ${{ env.CHART_REPOSITORY_URL }}
         working-directory: selected-release

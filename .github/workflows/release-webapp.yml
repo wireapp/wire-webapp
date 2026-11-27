@@ -34,7 +34,7 @@ env:
   BETA_RUNTIME_BACKEND_REST: https://prod-nginz-https.wire.com
   BETA_RUNTIME_BACKEND_WS: wss://prod-nginz-ssl.wire.com
   CHART_REPOSITORY_URL: s3://public.wire.com/charts-webapp
-  DOCKER_REPOSITORY: quay.io/wire/wire-webapp
+  DOCKER_REPOSITORY: quay.io/wire/webapp
   E2E_RUNTIME_BACKEND_REST: https://staging-nginz-https.zinfra.io/
   E2E_RUNTIME_BACKEND_WS: wss://staging-nginz-ssl.zinfra.io/
   PRODUCTION_WEBAPP_URL: https://app.wire.com/
@@ -48,7 +48,6 @@ env:
   E2E_ELASTIC_BEANSTALK_ENVIRONMENT_NAME: wire-webapp-precommit-3
   E2E_WEBAPP_URL: https://wire-webapp-precommit-3.zinfra.io/
   PRODUCTION_ENVIRONMENT_NAME: wire-webapp-prod
-  QUAY_CHART_NAME: wire-webapp
   QUAY_ROBOT: wire+gha_wire-webapp
   RM_COMPONENT: webapp
   WIRE_BUILDS_REPOSITORY: wireapp/wire-builds
@@ -529,23 +528,11 @@ jobs:
           digest: ${{ needs.build_artifact.outputs.candidate_image_digest }}
           tag: ${{ steps.beta.outputs.version }}
 
-      - name: Prepare the Quay chart
-        id: quay_chart
-        run: |
-          set -euo pipefail
-
-          chart_directory="${RUNNER_TEMP}/quay-chart/${QUAY_CHART_NAME}"
-          mkdir -p "${RUNNER_TEMP}/quay-chart"
-          cp -a charts/webapp "${chart_directory}"
-          yq -i '.name = strenv(QUAY_CHART_NAME)' "${chart_directory}/Chart.yaml"
-          yq -i '.image.repository = strenv(DOCKER_REPOSITORY)' "${chart_directory}/values.yaml"
-          echo "chart_path=${chart_directory}" >> "$GITHUB_OUTPUT"
-
       - name: Publish or reuse the Beta Helm chart on Quay
         id: publish_oci_chart
         uses: wireapp/wire-rm-actions/publish-chart@9ff2112f54a312a66c579f6c815614e736e9791b
         with:
-          chart-path: ${{ steps.quay_chart.outputs.chart_path }}
+          chart-path: charts/webapp
           version: ${{ steps.beta.outputs.version }}
           channel: dev
           username: ${{ steps.quay.outputs.username }}
