@@ -51,6 +51,20 @@ import {WebAppEvents} from '../webAppEvents';
 
 type ConnectionRequestResult = {connectionStatus: ConnectionStatus; conversationId: QualifiedId};
 
+const deleteMessageForMeKeys = {
+  action: 'modalConversationDeleteMessageAction',
+  closeBtn: 'modalConversationDeleteMessageCloseBtn',
+  message: 'modalConversationDeleteMessageMessage',
+  headline: 'modalConversationDeleteMessageHeadline',
+} as const;
+
+const deletePendingMessageKeys = {
+  action: 'outboxDeletePendingAction',
+  closeBtn: 'outboxDeletePendingCloseBtn',
+  message: 'outboxDeletePendingMessage',
+  headline: 'outboxDeletePendingHeadline',
+} as const satisfies Record<keyof typeof deleteMessageForMeKeys, string>;
+
 export class ActionsViewModel {
   constructor(
     private readonly selfRepository: SelfRepository,
@@ -254,7 +268,9 @@ export class ActionsViewModel {
   readonly deleteMessage = (conversationEntity?: Conversation, messageEntity?: Message): Promise<void> => {
     if (conversationEntity !== undefined && messageEntity !== undefined) {
       // Nobody can have a message that was never attempted: it is deleted, not deleted "for me"
-      const isNeverAttempted = this.messageRepository.isPendingAndNeverAttempted(messageEntity.id);
+      const keys = this.messageRepository.isPendingAndNeverAttempted(messageEntity.id)
+        ? deletePendingMessageKeys
+        : deleteMessageForMeKeys;
       return new Promise(resolve => {
         PrimaryModal.show(
           PrimaryModal.type.CONFIRM,
@@ -264,20 +280,12 @@ export class ActionsViewModel {
                 await this.messageRepository.deleteMessage(conversationEntity, messageEntity);
                 resolve();
               },
-              text: this.translate(
-                isNeverAttempted ? 'outboxDeletePendingAction' : 'modalConversationDeleteMessageAction',
-              ),
+              text: this.translate(keys.action),
             },
             text: {
-              closeBtnLabel: this.translate(
-                isNeverAttempted ? 'outboxDeletePendingCloseBtn' : 'modalConversationDeleteMessageCloseBtn',
-              ),
-              message: this.translate(
-                isNeverAttempted ? 'outboxDeletePendingMessage' : 'modalConversationDeleteMessageMessage',
-              ),
-              title: this.translate(
-                isNeverAttempted ? 'outboxDeletePendingHeadline' : 'modalConversationDeleteMessageHeadline',
-              ),
+              closeBtnLabel: this.translate(keys.closeBtn),
+              message: this.translate(keys.message),
+              title: this.translate(keys.headline),
             },
           },
           undefined,
