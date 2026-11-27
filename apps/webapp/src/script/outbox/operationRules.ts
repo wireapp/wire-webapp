@@ -112,9 +112,6 @@ export function resolveConfiguration(configuration: OutboxConfiguration = {}): R
 
 // State table
 
-export type TargetResolved = Outcome<'target-resolved', {target: OperationState}>;
-export type TargetRefused = Outcome<'target-refused'>;
-
 /** What the table's rules read: the operation's attempts and its kind's limits */
 export type TransitionContext = {attempts: number; maxAttempts: number; whenExhausted: WhenExhausted};
 
@@ -164,7 +161,7 @@ export function resolveTarget(
   from: OperationState | 'initial',
   trigger: Trigger,
   context: TransitionContext,
-): TargetResolved | TargetRefused {
+): Outcome<'target-resolved', {target: OperationState}> | Outcome<'target-refused'> {
   const rule = STATE_TABLE[from][trigger];
   if (rule === undefined) {
     return {outcome: 'target-refused'};
@@ -186,12 +183,6 @@ export const isFinal = isInState('succeeded', 'deleted');
 
 // Lane follows
 
-const isEnded = (state: OperationState): state is EndedState => {
-  return state === 'dead-lettered' || state === 'deleted';
-};
-
-const LANE_TRIGGERS: readonly Trigger[] = ['lane-dead-lettered', 'lane-deleted'];
-
 const LANE_TRIGGER_FOR = {'dead-lettered': 'lane-dead-lettered', deleted: 'lane-deleted'} as const;
 
 /**
@@ -205,20 +196,18 @@ export function decideCascade(
   target: OperationState,
   laneWhenEnded: LaneSettings,
 ): Cascade {
-  if (!isEnded(target)) {
+  if (target !== 'dead-lettered' && target !== 'deleted') {
     return {state: 'none'};
   }
-  const follows = laneWhenEnded[target] === 'follows' && from !== 'dead-lettered' && !LANE_TRIGGERS.includes(trigger);
+  const isLaneTrigger = trigger === 'lane-dead-lettered' || trigger === 'lane-deleted';
+  const follows = laneWhenEnded[target] === 'follows' && from !== 'dead-lettered' && !isLaneTrigger;
   return follows ? {state: 'pending', trigger: LANE_TRIGGER_FOR[target]} : {state: 'none'};
 }
-
-type PendingCascade = Extract<Cascade, State<'pending'>>;
-export type CascadingOperation = OperationSnapshot & {cascade: PendingCascade};
 
 /** Whether the operations behind it, stored with its ending, are still to be ended */
 export function isCascadePending<Operation extends OperationData>(
   operation: Operation,
-): operation is Operation & {cascade: PendingCascade} {
+): operation is Operation & {cascade: Extract<Cascade, State<'pending'>>} {
   return isInState('pending')(operation.cascade);
 }
 
@@ -226,28 +215,20 @@ export function isCascadePending<Operation extends OperationData>(
 
 const VIEW_KEYS = ['state', 'id', 'kind', 'payload', 'correlation', 'lane', 'queuedAt', 'attempts'] as const;
 
-function pick<Value extends object, Key extends keyof Value>(value: Value, keys: readonly Key[]): Pick<Value, Key> {
-  return Object.fromEntries(
-    keys.map(key => {
-      return [key, value[key]];
-    }),
-  ) as Pick<Value, Key>;
-}
-
 /** What the kernel hands out of an operation: never what only the kernel reads */
 export function toView(operation: OperationView): OperationView {
-  return Object.freeze(pick(operation, VIEW_KEYS));
+  const view = Object.fromEntries(
+    VIEW_KEYS.map(key => {
+      return [key, operation[key]];
+    }),
+  ) as OperationView;
+  return Object.freeze(view);
 }
 
 function expiryFrom(limit: ExpiryLimit, serverTime: number): Expiry {
-  return match(limit)
-    .with({state: 'expires-after'}, ({milliseconds}): Expiry => {
-      return {state: 'expires-at', serverTime: serverTime + milliseconds};
-    })
-    .with({state: 'never-expires'}, (): Expiry => {
-      return {state: 'never-expires'};
-    })
-    .exhaustive();
+  return isInState('expires-after')(limit)
+    ? {state: 'expires-at', serverTime: serverTime + limit.milliseconds}
+    : {state: 'never-expires'};
 }
 
 function requestedExpiryLimit(request: EnqueueRequest<unknown>, kind: ResolvedKind): ExpiryLimit {
@@ -269,16 +250,10 @@ function laneOf(request: EnqueueRequest<unknown>, fallback: LaneMembership): Lan
 const isInLane = isInState('in-lane');
 
 function isSameLane(first: LaneMembership, second: LaneMembership): boolean {
-  return match([first, second])
-    .with([{state: 'in-lane'}, {state: 'in-lane'}], ([one, other]) => {
-      return one.laneKey === other.laneKey;
-    })
-    .with([{state: 'no-lane'}, {state: 'no-lane'}], () => {
-      return true;
-    })
-    .otherwise(() => {
-      return false;
-    });
+  if (isInLane(first) && isInLane(second)) {
+    return first.laneKey === second.laneKey;
+  }
+  return isInState('no-lane')(first) && isInState('no-lane')(second);
 }
 
 /** A new operation: the limits of the request override the kind's, for this operation only */
@@ -330,6 +305,36 @@ export function versionOperationData(
   };
 }
 
+/** A stored snapshot is usable when its schema and kind are known, its operation hasn't ended and its payload parses */
+export function parseStoredSnapshot(
+  snapshot: OperationSnapshot,
+  kinds: ReadonlyMap<string, ResolvedKind>,
+):
+  | Outcome<'snapshot-usable', {snapshot: OperationSnapshot}>
+  | Outcome<
+      'snapshot-unusable',
+      {reason: 'schema-unknown' | 'kind-not-registered' | 'operation-ended' | 'payload-invalid'}
+    > {
+  const kind = kinds.get(snapshot.kind);
+  if (snapshot.schemaVersion !== SCHEMA_VERSION) {
+    return {outcome: 'snapshot-unusable', reason: 'schema-unknown'};
+  }
+  if (kind === undefined) {
+    return {outcome: 'snapshot-unusable', reason: 'kind-not-registered'};
+  }
+  if (isFinal(snapshot) && !isCascadePending(snapshot)) {
+    return {outcome: 'snapshot-unusable', reason: 'operation-ended'};
+  }
+  try {
+    return {
+      outcome: 'snapshot-usable',
+      snapshot: Object.freeze({...snapshot, payload: kind.parsePayload(snapshot.payload)}),
+    };
+  } catch {
+    return {outcome: 'snapshot-unusable', reason: 'payload-invalid'};
+  }
+}
+
 /** Lane order only matters among the operations that exist, so the next place follows the last one */
 export function nextQueuedSeqOf(operations: Iterable<OperationData>): number {
   return (
@@ -341,9 +346,7 @@ export function nextQueuedSeqOf(operations: Iterable<OperationData>): number {
 
 // Lanes
 
-type LanedOperation = OperationSnapshot & {lane: State<'in-lane', {laneKey: string}>};
-
-const isLaned = (operation: OperationSnapshot): operation is LanedOperation => {
+const isLaned = (operation: OperationSnapshot): operation is OperationSnapshot & {lane: State<'in-lane'>} => {
   return isInLane(operation.lane);
 };
 
@@ -417,9 +420,9 @@ export type PassSituation = {
   backoffRemainingMilliseconds: number;
 };
 
-type ExpiringOperation = OperationSnapshot & {expiry: State<'expires-at', {serverTime: number}>};
-
-const isExpiring = (operation: OperationSnapshot): operation is ExpiringOperation => {
+const isExpiring = (
+  operation: OperationSnapshot,
+): operation is OperationSnapshot & {expiry: State<'expires-at', {serverTime: number}>} => {
   return isInState('queued', 'on-hold')(operation) && isInState('expires-at')(operation.expiry);
 };
 
