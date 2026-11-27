@@ -34,7 +34,7 @@ env:
   BETA_RUNTIME_BACKEND_REST: https://prod-nginz-https.wire.com
   BETA_RUNTIME_BACKEND_WS: wss://prod-nginz-ssl.wire.com
   CHART_REPOSITORY_URL: s3://public.wire.com/charts-webapp
-  DOCKER_REPOSITORY: quay.io/wire/webapp
+  DOCKER_REPOSITORY: quay.io/wire/wire-webapp
   E2E_RUNTIME_BACKEND_REST: https://staging-nginz-https.zinfra.io/
   E2E_RUNTIME_BACKEND_WS: wss://staging-nginz-ssl.zinfra.io/
   PRODUCTION_WEBAPP_URL: https://app.wire.com/
@@ -48,6 +48,9 @@ env:
   E2E_ELASTIC_BEANSTALK_ENVIRONMENT_NAME: wire-webapp-precommit-3
   E2E_WEBAPP_URL: https://wire-webapp-precommit-3.zinfra.io/
   PRODUCTION_ENVIRONMENT_NAME: wire-webapp-prod
+  QUAY_CHART_NAME: wire-webapp
+  QUAY_ROBOT: wire+gha_wire-webapp
+  RM_COMPONENT: webapp
   WIRE_BUILDS_REPOSITORY: wireapp/wire-builds
 
 jobs:
@@ -140,8 +143,11 @@ jobs:
       WIRE_WEBAPP_CONFIGURATION: production
     permissions:
       contents: read
+      id-token: write # Log in to Quay and push the candidate image.
+    environment: quay-publication
     outputs:
       artifact_checksum: ${{ steps.artifact_metadata.outputs.artifact_checksum }}
+      candidate_image_digest: ${{ steps.candidate_image.outputs.digest }}
       artifact_name: ${{ steps.artifact_metadata.outputs.artifact_name }}
       artifact_version: ${{ steps.validate_artifact_metadata.outputs.artifact_version }}
       artifact_asset_version: ${{ steps.validate_artifact_metadata.outputs.artifact_asset_version }}
@@ -189,6 +195,16 @@ jobs:
             echo "release_version=${RELEASE_VERSION}"
             echo "release_commit_sha=${EXPECTED_RELEASE_COMMIT_SHA}"
           } >> "$GITHUB_OUTPUT"
+
+      - name: Verify the release declaration matches the release version
+        uses: wireapp/wire-rm-actions/release-declaration@9ff2112f54a312a66c579f6c815614e736e9791b
+        with:
+          file: publication/declaration.json
+          component: ${{ env.RM_COMPONENT }}
+          version: ${{ steps.release_metadata.outputs.release_version }}
+
+      - name: Verify the compatibility file
+        uses: wireapp/wire-rm-actions/compatibility@9ff2112f54a312a66c579f6c815614e736e9791b
 
       - name: Setup Node.js
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
@@ -266,6 +282,48 @@ jobs:
             }' > "${distribution_context_directory}/distribution-manifest.json"
 
           echo "distribution_artifact_name=${distribution_artifact_name}" >> "$GITHUB_OUTPUT"
+
+      - name: Log in to Quay with the OIDC token of the job
+        uses: wireapp/wire-rm-actions/quay-login@9ff2112f54a312a66c579f6c815614e736e9791b
+        with:
+          robot: ${{ env.QUAY_ROBOT }}
+
+      - name: Build and push the candidate image
+        id: candidate_image
+        uses: wireapp/wire-rm-actions/build-image@9ff2112f54a312a66c579f6c815614e736e9791b
+        with:
+          dockerfile: ${{ runner.temp }}/${{ steps.distribution_artifact.outputs.distribution_artifact_name }}/apps/server/Dockerfile
+          context: ${{ runner.temp }}/${{ steps.distribution_artifact.outputs.distribution_artifact_name }}
+          image: ${{ env.DOCKER_REPOSITORY }}
+          version: ${{ steps.release_metadata.outputs.release_version }}
+          tag: ${{ steps.release_metadata.outputs.release_version }}-candidate-${{ github.run_id }}-${{ github.run_attempt }}
+          revision: ${{ steps.release_metadata.outputs.release_commit_sha }}
+
+      - name: Verify the runtime defaults of the candidate image
+        env:
+          CANDIDATE_IMAGE_REF: ${{ steps.candidate_image.outputs.ref }}
+        run: ./tools/dockerPublication/verifyRuntimeDefaults.sh "${CANDIDATE_IMAGE_REF}"
+
+      - name: Record the candidate image in the distribution manifest
+        env:
+          CANDIDATE_IMAGE_DIGEST: ${{ steps.candidate_image.outputs.digest }}
+          CANDIDATE_IMAGE_TAG: ${{ steps.candidate_image.outputs.tag }}
+          DISTRIBUTION_MANIFEST_PATH: ${{ runner.temp }}/${{ steps.distribution_artifact.outputs.distribution_artifact_name }}/distribution-manifest.json
+        run: |
+          set -euo pipefail
+
+          updated_manifest="$(
+            jq \
+              --arg candidate_image_repository "${DOCKER_REPOSITORY}" \
+              --arg candidate_image_tag "${CANDIDATE_IMAGE_TAG}" \
+              --arg candidate_image_digest "${CANDIDATE_IMAGE_DIGEST}" \
+              '. + {
+                candidateImageRepository: $candidate_image_repository,
+                candidateImageTag: $candidate_image_tag,
+                candidateImageDigest: $candidate_image_digest
+              }' "${DISTRIBUTION_MANIFEST_PATH}"
+          )"
+          printf '%s\n' "${updated_manifest}" > "${DISTRIBUTION_MANIFEST_PATH}"
 
       - name: Upload exact public Docker distribution context
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
@@ -412,6 +470,134 @@ jobs:
           unset git_authentication_header
 
           echo "beta_tag_name=${beta_tag_name}" >> "$GITHUB_OUTPUT"
+
+  publish_beta_distribution:
+    name: Publish Beta distribution
+    runs-on: ubuntu-26.04
+    needs: [build_artifact, create_beta_tag]
+    if: ${{ needs.create_beta_tag.result == 'success' }}
+    permissions:
+      contents: read # Read the release commit and its publication files.
+      id-token: write # Log in to Quay and declare the Beta to the release managers.
+    environment: release-publication
+    concurrency:
+      group: publish-webapp-distribution
+      cancel-in-progress: false
+      queue: max
+    outputs:
+      beta_version: ${{ steps.beta.outputs.version }}
+      docker_image_digest: ${{ steps.promote_docker.outputs.digest }}
+      oci_chart_repository: ${{ steps.publish_oci_chart.outputs.repository }}
+      oci_chart_digest: ${{ steps.publish_oci_chart.outputs.digest }}
+
+    steps:
+      - name: Checkout release commit
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          ref: ${{ needs.build_artifact.outputs.release_commit_sha }}
+
+      - name: Resolve the Beta version
+        id: beta
+        env:
+          BETA_TAG: ${{ needs.create_beta_tag.outputs.beta_tag_name }}
+        run: |
+          set -euo pipefail
+
+          {
+            echo "version=${BETA_TAG#v}"
+            echo "released_at=$(date -u +%F)"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Setup Helm
+        uses: azure/setup-helm@dda3372f752e03dde6b3237bc9431cdc2f7a02a2
+        with:
+          version: '3.22.1'
+
+      - name: Log in to Quay with the OIDC token of the job
+        id: quay
+        uses: wireapp/wire-rm-actions/quay-login@9ff2112f54a312a66c579f6c815614e736e9791b
+        with:
+          robot: ${{ env.QUAY_ROBOT }}
+
+      - name: Promote the candidate image to the Beta tag
+        id: promote_docker
+        uses: wireapp/wire-rm-actions/promote-image@9ff2112f54a312a66c579f6c815614e736e9791b
+        with:
+          repository: ${{ env.DOCKER_REPOSITORY }}
+          digest: ${{ needs.build_artifact.outputs.candidate_image_digest }}
+          tag: ${{ steps.beta.outputs.version }}
+
+      - name: Prepare the Quay chart
+        id: quay_chart
+        run: |
+          set -euo pipefail
+
+          chart_directory="${RUNNER_TEMP}/quay-chart/${QUAY_CHART_NAME}"
+          mkdir -p "${RUNNER_TEMP}/quay-chart"
+          cp -a charts/webapp "${chart_directory}"
+          yq -i '.name = strenv(QUAY_CHART_NAME)' "${chart_directory}/Chart.yaml"
+          yq -i '.image.repository = strenv(DOCKER_REPOSITORY)' "${chart_directory}/values.yaml"
+          echo "chart_path=${chart_directory}" >> "$GITHUB_OUTPUT"
+
+      - name: Publish or reuse the Beta Helm chart on Quay
+        id: publish_oci_chart
+        uses: wireapp/wire-rm-actions/publish-chart@9ff2112f54a312a66c579f6c815614e736e9791b
+        with:
+          chart-path: ${{ steps.quay_chart.outputs.chart_path }}
+          version: ${{ steps.beta.outputs.version }}
+          channel: dev
+          username: ${{ steps.quay.outputs.username }}
+          password: ${{ steps.quay.outputs.token }}
+
+      - name: Read the release documents
+        id: release_documents
+        uses: wireapp/wire-rm-actions/release-documents@9ff2112f54a312a66c579f6c815614e736e9791b
+        with:
+          component: ${{ env.RM_COMPONENT }}
+          version: ${{ steps.beta.outputs.version }}
+          release-type: beta
+          publication-dir: publication
+          out-dir: ${{ runner.temp }}/release-documents
+
+      - name: Write the Beta release manifest
+        id: release_manifest
+        uses: wireapp/wire-rm-actions/release-manifest@9ff2112f54a312a66c579f6c815614e736e9791b
+        with:
+          mode: write
+          manifest: ${{ runner.temp }}/release-manifest.json
+          component: ${{ env.RM_COMPONENT }}
+          release-type: beta
+          version: ${{ steps.beta.outputs.version }}
+          source-repository: ${{ github.server_url }}/${{ github.repository }}
+          source-ref: ${{ needs.create_beta_tag.outputs.beta_tag_name }}
+          source-commit: ${{ needs.build_artifact.outputs.release_commit_sha }}
+          image-repository: ${{ env.DOCKER_REPOSITORY }}
+          image-digest: ${{ steps.promote_docker.outputs.digest }}
+          chart-repository: ${{ steps.publish_oci_chart.outputs.repository }}
+          chart-digest: ${{ steps.publish_oci_chart.outputs.digest }}
+          compatibility-file: publication/compatibility.yaml
+          documents-json: ${{ steps.release_documents.outputs.documents-json }}
+
+      - name: Declare the Beta to the release managers
+        uses: wireapp/wire-rm-actions/notify-rm@9ff2112f54a312a66c579f6c815614e736e9791b
+        with:
+          rm-staging-url: ${{ vars.RM_STAGING_URL }}
+          rm-staging-audience: wire-release-manager-staging
+          rm-prod-url: ${{ vars.RM_PROD_URL }}
+          rm-prod-audience: wire-release-manager-prod
+          component: ${{ env.RM_COMPONENT }}
+          version: ${{ steps.beta.outputs.version }}
+          kind: prerelease
+          repository: ${{ steps.publish_oci_chart.outputs.repository }}
+          digest: ${{ steps.publish_oci_chart.outputs.digest }}
+          release-url: ${{ github.server_url }}/${{ github.repository }}/tree/${{ needs.create_beta_tag.outputs.beta_tag_name }}
+          released-at: ${{ steps.beta.outputs.released_at }}
+          release-note-title: ${{ needs.create_beta_tag.outputs.beta_tag_name }}
+          release-declaration-file: ${{ runner.temp }}/release-documents/release-declaration.json
+          release-manifest-file: ${{ steps.release_manifest.outputs.manifest }}
+          required: 'true'
 
   notify_beta_release_success:
     name: Notify successful Beta release
@@ -957,6 +1143,7 @@ jobs:
     permissions:
       actions: read # Download the exact source release artifact.
       contents: read # Fetch the immutable Production tag for validation.
+      id-token: write # Log in to Quay and declare the release to the release managers.
     uses: $/.github/workflows/publish-production-distribution.yml
     with:
       production_tag: ${{ needs.create_production_tag.outputs.production_tag_name }}
@@ -964,8 +1151,6 @@ jobs:
       source_run_id: ${{ github.run_id }}
       distribution_artifact_name: ${{ needs.build_artifact.outputs.distribution_artifact_name }}
     secrets:
-      WEBTEAM_QUAY_USERNAME: ${{ secrets.WEBTEAM_QUAY_USERNAME }}
-      WEBTEAM_QUAY_PASSWORD: ${{ secrets.WEBTEAM_QUAY_PASSWORD }}
       CHARTS_WEBAPP_AUTOMATION_AWS_ACCESS_KEY_ID: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_ACCESS_KEY_ID }}
       CHARTS_WEBAPP_AUTOMATION_AWS_SECRET_ACCESS_KEY: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_SECRET_ACCESS_KEY }}
       WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN: ${{ secrets.WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN }}
@@ -1157,6 +1342,8 @@ jobs:
             Production runtime-verification result: ${{ needs.verify_production_runtime.result }}
             Production distribution result: ${{ needs.publish_production_distribution.result }}
             Docker image tag: ${{ needs.publish_production_distribution.outputs.docker_image_tag }}
+            Docker image digest: ${{ needs.publish_production_distribution.outputs.docker_image_digest }}
+            Quay chart: ${{ needs.publish_production_distribution.outputs.oci_chart_repository }}
             Helm chart version: ${{ needs.publish_production_distribution.outputs.helm_chart_version }}
             wire-builds commit SHA: ${{ needs.publish_production_distribution.outputs.wire_builds_commit_sha }}
             GitHub Release handoff result: ${{ needs.ensure_github_release.result }}
@@ -1282,6 +1469,7 @@ jobs:
         build_artifact,
         deploy_to_beta,
         create_beta_tag,
+        publish_beta_distribution,
         run_e2e,
         production_preflight,
         production_approval,
@@ -1318,6 +1506,7 @@ jobs:
             Build: ${{ needs.build_artifact.result }}
             Beta deployment: ${{ needs.deploy_to_beta.result }}
             Beta tag: ${{ needs.create_beta_tag.result }}
+            Beta publication: ${{ needs.publish_beta_distribution.result }}
             E2E system gate: ${{ needs.run_e2e.result }}
             Production preflight: ${{ needs.production_preflight.result }}
             Production approval: ${{ needs.production_approval.result }}

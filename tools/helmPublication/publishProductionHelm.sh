@@ -30,6 +30,9 @@ case "${helm_action}" in
     chart_version="$("${script_directory}/chartNextVersion.sh" prerelease)"
     CHART_VERSION="${chart_version}" IMAGE_TAG="${DOCKER_IMAGE_TAG}" \
       yq -i '.version = strenv(CHART_VERSION) | .appVersion = strenv(IMAGE_TAG)' charts/webapp/Chart.yaml
+    if [[ -n "${IMAGE_REPOSITORY:-}" ]]; then
+      IMAGE_REPOSITORY="${IMAGE_REPOSITORY}" yq -i '.image.repository = strenv(IMAGE_REPOSITORY)' charts/webapp/values.yaml
+    fi
     chart_package_directory="${RUNNER_TEMP}/webapp-chart"
     mkdir -p "${chart_package_directory}"
     helm package ./charts/webapp --destination "${chart_package_directory}"

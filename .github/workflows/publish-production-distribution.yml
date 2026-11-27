@@ -22,10 +22,16 @@ on:
         type: string
     outputs:
       docker_image_tag:
-        description: 'Immutable Quay image tag'
+        description: 'Release Quay image tag'
         value: ${{ jobs.publish_distribution.outputs.docker_image_tag }}
+      docker_image_digest:
+        description: 'sha256 digest the release image tag resolves to'
+        value: ${{ jobs.publish_distribution.outputs.docker_image_digest }}
+      oci_chart_repository:
+        description: 'OCI repository of the published Helm chart'
+        value: ${{ jobs.publish_distribution.outputs.oci_chart_repository }}
       helm_chart_version:
-        description: 'Selected WebApp Helm chart version'
+        description: 'Selected WebApp Helm chart version on the S3 repository'
         value: ${{ jobs.publish_distribution.outputs.helm_chart_version }}
       wire_builds_commit_sha:
         description: 'Verified wire-builds/main commit'
@@ -34,10 +40,6 @@ on:
         description: 'Distribution result'
         value: ${{ jobs.publish_distribution.outputs.distribution_result }}
     secrets:
-      WEBTEAM_QUAY_USERNAME:
-        required: true
-      WEBTEAM_QUAY_PASSWORD:
-        required: true
       CHARTS_WEBAPP_AUTOMATION_AWS_ACCESS_KEY_ID:
         required: true
       CHARTS_WEBAPP_AUTOMATION_AWS_SECRET_ACCESS_KEY:
@@ -50,7 +52,10 @@ permissions: {}
 env:
   CHART_REPOSITORY_NAME: charts-webapp
   CHART_REPOSITORY_URL: s3://public.wire.com/charts-webapp
-  DOCKER_REPOSITORY: quay.io/wire/webapp
+  DOCKER_REPOSITORY: quay.io/wire/wire-webapp
+  QUAY_CHART_NAME: wire-webapp
+  QUAY_ROBOT: wire+gha_wire-webapp
+  RM_COMPONENT: webapp
   DISTRIBUTION_CONTEXT_PATH: distribution-context
   WIRE_BUILDS_REPOSITORY: wireapp/wire-builds
 
@@ -59,14 +64,18 @@ jobs:
     name: Publish Docker, Helm, and wire-builds distribution
     runs-on: ubuntu-26.04
     permissions:
-      actions: read
-      contents: read
+      actions: read # Download the exact distribution context of the release run.
+      contents: read # Fetch the immutable Production tag and the distribution tooling.
+      id-token: write # Log in to Quay and declare the release to the release managers.
+    environment: release-publication
     concurrency:
       group: publish-webapp-distribution
       cancel-in-progress: false
       queue: max
     outputs:
-      docker_image_tag: ${{ steps.publish_docker.outputs.docker_image_tag }}
+      docker_image_tag: ${{ steps.release.outputs.version }}
+      docker_image_digest: ${{ steps.promote_docker.outputs.digest }}
+      oci_chart_repository: ${{ steps.publish_oci_chart.outputs.repository }}
       helm_chart_version: ${{ steps.publish_helm.outputs.helm_chart_version }}
       wire_builds_commit_sha: ${{ steps.update_wire_builds.outputs.wire_builds_commit_sha }}
       distribution_result: ${{ steps.distribution_result.outputs.distribution_result }}
@@ -118,31 +127,123 @@ jobs:
         working-directory: selected-release
         run: ../workflow-source/tools/productionDistribution/validateProductionDistribution.sh
 
+      - name: Resolve the release version
+        id: release
+        env:
+          PRODUCTION_TAG: ${{ inputs.production_tag }}
+        run: |
+          set -euo pipefail
+
+          version="${PRODUCTION_TAG#v}"
+          if [[ ! "${version}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Production tag ${PRODUCTION_TAG} is not a stable SemVer tag." >&2
+            exit 1
+          fi
+
+          {
+            echo "version=${version}"
+            echo "released_at=$(date -u +%F)"
+          } >> "$GITHUB_OUTPUT"
+
       - name: Setup Helm
         uses: azure/setup-helm@dda3372f752e03dde6b3237bc9431cdc2f7a02a2
         with:
           version: '3.22.1'
 
-      - name: Publish or reuse Docker image
-        id: publish_docker
-        env:
-          DOCKER_PASSWORD: ${{ secrets.WEBTEAM_QUAY_PASSWORD }}
-          DOCKER_USERNAME: ${{ secrets.WEBTEAM_QUAY_USERNAME }}
-          DOCKER_REPOSITORY: ${{ env.DOCKER_REPOSITORY }}
-          PRODUCTION_IMAGE_TAG_OUTPUT_PATH: ${{ runner.temp }}/production-image-tag.txt
-          PRODUCTION_TAG: ${{ inputs.production_tag }}
-          RELEASE_COMMIT_SHA: ${{ steps.validate_identity.outputs.production_tag_commit_sha }}
-          WIRE_WEBAPP_CONFIG_MANIFEST_PATH: ${{ github.workspace }}/selected-release/apps/webapp/app-config/package.json
-          WIRE_WEBAPP_DOCKER_CONTEXT_PATH: ${{ env.DISTRIBUTION_CONTEXT_PATH }}
-          WIRE_WEBAPP_RELEASE_COMMIT_SHA: ${{ steps.validate_identity.outputs.production_tag_commit_sha }}
-        run: ./workflow-source/tools/dockerPublication/publishProductionDocker.sh
+      - name: Log in to Quay with the OIDC token of the job
+        id: quay
+        uses: wireapp/wire-rm-actions/quay-login@9ff2112f54a312a66c579f6c815614e736e9791b
+        with:
+          robot: ${{ env.QUAY_ROBOT }}
 
-      - name: Publish or reuse Helm chart
+      - name: Read the candidate image recorded by the release build
+        id: candidate_image
+        env:
+          DISTRIBUTION_MANIFEST_PATH: ${{ github.workspace }}/${{ env.DISTRIBUTION_CONTEXT_PATH }}/distribution-manifest.json
+        run: |
+          set -euo pipefail
+
+          candidate_image_repository="$(jq --raw-output '.candidateImageRepository // empty' "${DISTRIBUTION_MANIFEST_PATH}")"
+          candidate_image_digest="$(jq --raw-output '.candidateImageDigest // empty' "${DISTRIBUTION_MANIFEST_PATH}")"
+
+          if [[ "${candidate_image_repository}" != "${DOCKER_REPOSITORY}" ]]; then
+            echo "The distribution manifest records the candidate image in '${candidate_image_repository}', expected ${DOCKER_REPOSITORY}." >&2
+            exit 1
+          fi
+
+          if [[ ! "${candidate_image_digest}" =~ ^sha256:[0-9a-f]{64}$ ]]; then
+            echo "The distribution manifest records no sha256 digest for the candidate image: '${candidate_image_digest}'." >&2
+            exit 1
+          fi
+
+          echo "digest=${candidate_image_digest}" >> "$GITHUB_OUTPUT"
+
+      - name: Promote the candidate image to the release tag
+        id: promote_docker
+        uses: wireapp/wire-rm-actions/promote-image@9ff2112f54a312a66c579f6c815614e736e9791b
+        with:
+          repository: ${{ env.DOCKER_REPOSITORY }}
+          digest: ${{ steps.candidate_image.outputs.digest }}
+          tag: ${{ steps.release.outputs.version }}
+
+      - name: Prepare the Quay chart
+        id: quay_chart
+        run: |
+          set -euo pipefail
+
+          chart_directory="${RUNNER_TEMP}/quay-chart/${QUAY_CHART_NAME}"
+          mkdir -p "${RUNNER_TEMP}/quay-chart"
+          cp -a selected-release/charts/webapp "${chart_directory}"
+          yq -i '.name = strenv(QUAY_CHART_NAME)' "${chart_directory}/Chart.yaml"
+          yq -i '.image.repository = strenv(DOCKER_REPOSITORY)' "${chart_directory}/values.yaml"
+          echo "chart_path=${chart_directory}" >> "$GITHUB_OUTPUT"
+
+      - name: Publish or reuse the release Helm chart on Quay
+        id: publish_oci_chart
+        uses: wireapp/wire-rm-actions/publish-chart@9ff2112f54a312a66c579f6c815614e736e9791b
+        with:
+          chart-path: ${{ steps.quay_chart.outputs.chart_path }}
+          version: ${{ steps.release.outputs.version }}
+          channel: stable
+          username: ${{ steps.quay.outputs.username }}
+          password: ${{ steps.quay.outputs.token }}
+
+      - name: Read the release documents
+        id: release_documents
+        uses: wireapp/wire-rm-actions/release-documents@9ff2112f54a312a66c579f6c815614e736e9791b
+        with:
+          component: ${{ env.RM_COMPONENT }}
+          version: ${{ steps.release.outputs.version }}
+          release-type: ga
+          publication-dir: selected-release/publication
+          out-dir: ${{ runner.temp }}/release-documents
+
+      - name: Write the release manifest
+        id: release_manifest
+        uses: wireapp/wire-rm-actions/release-manifest@9ff2112f54a312a66c579f6c815614e736e9791b
+        with:
+          mode: write
+          manifest: ${{ runner.temp }}/release-manifest.json
+          component: ${{ env.RM_COMPONENT }}
+          release-type: ga
+          version: ${{ steps.release.outputs.version }}
+          source-repository: ${{ github.server_url }}/${{ github.repository }}
+          source-ref: ${{ inputs.production_tag }}
+          source-commit: ${{ steps.validate_identity.outputs.production_tag_commit_sha }}
+          image-repository: ${{ env.DOCKER_REPOSITORY }}
+          image-digest: ${{ steps.promote_docker.outputs.digest }}
+          chart-repository: ${{ steps.publish_oci_chart.outputs.repository }}
+          chart-digest: ${{ steps.publish_oci_chart.outputs.digest }}
+          compatibility-file: selected-release/publication/compatibility.yaml
+          documents-json: ${{ steps.release_documents.outputs.documents-json }}
+
+      - name: Publish or reuse the Helm chart on S3
         id: publish_helm
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_SECRET_ACCESS_KEY }}
-          DOCKER_IMAGE_TAG: ${{ steps.publish_docker.outputs.docker_image_tag }}
+          DOCKER_IMAGE_TAG: ${{ steps.release.outputs.version }}
+          IMAGE_REPOSITORY: ${{ env.DOCKER_REPOSITORY }}
           CHART_REPOSITORY_NAME: ${{ env.CHART_REPOSITORY_NAME }}
           CHART_REPOSITORY_URL: ${{ env.CHART_REPOSITORY_URL }}
         working-directory: selected-release
@@ -160,16 +261,37 @@ jobs:
       - name: Update wire-builds main idempotently
         id: update_wire_builds
         env:
-          DOCKER_IMAGE_TAG: ${{ steps.publish_docker.outputs.docker_image_tag }}
+          DOCKER_IMAGE_TAG: ${{ steps.release.outputs.version }}
           HELM_CHART_VERSION: ${{ steps.publish_helm.outputs.helm_chart_version }}
           RELEASE_COMMIT_SHA: ${{ steps.validate_identity.outputs.production_tag_commit_sha }}
         working-directory: wire-builds
         run: ../workflow-source/tools/wireBuilds/updateWireBuilds.sh
 
+      - name: Declare the release to the release managers
+        uses: wireapp/wire-rm-actions/notify-rm@9ff2112f54a312a66c579f6c815614e736e9791b
+        with:
+          rm-staging-url: ${{ vars.RM_STAGING_URL }}
+          rm-staging-audience: wire-release-manager-staging
+          rm-prod-url: ${{ vars.RM_PROD_URL }}
+          rm-prod-audience: wire-release-manager-prod
+          component: ${{ env.RM_COMPONENT }}
+          version: ${{ steps.release.outputs.version }}
+          kind: ga
+          repository: ${{ steps.publish_oci_chart.outputs.repository }}
+          digest: ${{ steps.publish_oci_chart.outputs.digest }}
+          release-url: ${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ inputs.production_tag }}
+          released-at: ${{ steps.release.outputs.released_at }}
+          release-note-title: ${{ inputs.production_tag }}
+          release-declaration-file: ${{ runner.temp }}/release-documents/release-declaration.json
+          release-manifest-file: ${{ steps.release_manifest.outputs.manifest }}
+          required: 'true'
+
       - name: Mark distribution complete
         id: distribution_result
         env:
-          DOCKER_IMAGE_TAG: ${{ steps.publish_docker.outputs.docker_image_tag }}
+          DOCKER_IMAGE_TAG: ${{ steps.release.outputs.version }}
+          DOCKER_IMAGE_DIGEST: ${{ steps.promote_docker.outputs.digest }}
+          OCI_CHART_REPOSITORY: ${{ steps.publish_oci_chart.outputs.repository }}
           HELM_CHART_VERSION: ${{ steps.publish_helm.outputs.helm_chart_version }}
           WIRE_BUILDS_COMMIT_SHA: ${{ steps.update_wire_builds.outputs.wire_builds_commit_sha }}
         run: |
@@ -181,7 +303,8 @@ jobs:
 
           {
             echo '## Production distribution'
-            echo "- Docker image: ${DOCKER_IMAGE_TAG}"
-            echo "- Helm chart: ${HELM_CHART_VERSION}"
+            echo "- Docker image: ${DOCKER_REPOSITORY}:${DOCKER_IMAGE_TAG} (${DOCKER_IMAGE_DIGEST})"
+            echo "- Quay chart: ${OCI_CHART_REPOSITORY}"
+            echo "- S3 Helm chart: ${HELM_CHART_VERSION}"
             echo "- wire-builds/main commit: ${WIRE_BUILDS_COMMIT_SHA}"
           } >> "${GITHUB_STEP_SUMMARY}"
