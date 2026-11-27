@@ -31,8 +31,8 @@ import {MessageReactionsList} from './messageActions/messageReactions/messageRea
 import {MessageHeader} from './messageHeader';
 import {Quote} from './messageQuote';
 import {PendingClock} from './pendingClock';
-import {writtenTime as writtenTimeStyles} from './pendingClock.styles';
 import {CompleteFailureToSendWarning, PartialFailureToSendWarning} from './warnings';
+import {shouldShowWrittenTime, writtenTimeStyles} from './writtenTime';
 
 import {MessageActions} from '..';
 import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
@@ -87,10 +87,6 @@ export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetS
   outboxState: OutboxState | undefined;
 }
 
-/** A message sent at least this long after it was written says when it was written */
-const writtenTimeShownAfterMinutes = 5;
-const WRITTEN_TIME_SHOWN_AFTER_MILLISECONDS = writtenTimeShownAfterMinutes * TIME_IN_MILLIS.MINUTE;
-
 interface WrittenTimeProps {
   /** Unix timestamp in milliseconds */
   timestamp: number;
@@ -98,6 +94,7 @@ interface WrittenTimeProps {
   translate: (key: 'outboxWrittenTimeAgo' | 'outboxWrittenTimeAt', substitutions: {time: string}) => string;
 }
 
+/** Kept here, apart from the rest of the written time, because the time helpers it needs sit in this module's cycle */
 const WrittenTime: FunctionComponent<WrittenTimeProps> = ({timestamp, formatter, translate}) => {
   const time = useRelativeTimestamp(timestamp, false, formatter);
   const isRelative = isYoungerThan1Hour(fromUnixTime(timestamp / TIME_IN_MILLIS.SECOND));
@@ -189,10 +186,7 @@ export const ContentMessageComponent: FunctionComponent<ContentMessageProps> = (
   const isDimmed = isOutboxEnabled && sendingState !== 'sent';
   const writtenTimestamp = Date.parse(writtenTime ?? '');
   const showWrittenTime =
-    isOutboxEnabled &&
-    sendingState === 'sent' &&
-    Number.isFinite(writtenTimestamp) &&
-    timestamp - writtenTimestamp >= WRITTEN_TIME_SHOWN_AFTER_MILLISECONDS;
+    isOutboxEnabled && shouldShowWrittenTime({sendingState, sentTimestamp: timestamp, writtenTimestamp});
 
   const [messageAriaLabel] = getMessageAriaLabel({
     assets,

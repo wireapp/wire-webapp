@@ -30,8 +30,3 @@ export const pendingClockIcon: CSSObject = {
   height: '12px',
   fill: 'var(--content-message-timestamp)',
 };
-
-export const writtenTime: CSSObject = {
-  marginLeft: '4px',
-  color: 'var(--content-message-timestamp)',
-};
