@@ -362,11 +362,6 @@ export class App {
       repositories.audio,
       this.translate,
       this.outbox,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
       this.fireAndForgetInvoker,
     );
 

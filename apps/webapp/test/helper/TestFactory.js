@@ -357,6 +357,7 @@ export class TestFactory {
       new AudioRepository(),
       translate,
       undefined,
+      undefined,
       userRepository['userState'],
       clientState,
     );

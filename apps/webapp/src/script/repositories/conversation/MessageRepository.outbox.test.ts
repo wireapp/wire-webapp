@@ -99,12 +99,12 @@ function buildMessageRepositoryParts(outbox?: Outbox): MessageRepositoryParts {
     new AudioRepository(),
     translateForTest,
     outbox,
+    invoker,
     userState,
     clientState,
     conversationState,
     new TeamState(),
     createCoreTestFixture({service: {conversation: {send, messageTimer: new MessageTimer()}}}),
-    invoker,
   );
   return {repository, conversation, conversationState, eventService, eventRepository, send, invoker};
 }

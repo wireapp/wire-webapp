@@ -325,6 +325,7 @@ export function createOutboxRepository({maxOperations}: {maxOperations?: number}
     audioRepository,
     translateForTest,
     kit.outbox,
+    invoker,
     userState,
     clientState,
     conversationState,
@@ -332,7 +333,6 @@ export function createOutboxRepository({maxOperations}: {maxOperations?: number}
     createCoreTestFixture({
       service: {conversation: {send, messageTimer: new MessageTimer()}, linkPreview: {uploadLinkPreviewImage}},
     }),
-    invoker,
   );
   const clientMismatch = jest.fn().mockResolvedValue(true);
   repository.setClientMismatchHandler(clientMismatch);

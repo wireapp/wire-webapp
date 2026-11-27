@@ -1012,6 +1012,7 @@ describe('MessageRepository without an outbox keeps sending directly', () => {
       audioRepository,
       translateForTest,
       undefined,
+      undefined,
       userState,
       new ClientState(),
       new ConversationState(userState),

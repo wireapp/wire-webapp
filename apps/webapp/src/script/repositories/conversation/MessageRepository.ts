@@ -312,13 +312,13 @@ export class MessageRepository {
     private readonly audioRepository: AudioRepository,
     private readonly translate: Translate,
     private readonly outbox: Outbox | undefined,
+    /** Required with an outbox */
+    private readonly fireAndForgetInvoker: FireAndForgetInvoker | undefined,
     private readonly userState = container.resolve(UserState),
     private readonly clientState = container.resolve(ClientState),
     private readonly conversationState = container.resolve(ConversationState),
     private readonly teamState = container.resolve(TeamState),
     private readonly core = container.resolve(Core),
-    /** Required with an outbox */
-    private readonly fireAndForgetInvoker?: FireAndForgetInvoker,
   ) {
     this.logger = getLogger('MessageRepository');
 

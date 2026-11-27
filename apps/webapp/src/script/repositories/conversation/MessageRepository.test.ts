@@ -138,6 +138,7 @@ async function buildMessageRepository(
     audioRepository: new AudioRepository(),
     translate,
     outbox: undefined,
+    fireAndForgetInvoker: undefined,
     userState,
     clientState,
     conversationState,
