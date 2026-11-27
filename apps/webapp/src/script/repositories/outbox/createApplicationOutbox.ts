@@ -41,8 +41,23 @@ export function createApplicationOutbox({storageService, serverTimeHandler}: App
 
   return createOutbox({
     store,
-    getServerTime: () => {
-      return serverTimeHandler.toServerTimestamp();
+    clock: {
+      getServerTime: () => {
+        return serverTimeHandler.toServerTimestamp();
+      },
+      getStopwatchTime: () => {
+        return performance.now();
+      },
+      setTimer: (callback, milliseconds) => {
+        return window.setTimeout(callback, milliseconds);
+      },
+      clearTimer: timer => {
+        window.clearTimeout(timer);
+      },
+    },
+    random: Math.random,
+    createId: () => {
+      return crypto.randomUUID();
     },
     logger: getLogger('Outbox'),
   });

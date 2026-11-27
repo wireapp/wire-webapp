@@ -438,9 +438,9 @@ export class App {
 
   /** A failed start leaves the outbox unstarted, so every enqueue is refused; the app carries on */
   private async startOutbox(): Promise<void> {
-    const outcome = await this.outbox?.start();
-    if (outcome?.type === 'storage-failed' || outcome?.type === 'storage-full') {
-      this.logger.error('Outbox failed to start and stays unstarted', {outcome: outcome.type});
+    const startResult = await this.outbox?.start();
+    if (startResult?.outcome === 'storage-failed' || startResult?.outcome === 'storage-full') {
+      this.logger.error('Outbox failed to start and stays unstarted', {outcome: startResult.outcome});
     }
   }
 

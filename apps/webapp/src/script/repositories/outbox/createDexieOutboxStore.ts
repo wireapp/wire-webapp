@@ -51,7 +51,7 @@ function errorNameOf(error: unknown): string {
 
 function toStorageFailure(error: unknown): StorageFull | StorageFailed {
   const errorName = errorNameOf(error);
-  return errorName === 'QuotaExceededError' ? {type: 'storage-full'} : {type: 'storage-failed', errorName};
+  return errorName === 'QuotaExceededError' ? {outcome: 'storage-full'} : {outcome: 'storage-failed', errorName};
 }
 
 /**
@@ -108,9 +108,9 @@ export function createDexieOutboxStore(getTable: () => Table<OperationSnapshot, 
       }
       quarantinedCount += rowsWithoutId.length + implausibleIds.length;
 
-      return {type: 'snapshots-loaded', operations, quarantinedCount};
+      return {outcome: 'snapshots-loaded', operations, quarantinedCount};
     } catch (error: unknown) {
-      return {type: 'storage-failed', errorName: errorNameOf(error)};
+      return {outcome: 'storage-failed', errorName: errorNameOf(error)};
     }
   }
 
@@ -118,7 +118,7 @@ export function createDexieOutboxStore(getTable: () => Table<OperationSnapshot, 
     try {
       // Dexie writes the generated key onto the object it is given
       await getTable().add({...snapshot});
-      return {type: 'snapshot-appended'};
+      return {outcome: 'snapshot-appended'};
     } catch (error: unknown) {
       return toStorageFailure(error);
     }
@@ -127,9 +127,9 @@ export function createDexieOutboxStore(getTable: () => Table<OperationSnapshot, 
   async function remove(operationIds: string[]): Promise<RemoveOutcome> {
     try {
       await getTable().where('id').anyOf(operationIds).delete();
-      return {type: 'snapshots-removed'};
+      return {outcome: 'snapshots-removed'};
     } catch (error: unknown) {
-      return {type: 'storage-failed', errorName: errorNameOf(error)};
+      return {outcome: 'storage-failed', errorName: errorNameOf(error)};
     }
   }
 
