@@ -2818,10 +2818,19 @@ export class MessageRepository {
         this.logger.info('The outbox answered deleting an operation of a deleted message', {
           outcome: deleteResult.outcome,
         });
+        if (this.isOutboxUnavailable(deleteResult)) {
+          this.logger.warn('The message stays, because the outbox could not save its deletion');
+          return;
+        }
       }
     }
     if (pending === undefined || !isDeletable || this.isUnconfirmed(pending)) {
-      this.isAccepted(await this.enqueueChange(removal));
+      const removalResult = await this.enqueueChange(removal);
+      this.isAccepted(removalResult);
+      if (this.isOutboxUnavailable(removalResult)) {
+        this.logger.warn('The message stays, because the outbox could not save its removal');
+        return;
+      }
     }
     await this.deleteMessageById(conversation, message.id);
   }
@@ -3241,6 +3250,11 @@ export class MessageRepository {
 
   private isDegraded(conversation: Conversation): boolean {
     return conversation.verification_state() === ConversationVerificationState.DEGRADED;
+  }
+
+  /** The operation of a message may still be in storage, so the message must stay or it would load and send later. */
+  private isOutboxUnavailable({outcome}: {outcome: string}): boolean {
+    return outcome === 'outbox-not-started' || outcome === 'storage-full' || outcome === 'storage-failed';
   }
 
   /** Also logs what the outbox answered, without content */

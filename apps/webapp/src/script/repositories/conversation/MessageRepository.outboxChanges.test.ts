@@ -635,6 +635,27 @@ describe('MessageRepository routes changes through the outbox', () => {
       expect(parts.deleteEvent).toHaveBeenCalledWith(CONVERSATION_ID.id, 'message-1');
     });
 
+    it.each(['outbox-not-started', 'storage-full', 'storage-failed'])(
+      'keeps the message when the outbox answers %s to its deletion',
+      async outcome => {
+        seedMessage(parts, {messageId: 'message-1'});
+        if (outcome !== 'outbox-not-started') {
+          await startOutbox(parts);
+        }
+        if (outcome === 'storage-failed') {
+          parts.store.fail('append', true);
+        }
+        if (outcome === 'storage-full') {
+          parts.store.fill(true);
+        }
+
+        await deleteForEveryone(createMessage(parts, 'message-1'));
+
+        expect(parts.deleteEvent).not.toHaveBeenCalled();
+        expect(parts.sendToBackend).not.toHaveBeenCalled();
+      },
+    );
+
     it('a message with a later message in its conversation deletes only itself, and the later one still goes out', async () => {
       seedMessage(parts, {messageId: 'message-1'});
       seedMessage(parts, {messageId: 'message-2', queuedSeq: 2});
