@@ -73,6 +73,7 @@ const GroupVideoGridTile: FunctionComponent<GroupVideoGridTileProps> = ({
     isActivelySpeaking,
     isAudioEstablished,
     isSwitchingVideoResolution,
+    networkStats,
   } = useKoSubscribableChildren(participant, [
     'isMuted',
     'handRaisedAt',
@@ -82,6 +83,7 @@ const GroupVideoGridTile: FunctionComponent<GroupVideoGridTileProps> = ({
     'videoState',
     'isAudioEstablished',
     'isSwitchingVideoResolution',
+    'networkStats',
   ]);
 
   const {name} = useKoSubscribableChildren(participant?.user, ['name']);
@@ -218,7 +220,7 @@ const GroupVideoGridTile: FunctionComponent<GroupVideoGridTileProps> = ({
 
       {nameContainer}
 
-      {!minimized && !isSelfParticipant && <ParticipantNetworkStats name={name} isSelf={false} />}
+      {!minimized && !isSelfParticipant && <ParticipantNetworkStats name={name} isSelf={false} sample={networkStats} />}
 
       {(hasPausedVideo || isSwitchingVideoResolution || doVideoReconnecting) && (
         <div className="group-video-grid__pause-overlay">

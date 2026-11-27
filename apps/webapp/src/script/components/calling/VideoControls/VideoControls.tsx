@@ -214,7 +214,8 @@ export const VideoControls: FunctionComponent<VideoControlsProps> = ({
     sharesScreen: selfSharesScreen,
     sharesCamera: selfSharesCamera,
     handRaisedAt: selfHandRaisedAt,
-  } = useKoSubscribableChildren(selfParticipant, ['sharesScreen', 'sharesCamera', 'handRaisedAt']);
+    networkStats,
+  } = useKoSubscribableChildren(selfParticipant, ['sharesScreen', 'sharesCamera', 'handRaisedAt', 'networkStats']);
   const {
     ENABLE_PRESS_SPACE_TO_UNMUTE: isPressSpaceToUnmuteEnable,
     ENABLE_IN_CALL_REACTIONS: isInCallReactionsEnable,
@@ -1003,7 +1004,7 @@ export const VideoControls: FunctionComponent<VideoControlsProps> = ({
         {isDesktop && (
           <>
             <li className="video-controls__item">
-              <ParticipantNetworkStats name="My connection" isSelf variant="toolbar" />
+              <ParticipantNetworkStats name="My connection" isSelf variant="toolbar" sample={networkStats} />
             </li>
             {isInCallHandRaiseControlVisible && (
               <li className="video-controls__item">

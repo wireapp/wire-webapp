@@ -31,9 +31,10 @@ const CandidateSchema = z.union([
   z.literal('Host'),
   z.literal('Srflx'),
   z.literal('Prflx'),
+  z.literal('???'),
   stringLiteralUnknown,
 ]);
-const ProtocolSchema = z.union([z.literal('UDP'), z.literal('TCP'), stringLiteralUnknown]);
+const ProtocolSchema = z.union([z.literal('UDP'), z.literal('TCP'), z.literal('???'), stringLiteralUnknown]);
 const PeerSchema = z.union([z.literal('Server'), z.literal('User'), stringLiteralUnknown]);
 
 const QualitySchema = z.union([
@@ -50,6 +51,22 @@ const NetworkMetricSchema = z.object({
   rx: z.number(),
 });
 
+const AudioMetricsSchema = z.object({
+  bitrate: z.number().finite(),
+  jitter: z.number().finite(),
+  loss: z.number().finite(),
+});
+const VideoMetricsSchema = AudioMetricsSchema.extend({
+  width: z.number().finite(),
+  height: z.number().finite(),
+  fps: z.number().finite(),
+});
+const TrackSourceSchema = z.object({
+  trackId: z.string(),
+  userId: z.string().nullable(),
+  clientId: z.string().nullable(),
+});
+
 export const NetworkQualityInfoSchema = z.object({
   quality: QualitySchema,
   rtt: z.number().optional(),
@@ -64,9 +81,20 @@ export const NetworkQualityInfoSchema = z.object({
     .object({
       candidate: CandidateSchema,
       protocol: ProtocolSchema,
+      local_proto: z.union([ProtocolSchema, z.literal('TLS')]).optional(),
+      local_cand: CandidateSchema.optional(),
+      remote_proto: ProtocolSchema.optional(),
+      remote_cand: CandidateSchema.optional(),
     })
     .optional(),
   peer: PeerSchema.optional(),
+  tx: z.object({audio: AudioMetricsSchema, video: VideoMetricsSchema}).optional(),
+  rx: z
+    .object({
+      audio: z.array(AudioMetricsSchema.merge(TrackSourceSchema)),
+      video: z.array(VideoMetricsSchema.merge(TrackSourceSchema)),
+    })
+    .optional(),
 });
 
 export type NetworkQualityInfo = z.infer<typeof NetworkQualityInfoSchema>;

@@ -288,6 +288,26 @@ describe('AVS connection test', () => {
   });
 });
 
+describe('AVS network quality registration', () => {
+  it('registers one ten-second callback and forwards the original payload', () => {
+    const repository = createCallingRepositoryWithoutEventSubscriptions({post: jest.fn()});
+    const setNetworkQualityHandler = jest.fn<ReturnType<Wcall['setNetworkQualityHandler']>, Parameters<Wcall['setNetworkQualityHandler']>>().mockReturnValue(0);
+    const api = {
+      create: jest.fn().mockReturnValue(7), setNetworkQualityHandler,
+      setMuteHandler: jest.fn(), setStateHandler: jest.fn(), setParticipantChangedHandler: jest.fn(),
+      setReqClientsHandler: jest.fn(), setReqNewEpochHandler: jest.fn(), setActiveSpeakerHandler: jest.fn(),
+      processNotifications: jest.fn(),
+    };
+    const handler = jest.spyOn(repository, 'updateCallQuality' as never);
+    repository['createWUser'](api as unknown as Wcall, 'self', 'client');
+    expect(setNetworkQualityHandler).toHaveBeenCalledTimes(1);
+    expect(setNetworkQualityHandler).toHaveBeenCalledWith(7, expect.any(Function), 10, 0);
+    const callback = setNetworkQualityHandler.mock.calls[0][1];
+    callback('conversation', 'user', 'client', '{invalid}', 0);
+    expect(handler).toHaveBeenCalledWith('conversation', 'user', 'client', '{invalid}');
+  });
+});
+
 describe('CallingRepository AVS logging', () => {
   afterEach(() => {
     jest.restoreAllMocks();
@@ -1968,6 +1988,21 @@ describe('CallingRepository', () => {
       expect(callingRepository['logger'].warn).toHaveBeenCalledWith('Invalid network quality info JSON', {
         error: expect.any(Error),
       });
+    });
+
+    it('updates the call participants from the new AVS metrics without losing existing quality handling', () => {
+      const call = requireValueForTest(callingRepository['callState'].calls()[0]);
+      const audio = {bitrate: 32000, jitter: 5, loss: 0.5};
+      const video = {...audio, bitrate: 1080000, width: 1280, height: 720, fps: 30};
+      callingRepository['updateCallQuality'](conversationId, userId, remoteClientId, JSON.stringify({
+        ...JSON.parse(qualityInfo(QUALITY.NORMAL)),
+        tx: {audio, video},
+        rx: {audio: [{...audio, trackId: 'remote-audio', userId, clientId: remoteClientId}], video: []},
+      }));
+      expect(call.getSelfParticipant().networkStats()?.video[0].bitrate).toBe(1080000);
+      const peer = requireValueForTest(call.participants().find(participant => { return participant.clientId === remoteClientId; }));
+      expect(peer.networkStats()?.audio[0].loss).toBe(0.5);
+      expect(Warnings.hideWarning).toHaveBeenCalledWith(Warnings.TYPE.CALL_QUALITY_POOR);
     });
 
     it('logs warning when network quality info schema validation fails', () => {

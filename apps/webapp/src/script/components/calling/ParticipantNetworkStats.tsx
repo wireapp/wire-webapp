@@ -21,6 +21,8 @@ import {createContext, useContext, useId, useState, type ReactNode} from 'react'
 
 import {Button, Dialog, DialogTrigger, Popover} from 'react-aria-components';
 
+import {QUALITY, type AudioMetrics, type VideoMetrics} from '@wireapp/avs';
+
 import {
   networkStatsButton,
   networkStatsDialog,
@@ -28,6 +30,7 @@ import {
   networkStatsRows,
 } from './ParticipantNetworkStats.styles';
 
+import type {ParticipantNetworkSample} from '../../repositories/calling/participantNetworkStats';
 import {CloseIcon} from '../../uiKit/dataDisplay/icon/closeIcon';
 import {StatisticsIcon} from '../../uiKit/dataDisplay/icon/statisticsIcon';
 import {NetworkIcon} from '../icon';
@@ -40,10 +43,35 @@ export const ParticipantNetworkStatsProvider = ({children}: {children: ReactNode
   return <OpenStatsContext.Provider value={{id, setId}}>{children}</OpenStatsContext.Provider>;
 };
 
-// Preview fixtures only. Values describe outgoing media for self and incoming media for peers.
-const dummyStats = {
-  self: {rtt: '24 ms', audio: '32 kbit/s', audioJitter: '3 ms', loss: '0.00%', video: '1.24 Mbit/s', jitter: '8 ms'},
-  peer: {rtt: '38 ms', audio: '32 kbit/s', audioJitter: '5 ms', loss: '0.12%', video: '1.08 Mbit/s', jitter: '12 ms'},
+const qualityLabels: Record<number, string> = {
+  [QUALITY.NORMAL]: 'Good',
+  [QUALITY.MEDIUM]: 'Fair',
+  [QUALITY.POOR]: 'Poor',
+  [QUALITY.NETWORK_PROBLEM]: 'Network problem',
+  [QUALITY.RECONNECTING]: 'Reconnecting',
+};
+const qualityColors: Record<number, string> = {
+  [QUALITY.NORMAL]: '#27883e',
+  [QUALITY.MEDIUM]: '#b56a12',
+  [QUALITY.POOR]: '#c62828',
+  [QUALITY.NETWORK_PROBLEM]: '#c62828',
+  [QUALITY.RECONNECTING]: '#c62828',
+};
+const decimalPlaces = 2;
+const bitsPerKilobit = 1000;
+const bitsPerMegabit = 1000000;
+const metric = (value: number | undefined, suffix: string): string => {
+  return value === undefined || !Number.isFinite(value) || value < 0
+    ? '—'
+    : `${Number(value.toFixed(decimalPlaces))}${suffix}`;
+};
+const bitrate = (value: number | undefined): string => {
+  if (value === undefined || value < 0) {
+    return '—';
+  }
+  return value >= bitsPerMegabit
+    ? metric(value / bitsPerMegabit, ' Mbit/s')
+    : metric(value / bitsPerKilobit, ' kbit/s');
 };
 
 const StatRows = ({rows}: {rows: [string, string][]}): ReactNode => {
@@ -61,20 +89,69 @@ const StatRows = ({rows}: {rows: [string, string][]}): ReactNode => {
   );
 };
 
+const MediaStats = ({
+  label,
+  tracks,
+}: {
+  label: 'Audio' | 'Video';
+  tracks: (AudioMetrics | VideoMetrics)[];
+}): ReactNode => {
+  const displayed: (AudioMetrics | VideoMetrics | undefined)[] = tracks.length === 0 ? [undefined] : tracks;
+  return displayed.map((track, index) => {
+    const video = track !== undefined && 'width' in track ? track : undefined;
+    const rows: [string, string][] = [
+      ['Bandwidth', bitrate(track?.bitrate)],
+      ['Jitter', metric(track?.jitter, ' ms')],
+      ['Packet loss', metric(track?.loss, '%')],
+    ];
+    if (label === 'Video') {
+      rows.push(
+        [
+          'Resolution',
+          video !== undefined && video.width > 0 && video.height > 0 ? `${video.width} × ${video.height}` : '—',
+        ],
+        ['Frame rate', metric(video?.fps, ' fps')],
+      );
+    }
+    return (
+      <section key={`${label}-${index}`} aria-label={`${label} statistics${index > 0 ? ` ${index + 1}` : ''}`}>
+        <h3>
+          {label}
+          {tracks.length > 1 ? ` · Track ${index + 1}` : ''}
+        </h3>
+        <StatRows rows={rows} />
+      </section>
+    );
+  });
+};
+
 export const ParticipantNetworkStats = ({
   name,
   isSelf,
   variant = 'tile',
+  sample,
 }: {
   name: string;
   isSelf: boolean;
   variant?: 'tile' | 'toolbar';
+  sample?: ParticipantNetworkSample;
 }): ReactNode => {
   const id = useId();
   const shared = useContext(OpenStatsContext);
   const [localOpen, setLocalOpen] = useState(false);
   const isOpen = shared === null ? localOpen : shared.id === id;
-  const values = dummyStats[isSelf ? 'self' : 'peer'];
+  const quality = sample?.quality;
+  const qualityLabel = quality == null ? 'Unknown' : (qualityLabels[quality] ?? 'Unknown');
+  const qualityColor = quality == null ? 'var(--gray-60)' : (qualityColors[quality] ?? 'var(--gray-60)');
+  const connection = sample?.connection;
+  const connectedTo = sample?.peer === undefined ? '—' : {Server: 'SFT', User: 'Peer', Unknown: '—'}[sample.peer];
+  let route = '—';
+  const localCandidate = connection?.local_cand ?? connection?.candidate;
+  if (localCandidate === 'Relay' || connection?.remote_cand === 'Relay') {
+    route = 'TURN relay';
+  } else if (localCandidate !== undefined && localCandidate !== 'Unknown' && localCandidate !== '???') {
+    route = 'Direct';
+  }
   const isToolbar = variant === 'toolbar';
   const label = isToolbar ? 'My connection statistics' : `Network statistics for ${name}`;
   const setOpen = (open: boolean): void => {
@@ -116,7 +193,11 @@ export const ParticipantNetworkStats = ({
             <header>
               <div>
                 <strong>{isToolbar ? 'My connection' : name}</strong>
-                <small>Network statistics · Demo data</small>
+                <small>
+                  {sample === undefined
+                    ? 'Network statistics'
+                    : `Updated ${new Date(sample.receivedAt).toLocaleTimeString()}`}
+                </small>
               </div>
               <Button
                 aria-label="Close network statistics"
@@ -127,43 +208,30 @@ export const ParticipantNetworkStats = ({
                 <CloseIcon width={12} height={12} color="currentColor" aria-hidden="true" />
               </Button>
             </header>
-            <div className="quality">
-              <span>Connectivity quality</span>
-              <strong>
-                <i />
-                Stable
-              </strong>
-            </div>
-            <div className="quality">
-              <span>Media quality</span>
-              <strong>
-                <i />
-                Good
-              </strong>
-            </div>
-            <StatRows rows={[['Round trip time', values.rtt]]} />
-            <section aria-label="Audio statistics">
-              <h3>Audio</h3>
+            {sample === undefined && <p role="status">Waiting for AVS statistics…</p>}
+            {(isSelf || quality != null) && (
+              <div className="quality">
+                <span>Connectivity quality</span>
+                <strong>
+                  <i css={{background: qualityColor}} />
+                  {qualityLabel}
+                </strong>
+              </div>
+            )}
+            <StatRows
+              rows={[[isSelf ? 'Connection RTT' : 'Round trip time', metric(sample?.rttMs ?? undefined, ' ms')]]}
+            />
+            {isSelf && (
               <StatRows
                 rows={[
-                  ['Bandwidth', values.audio],
-                  ['Jitter', values.audioJitter],
-                  ['Packet loss', '0.00%'],
+                  ['Connected to', connectedTo],
+                  ['Route', route],
+                  ['Protocol', connection?.local_proto ?? connection?.protocol ?? '—'],
                 ]}
               />
-            </section>
-            <section aria-label="Video statistics">
-              <h3>Video</h3>
-              <StatRows
-                rows={[
-                  ['Bandwidth', values.video],
-                  ['Jitter', values.jitter],
-                  ['Packet loss', values.loss],
-                  ['Resolution', '1280 × 720'],
-                  ['Frame rate', '30 fps'],
-                ]}
-              />
-            </section>
+            )}
+            <MediaStats label="Audio" tracks={sample?.audio ?? []} />
+            <MediaStats label="Video" tracks={sample?.video ?? []} />
           </Dialog>
         </Popover>
       </DialogTrigger>

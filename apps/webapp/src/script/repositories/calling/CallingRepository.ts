@@ -59,6 +59,7 @@ import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
 import {isIncomingSetupOffer, shouldRejectStaleIncomingRing} from './incomingCallInvite';
 import {ClientId, Participant, UserId} from './Participant';
+import {updateParticipantNetworkStats} from './participantNetworkStats';
 import {getAllowedSftOrigins, isAllowedSftUrl} from './sftUrl';
 
 import type {CallConfigData} from '../../apiClient/account/callConfigData';
@@ -743,13 +744,17 @@ export class CallingRepository {
       this.videoStateChanged, // `vstateh`,
     );
     const tenSeconds = 10;
-    wCall.setNetworkQualityHandler(
+    const networkQualityResult = wCall.setNetworkQualityHandler(
       wUser,
       (conversationId, userId, clientId, quality) => {
         this.updateCallQuality(conversationId, userId, clientId, quality);
       },
       tenSeconds,
+      0,
     );
+    if (networkQualityResult !== 0) {
+      this.logger.warn('Cannot register AVS network quality handler', {result: networkQualityResult});
+    }
     wCall.setMuteHandler(wUser, this.updateMuteState);
     wCall.setStateHandler(wUser, this.updateCallState);
     wCall.setParticipantChangedHandler(wUser, this.handleCallParticipantChanges);
@@ -862,12 +867,17 @@ export class CallingRepository {
     }
 
     const {quality} = qualityInfo;
-    if (quality === UNKNOWN_NETWORK_QUALITY) {
+    if (quality === UNKNOWN_NETWORK_QUALITY && qualityInfo.tx === undefined) {
       return;
     }
 
     const call = this.findCall(this.parseQualifiedId(conversationId));
     if (isUndefined(call)) {
+      return;
+    }
+
+    updateParticipantNetworkStats(call, qualityInfo, userId, clientId, Date.now());
+    if (quality === UNKNOWN_NETWORK_QUALITY) {
       return;
     }
 
@@ -955,6 +965,9 @@ export class CallingRepository {
 
   private removeCall(call: Call): void {
     const index = this.callState.calls().indexOf(call);
+    call.participants().forEach(participant => {
+      participant.networkStats(undefined);
+    });
     call.getSelfParticipant().releaseMediaStream(true);
     call.participants.removeAll();
     call.removeAllAudio();

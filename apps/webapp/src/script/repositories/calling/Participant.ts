@@ -22,6 +22,8 @@ import ko, {computed, observable, pureComputed} from 'knockout';
 import {VIDEO_STATE} from '@wireapp/avs';
 import {AvsDebugger} from '@wireapp/avs-debugger';
 
+import type {ParticipantNetworkSample} from './participantNetworkStats';
+
 import {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {getLogger, Logger} from '../../util/logger';
 import {matchQualifiedIds} from '../../util/qualifiedId';
@@ -33,6 +35,7 @@ export type UserId = string;
 export type ClientId = string;
 
 export class Participant {
+  public readonly networkStats = observable<ParticipantNetworkSample | undefined>();
   // Video
   public readonly videoState = observable(VIDEO_STATE.STOPPED);
   // The (self-) participant hold everytime the original video and this will never change.
@@ -139,6 +142,7 @@ export class Participant {
   }
 
   releaseMediaStream(stopTracks: boolean): void {
+    this.networkStats(undefined);
     this.releaseVideoStream(stopTracks);
     this.releaseAudioStream();
   }
