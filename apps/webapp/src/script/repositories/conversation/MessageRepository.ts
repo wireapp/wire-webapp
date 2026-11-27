@@ -223,7 +223,7 @@ const enum SendAndInjectSendingState {
   QUEUED = 'QUEUED',
 }
 
-/** What a change keeps in its payload to be taken back when it is given up unsent */
+/** What a change keeps in its payload to be taken back when it is deleted unsent */
 type PreviousState = {type: 'reactions'; reactions: string} | {type: 'event'; event: StoredEvent};
 
 type SendAndInjectResult = Omit<SendResult, 'state'> & {state: MessageSendingState | SendAndInjectSendingState};
@@ -297,7 +297,7 @@ function referencedMessageId(payload: MessagePayload): string | undefined {
 
 /** An enqueue with the key of a running attempt answers how that attempt ended, whichever way it ended. */
 function endsRunningAttempt(enqueueResult: EnqueueOutcome<unknown>): boolean {
-  return enqueueResult.outcome === 'operation-succeeded' || enqueueResult.outcome === 'operation-dropped';
+  return enqueueResult.outcome === 'operation-succeeded' || enqueueResult.outcome === 'operation-deleted';
 }
 
 export class MessageRepository {
@@ -2122,7 +2122,7 @@ export class MessageRepository {
 
   /** The outbox also reports the operations it loads at startup as changed, so the referrers cover them too. */
   private trackReferrer(operation: OperationView<MessagePayload>): void {
-    const isFinished = operation.state === 'succeeded' || operation.state === 'dropped';
+    const isFinished = operation.state === 'succeeded' || operation.state === 'deleted';
     if (isFinished || referencedMessageId(operation.payload) === undefined) {
       this.referrers.delete(operation.id);
     } else {
@@ -2179,7 +2179,7 @@ export class MessageRepository {
         if (this.hasFailedInOutbox(payload.targetMessageId)) {
           return {outcome: 'attempt-dead-lettered'};
         }
-        return this.performChangeOperation({payload});
+        return this.attemptChangeOperation({payload});
       case 'edit':
       case 'delete':
         return this.attemptChangeOperation({payload});
@@ -2773,10 +2773,10 @@ export class MessageRepository {
         const editPendingMessage = (): Promise<EnqueueOutcome<unknown>> => {
           return this.editPendingMessage(conversation, textMessage, originalMessage, mentions, payload);
         };
-        // An attempt started meanwhile. One that was dropped never sent the message, so the new version still takes
+        // An attempt started meanwhile. One that was deleted never sent the message, so the new version still takes
         // its place. One that went through sent the message.
         await this.enqueueAgainIfAttemptEnded(editPendingMessage, ({outcome}) => {
-          return outcome === 'operation-dropped'
+          return outcome === 'operation-deleted'
             ? editPendingMessage()
             : this.enqueueEditAfterMessage(conversation, textMessage, originalMessage, mentions);
         });
@@ -2932,7 +2932,7 @@ export class MessageRepository {
   }
 
   /**
-   * The payload with what it takes to take the change back when it is given up unsent. A change that replaces one
+   * The payload with what it takes to take the change back when it is deleted unsent. A change that replaces one
    * still unsent keeps what the first one would take back to.
    */
   private withPreviousState(
@@ -3092,7 +3092,7 @@ export class MessageRepository {
     if (conversation === undefined) {
       return;
     }
-    if (state === 'dropped') {
+    if (state === 'deleted') {
       this.activeFireAndForgetInvoker.fireAndForget(() => {
         return this.takeBackUnsentChange(conversation, payload);
       });
@@ -3106,7 +3106,7 @@ export class MessageRepository {
   };
 
   /**
-   * A change given up unsent is taken back, so that the sender doesn't keep a change nobody received. The sender is
+   * A change deleted unsent is taken back, so that the sender doesn't keep a change nobody received. The sender is
    * told about edits and removals. A change stored without what it takes to take it back stays.
    */
   private async takeBackUnsentChange(conversation: Conversation, payload: MessageChangePayload): Promise<void> {

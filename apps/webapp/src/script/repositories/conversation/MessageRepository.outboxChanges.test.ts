@@ -473,7 +473,7 @@ describe('MessageRepository routes changes through the outbox', () => {
   describe('a change made while the previous change of the same message is being sent', () => {
     /**
      * Holds the first send of a change until it is released, and answers the ones after it at once.
-     * A send that ends as canceled has its operation dropped.
+     * A send that ends as canceled has its operation deleted.
      */
     async function holdFirstSend(endState = 'OUTGOING_SENT'): Promise<() => void> {
       let finishSending: () => void = () => {
@@ -589,7 +589,7 @@ describe('MessageRepository routes changes through the outbox', () => {
       );
     });
 
-    describe('when the first change ends dropped', () => {
+    describe('when the first change ends deleted', () => {
       const self = {id: 'selfid', domain: ''};
 
       it('still queues and shows the opposite reaction after an added one', async () => {
@@ -608,7 +608,7 @@ describe('MessageRepository routes changes through the outbox', () => {
 
         expect(parts.sendToBackend).toHaveBeenCalledTimes(2);
         expect(parts.sendToBackend.mock.calls[1][0].reaction.emoji).toBe('');
-        // Shown for each toggle, and once more for the revert of the dropped first one
+        // Shown for each toggle, and once more for the revert of the deleted first one
         expect(parts.inject).toHaveBeenCalledTimes(3);
       });
 
@@ -629,7 +629,7 @@ describe('MessageRepository routes changes through the outbox', () => {
 
         expect(parts.sendToBackend).toHaveBeenCalledTimes(2);
         expect(parts.sendToBackend.mock.calls[1][0].reaction.emoji).toBe('👍');
-        // Shown for each toggle, and once more for the revert of the dropped first one
+        // Shown for each toggle, and once more for the revert of the deleted first one
         expect(parts.inject).toHaveBeenCalledTimes(3);
       });
 
@@ -845,7 +845,7 @@ describe('MessageRepository routes changes through the outbox', () => {
       expect(parts.outbox.findByCorrelationKey('message-2').outcome).toBe('operation-not-found');
     });
 
-    it('for everyone, of a message that may have been delivered, drops it and sends a deletion', async () => {
+    it('for everyone, of a message that may have been delivered, deletes it and sends a deletion', async () => {
       seedMessage(parts, {messageId: 'message-1', attempts: 1});
       await startOutbox(parts);
 
@@ -862,7 +862,7 @@ describe('MessageRepository routes changes through the outbox', () => {
       expect(parts.deleteEvent).toHaveBeenCalledWith(CONVERSATION_ID.id, 'message-1');
     });
 
-    it('for me, of a message that may have been delivered, drops it and hides it', async () => {
+    it('for me, of a message that may have been delivered, deletes it and hides it', async () => {
       seedMessage(parts, {messageId: 'message-1', mayBeDelivered: true});
       await startOutbox(parts);
 
@@ -991,7 +991,7 @@ describe('MessageRepository routes changes through the outbox', () => {
     });
   });
 
-  describe('taking back a change that was given up unsent', () => {
+  describe('taking back a change that was deleted unsent', () => {
     const edited = {primary_key: 'primary-key', id: 'edit-1', edited_time: 'now', data: {content: 'new'}};
     const original = {id: 'sent-1', data: {content: 'old'}};
 

@@ -248,7 +248,7 @@ describe('the message kinds of MessageRepository', () => {
         failInOutbox('quoted-1');
 
         await expect(
-          parts.perform('message', textPayload({quote: {messageId: 'quoted-1', userId: 'sender'}})),
+          parts.attempt('message', textPayload({quote: {messageId: 'quoted-1', userId: 'sender'}})),
         ).resolves.toEqual(deadLettered);
 
         expect(parts.markMessage).toHaveBeenCalledWith(parts.conversation, 'message-1', StatusType.FAILED, 'generic');
@@ -259,7 +259,7 @@ describe('the message kinds of MessageRepository', () => {
         parts.records.set('message-1', sendingRecord());
 
         await expect(
-          parts.perform('message', textPayload({quote: {messageId: 'quoted-1', userId: 'sender'}})),
+          parts.attempt('message', textPayload({quote: {messageId: 'quoted-1', userId: 'sender'}})),
         ).resolves.toEqual(succeeded);
 
         expect(parts.sendToBackend).toHaveBeenCalledTimes(1);
@@ -270,7 +270,7 @@ describe('the message kinds of MessageRepository', () => {
     it('answers dead-lettered for a reaction to a message that failed, without sending or showing a failure', async () => {
       failInOutbox('message-1');
 
-      await expect(parts.perform('message', reactionPayload())).resolves.toEqual(deadLettered);
+      await expect(parts.attempt('message', reactionPayload())).resolves.toEqual(deadLettered);
 
       expect(parts.sendToBackend).not.toHaveBeenCalled();
       expect(parts.markMessage).not.toHaveBeenCalled();
@@ -758,7 +758,7 @@ describe('the message kinds of MessageRepository', () => {
       expect(parts.openGraph).toHaveBeenCalledWith(LINK);
     });
 
-    describe('onChanged of a change that is given up unsent', () => {
+    describe('onChanged of a change that is deleted unsent', () => {
       const previousEvent = {id: 'message-1', data: {content: 'old'}} as unknown as StoredEvent;
       const removedEvent = {id: 'message-1', data: {content: 'text'}} as unknown as StoredEvent;
       const removals = [
@@ -777,7 +777,7 @@ describe('the message kinds of MessageRepository', () => {
       });
 
       it('puts the reactions from before a reaction back, without a notice', async () => {
-        await parts.changed('message-change', reactionPayload({reactions: '', previousReactions: '👍'}), 'dropped');
+        await parts.changed('message-change', reactionPayload({reactions: '', previousReactions: '👍'}), 'deleted');
 
         expect(parts.injectOptimistic).toHaveBeenCalledTimes(1);
         expect(parts.injectOptimistic).toHaveBeenCalledWith(
@@ -790,21 +790,21 @@ describe('the message kinds of MessageRepository', () => {
       it('shows the version from before an edit again, and tells the sender', async () => {
         parts.records.set('edit-1', sendingRecord());
 
-        await parts.changed('message-change', editPayload({previousEvent}), 'dropped');
+        await parts.changed('message-change', editPayload({previousEvent}), 'deleted');
 
         expect(replaceEvent).toHaveBeenCalledWith(expect.objectContaining({...previousEvent, primary_key: 'edit-1'}));
         expect(undone).toHaveBeenCalledWith('edit');
       });
 
       it('says nothing when the edit is not what is shown any more', async () => {
-        await parts.changed('message-change', editPayload({previousEvent}), 'dropped');
+        await parts.changed('message-change', editPayload({previousEvent}), 'deleted');
 
         expect(replaceEvent).not.toHaveBeenCalled();
         expect(undone).not.toHaveBeenCalled();
       });
 
       it.each(removals)('shows the message of a %s again, and tells the sender', async (_name, payload) => {
-        await parts.changed('message-change', payload, 'dropped');
+        await parts.changed('message-change', payload, 'deleted');
 
         expect(injectEvent).toHaveBeenCalledWith(removedEvent);
         expect(undone).toHaveBeenCalledWith('delete');
@@ -813,7 +813,7 @@ describe('the message kinds of MessageRepository', () => {
       it.each(removals)('says nothing when the message of a %s is shown already', async (_name, payload) => {
         parts.records.set('message-1', sendingRecord());
 
-        await parts.changed('message-change', payload, 'dropped');
+        await parts.changed('message-change', payload, 'deleted');
 
         expect(injectEvent).not.toHaveBeenCalled();
         expect(undone).not.toHaveBeenCalled();
@@ -839,10 +839,10 @@ describe('the message kinds of MessageRepository', () => {
       it('takes nothing back that was stored without what it was before', async () => {
         parts.records.set('edit-1', sendingRecord());
 
-        await parts.changed('message-change', reactionPayload(), 'dropped');
-        await parts.changed('message-change', editPayload(), 'dropped');
-        await parts.changed('message-change', deletePayload(), 'dropped');
-        await parts.changed('message-change', hidePayload(), 'dropped');
+        await parts.changed('message-change', reactionPayload(), 'deleted');
+        await parts.changed('message-change', editPayload(), 'deleted');
+        await parts.changed('message-change', deletePayload(), 'deleted');
+        await parts.changed('message-change', hidePayload(), 'deleted');
 
         expect(parts.injectOptimistic).not.toHaveBeenCalled();
         expect(replaceEvent).not.toHaveBeenCalled();
