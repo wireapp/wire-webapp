@@ -251,8 +251,8 @@ describe('the message kinds of MessageRepository', () => {
           parts.attempt('message', textPayload({quote: {messageId: 'quoted-1', userId: 'sender'}})),
         ).resolves.toEqual(deadLettered);
 
-        expect(parts.markMessage).toHaveBeenCalledWith(parts.conversation, 'message-1', StatusType.FAILED, 'generic');
-        expect(parts.sendToBackend).not.toHaveBeenCalled();
+        expect(parts.records.get('message-1')).toMatchObject({status: StatusType.FAILED, failed_reason: 'generic'});
+        expect(parts.send).not.toHaveBeenCalled();
       });
 
       it('sends a reply to a message that was sent or is pending', async () => {
@@ -262,8 +262,8 @@ describe('the message kinds of MessageRepository', () => {
           parts.attempt('message', textPayload({quote: {messageId: 'quoted-1', userId: 'sender'}})),
         ).resolves.toEqual(succeeded);
 
-        expect(parts.sendToBackend).toHaveBeenCalledTimes(1);
-        expect(parts.markMessage).not.toHaveBeenCalled();
+        expect(parts.send).toHaveBeenCalledTimes(1);
+        expect(parts.records.get('message-1')).toMatchObject({status: StatusType.SENT});
       });
     });
 
@@ -272,8 +272,8 @@ describe('the message kinds of MessageRepository', () => {
 
       await expect(parts.attempt('message', reactionPayload())).resolves.toEqual(deadLettered);
 
-      expect(parts.sendToBackend).not.toHaveBeenCalled();
-      expect(parts.markMessage).not.toHaveBeenCalled();
+      expect(parts.send).not.toHaveBeenCalled();
+      expect(parts.updateEvent).not.toHaveBeenCalled();
       expect(parts.deleteMessage).not.toHaveBeenCalled();
     });
 
@@ -766,12 +766,10 @@ describe('the message kinds of MessageRepository', () => {
         ['hide', {...hidePayload(), removedEvent}],
       ] as const;
       let replaceEvent: jest.SpyInstance;
-      let injectEvent: jest.SpyInstance;
       let undone: jest.Mock;
 
       beforeEach(() => {
-        replaceEvent = jest.spyOn((parts.repository as any).eventService, 'replaceEvent').mockResolvedValue({});
-        injectEvent = jest.spyOn((parts.repository as any).eventRepository, 'injectEvent').mockResolvedValue(undefined);
+        replaceEvent = jest.spyOn(parts.eventService, 'replaceEvent').mockResolvedValue({} as any);
         undone = jest.fn();
         parts.repository.onChangeUndone(undone);
       });
@@ -779,10 +777,12 @@ describe('the message kinds of MessageRepository', () => {
       it('puts the reactions from before a reaction back, without a notice', async () => {
         await parts.changed('message-change', reactionPayload({reactions: '', previousReactions: '👍'}), 'deleted');
 
-        expect(parts.injectOptimistic).toHaveBeenCalledTimes(1);
-        expect(parts.injectOptimistic).toHaveBeenCalledWith(
-          expect.objectContaining({reaction: expect.objectContaining({emoji: '👍'})}),
-          parts.conversation,
+        expect(parts.injectEvent).toHaveBeenCalledTimes(1);
+        expect(parts.injectEvent).toHaveBeenCalledWith(
+          expect.objectContaining({
+            type: 'conversation.reaction',
+            data: expect.objectContaining({message_id: 'message-1', reaction: '👍'}),
+          }),
         );
         expect(undone).not.toHaveBeenCalled();
       });
@@ -806,7 +806,7 @@ describe('the message kinds of MessageRepository', () => {
       it.each(removals)('shows the message of a %s again, and tells the sender', async (_name, payload) => {
         await parts.changed('message-change', payload, 'deleted');
 
-        expect(injectEvent).toHaveBeenCalledWith(removedEvent);
+        expect(parts.injectEvent).toHaveBeenCalledWith(removedEvent);
         expect(undone).toHaveBeenCalledWith('delete');
       });
 
@@ -815,7 +815,7 @@ describe('the message kinds of MessageRepository', () => {
 
         await parts.changed('message-change', payload, 'deleted');
 
-        expect(injectEvent).not.toHaveBeenCalled();
+        expect(parts.injectEvent).not.toHaveBeenCalled();
         expect(undone).not.toHaveBeenCalled();
       });
 
@@ -829,9 +829,8 @@ describe('the message kinds of MessageRepository', () => {
           await parts.changed('message-change', editPayload({previousEvent}), state);
           await parts.changed('message-change', {...deletePayload(), removedEvent}, state);
 
-          expect(parts.injectOptimistic).not.toHaveBeenCalled();
           expect(replaceEvent).not.toHaveBeenCalled();
-          expect(injectEvent).not.toHaveBeenCalled();
+          expect(parts.injectEvent).not.toHaveBeenCalled();
           expect(undone).not.toHaveBeenCalled();
         },
       );
@@ -844,9 +843,8 @@ describe('the message kinds of MessageRepository', () => {
         await parts.changed('message-change', deletePayload(), 'deleted');
         await parts.changed('message-change', hidePayload(), 'deleted');
 
-        expect(parts.injectOptimistic).not.toHaveBeenCalled();
         expect(replaceEvent).not.toHaveBeenCalled();
-        expect(injectEvent).not.toHaveBeenCalled();
+        expect(parts.injectEvent).not.toHaveBeenCalled();
         expect(undone).not.toHaveBeenCalled();
       });
     });

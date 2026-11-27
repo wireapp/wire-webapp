@@ -19,11 +19,8 @@
 
 import {amplify} from 'amplify';
 
-import {GenericMessage} from '@wireapp/protocol-messaging';
+import type {GenericMessage} from '@wireapp/protocol-messaging';
 
-import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
-import {MessageSendingState} from '../../core/conversation';
-import {MessageTimer} from '../../core/conversation/messageTimer/messageTimer';
 import {StatusType} from '../../message/statusType';
 import {type OperationSnapshot, type Outbox} from '../../outbox';
 import type {FakeClock} from '../../outbox/testing/createFakeClock';
@@ -36,12 +33,14 @@ import {ContentMessage} from '../entity/message/contentMessage';
 import {Text as TextAsset} from '../entity/message/text';
 import {StorageKey} from '../storage';
 
+import type {MessageChangePayload, StoredEvent} from './outbox/messageOutboxTypes';
 import {
   createOutboxRepository,
   sendingRecord,
   sentResult,
   type OutboxRepository,
 } from './outbox/testing/createOutboxRepository';
+import {deletePayload, editPayload} from './outbox/testing/payloadFactories';
 
 const CONVERSATION_ID = {id: 'conversation-1', domain: 'wire.test'};
 const MESSAGES_LANE = `${CONVERSATION_ID.id}@${CONVERSATION_ID.domain}`;
@@ -505,7 +504,7 @@ describe('MessageRepository routes changes through the outbox', () => {
       await parts.repository.toggleReaction(parts.conversation, message, '👍', self);
       await waitForAttempt();
       expect(snapshotOf(parts.store, 'sent-1:reaction')?.state).toBe('in-progress');
-      const enqueue = jest.spyOn((parts.repository as any).outboxKinds.messageChange, 'enqueue');
+      const enqueue = jest.spyOn(parts.handles['message-change'], 'enqueue');
 
       message.reactions([['👍', [self]]]);
       const second = parts.repository.toggleReaction(parts.conversation, message, '❤️', self);
@@ -606,10 +605,10 @@ describe('MessageRepository routes changes through the outbox', () => {
         await second;
         await parts.clock.settle();
 
-        expect(parts.sendToBackend).toHaveBeenCalledTimes(2);
-        expect(parts.sendToBackend.mock.calls[1][0].reaction.emoji).toBe('');
+        expect(parts.send).toHaveBeenCalledTimes(2);
+        expect(parts.send.mock.calls[1][0].payload.reaction.emoji).toBe('');
         // Shown for each toggle, and once more for the revert of the deleted first one
-        expect(parts.inject).toHaveBeenCalledTimes(3);
+        expect(parts.injectEvent).toHaveBeenCalledTimes(3);
       });
 
       it('still queues and shows a reaction added again after a removed one', async () => {
@@ -627,10 +626,10 @@ describe('MessageRepository routes changes through the outbox', () => {
         await second;
         await parts.clock.settle();
 
-        expect(parts.sendToBackend).toHaveBeenCalledTimes(2);
-        expect(parts.sendToBackend.mock.calls[1][0].reaction.emoji).toBe('👍');
+        expect(parts.send).toHaveBeenCalledTimes(2);
+        expect(parts.send.mock.calls[1][0].payload.reaction.emoji).toBe('👍');
         // Shown for each toggle, and once more for the revert of the deleted first one
-        expect(parts.inject).toHaveBeenCalledTimes(3);
+        expect(parts.injectEvent).toHaveBeenCalledTimes(3);
       });
 
       it('still sends the second edit of the same message', async () => {
@@ -646,8 +645,8 @@ describe('MessageRepository routes changes through the outbox', () => {
         await second;
         await parts.clock.settle();
 
-        expect(parts.sendToBackend).toHaveBeenCalledTimes(2);
-        expect(parts.sendToBackend.mock.calls[1][0].edited.text.content).toBe('newer');
+        expect(parts.send).toHaveBeenCalledTimes(2);
+        expect(parts.send.mock.calls[1][0].payload.edited.text.content).toBe('newer');
       });
     });
 
@@ -995,82 +994,85 @@ describe('MessageRepository routes changes through the outbox', () => {
     const edited = {primary_key: 'primary-key', id: 'edit-1', edited_time: 'now', data: {content: 'new'}};
     const original = {id: 'sent-1', data: {content: 'old'}};
 
+    const editOfSent = editPayload({originalMessageId: 'sent-1', previousEvent: original as unknown as StoredEvent});
+    const deletionOf = (removedEvent: object): MessageChangePayload => {
+      return deletePayload({targetMessageId: 'sent-1', removedEvent: removedEvent as unknown as StoredEvent});
+    };
+
+    let replaceEvent: jest.SpyInstance;
+    let undone: jest.Mock;
+
+    beforeEach(() => {
+      replaceEvent = jest.spyOn(parts.eventService, 'replaceEvent').mockResolvedValue({} as any);
+      undone = jest.fn();
+    });
+
     it('stores the record from before an edit over the shown one, with nothing left of the edit', async () => {
-      const replaceEvent = jest.spyOn(parts.eventService, 'replaceEvent').mockResolvedValue({} as any);
+      parts.repository.onChangeUndone(undone);
       jest.spyOn(parts.eventService, 'loadEvent').mockResolvedValue(edited as any);
 
-      const restored = await (parts.repository as any).restoreEditedMessage(parts.conversation, {
-        messageId: 'edit-1',
-        previousEvent: original,
-      });
+      await parts.changed('message-change', editOfSent, 'deleted');
 
-      expect(restored).toBe(true);
       expect(replaceEvent).toHaveBeenCalledWith({
         edited_time: undefined,
         ...original,
         primary_key: 'primary-key',
       });
+      expect(undone).toHaveBeenCalledWith('edit');
     });
 
     it('leaves an edit that a later edit replaced alone', async () => {
-      const replaceEvent = jest.spyOn(parts.eventService, 'replaceEvent').mockResolvedValue({} as any);
+      parts.repository.onChangeUndone(undone);
       jest.spyOn(parts.eventService, 'loadEvent').mockResolvedValue({...edited, id: 'edit-2'} as any);
 
-      const restored = await (parts.repository as any).restoreEditedMessage(parts.conversation, {
-        messageId: 'edit-1',
-        previousEvent: original,
-      });
+      await parts.changed('message-change', editOfSent, 'deleted');
 
-      expect(restored).toBe(false);
       expect(replaceEvent).not.toHaveBeenCalled();
+      expect(undone).not.toHaveBeenCalled();
     });
 
     it('shows a removed message again by injecting its stored record, without the old primary key', async () => {
-      const injectEvent = jest
-        .spyOn((parts.repository as any).eventRepository, 'injectEvent')
-        .mockResolvedValue(undefined);
-      jest.spyOn(parts.eventService, 'loadEvent').mockResolvedValue(undefined);
+      parts.repository.onChangeUndone(undone);
 
-      const restored = await (parts.repository as any).restoreRemovedMessage(parts.conversation, {
-        ...original,
-        primary_key: 'primary-key',
-      });
+      await parts.changed('message-change', deletionOf({...original, primary_key: 'primary-key'}), 'deleted');
 
-      expect(restored).toBe(true);
-      expect(injectEvent).toHaveBeenCalledWith(original);
+      expect(parts.injectEvent).toHaveBeenCalledWith(original);
+      expect(undone).toHaveBeenCalledWith('delete');
     });
 
     it('does not inject a removed message that is stored again', async () => {
-      const injectEvent = jest
-        .spyOn((parts.repository as any).eventRepository, 'injectEvent')
-        .mockResolvedValue(undefined);
-      jest.spyOn(parts.eventService, 'loadEvent').mockResolvedValue(original as any);
+      parts.repository.onChangeUndone(undone);
+      parts.records.set('sent-1', sendingRecord());
 
-      const restored = await (parts.repository as any).restoreRemovedMessage(parts.conversation, original);
+      await parts.changed('message-change', deletionOf(original), 'deleted');
 
-      expect(restored).toBe(false);
-      expect(injectEvent).not.toHaveBeenCalled();
+      expect(parts.injectEvent).not.toHaveBeenCalled();
+      expect(undone).not.toHaveBeenCalled();
     });
 
-    it('tells the listeners of the change that was undone, until they stop listening', () => {
-      const listener = jest.fn();
-      const stop = parts.repository.onChangeUndone(listener);
+    it('tells the listeners of the change that was undone, until they stop listening', async () => {
+      const stop = parts.repository.onChangeUndone(undone);
+      jest.spyOn(parts.eventService, 'loadEvent').mockResolvedValue(edited as any);
 
-      (parts.repository as any).notifyChangeUndone('edit');
+      await parts.changed('message-change', editOfSent, 'deleted');
       stop();
-      (parts.repository as any).notifyChangeUndone('delete');
+      jest.spyOn(parts.eventService, 'loadEvent').mockResolvedValue(undefined);
+      await parts.changed('message-change', deletionOf(original), 'deleted');
 
-      expect(listener).toHaveBeenCalledTimes(1);
-      expect(listener).toHaveBeenCalledWith('edit');
+      expect(undone).toHaveBeenCalledTimes(1);
+      expect(undone).toHaveBeenCalledWith('edit');
     });
   });
 
   describe('a reply and a reaction to a message that failed', () => {
-    let failedReasons: Map<string, string | undefined>;
+    function failedReasonOf(messageId: string): string | undefined {
+      const record = parts.records.get(messageId);
+      return record?.status === StatusType.FAILED ? record.failed_reason : undefined;
+    }
 
     function sentIds(): string[] {
-      return parts.sendToBackend.mock.calls.map(([message]) => {
-        return message.reaction ? `reaction:${message.reaction.messageId}` : message.messageId;
+      return parts.send.mock.calls.map(([{payload}]: [{payload: GenericMessage}]) => {
+        return payload.reaction ? `reaction:${payload.reaction.messageId}` : payload.messageId;
       });
     }
 
@@ -1113,28 +1115,6 @@ describe('MessageRepository routes changes through the outbox', () => {
     }
 
     beforeEach(async () => {
-      failedReasons = new Map();
-      const setStatus = (parts.repository as any).markMessage.bind(parts.repository);
-      jest
-        .spyOn(parts.repository as any, 'markMessage')
-        .mockImplementation(
-          async (conversation: Conversation, messageId: string, status: StatusType, reason?: string) => {
-            failedReasons.set(messageId, status === StatusType.FAILED ? reason : undefined);
-            return setStatus(conversation, messageId, status, reason);
-          },
-        );
-      jest.spyOn(parts.eventService, 'loadEvent').mockImplementation(async (_conversationId, messageId) => {
-        const reason = failedReasons.get(messageId);
-        return {
-          primary_key: 'primary-key',
-          id: messageId,
-          status: reason === undefined ? StatusType.SENDING : StatusType.FAILED,
-          failed_reason: reason,
-        } as any;
-      });
-      jest.spyOn(parts.repository as any, 'buildOutboxText').mockImplementation(async (_conversation, payload: any) => {
-        return new GenericMessage({messageId: payload.messageId});
-      });
       seedMessage(parts, {messageId: 'message-1', state: 'dead-lettered', attempts: 0});
       await startOutbox(parts);
       parts.outbox.resume();
@@ -1153,7 +1133,7 @@ describe('MessageRepository routes changes through the outbox', () => {
       expect(sentIds()).toEqual([]);
       expect(snapshotOf(parts.store, replyId())).toEqual(expect.objectContaining({state: 'dead-lettered'}));
       expect(snapshotOf(parts.store, 'message-1:reaction')).toEqual(expect.objectContaining({state: 'dead-lettered'}));
-      expect(failedReasons.get(replyId())).toBe('generic');
+      expect(failedReasonOf(replyId())).toBe('generic');
     });
 
     it('go out after the message when it is sent again', async () => {
@@ -1169,7 +1149,7 @@ describe('MessageRepository routes changes through the outbox', () => {
     });
 
     it('leave a reply that failed for a reason of its own failed when the message is sent again', async () => {
-      failedReasons.set(replyId(), 'rejected');
+      parts.records.set(replyId(), {...parts.records.get(replyId()), failed_reason: 'rejected'});
 
       await parts.repository.retryTextMessage({
         conversation: parts.conversation,
@@ -1188,7 +1168,7 @@ describe('MessageRepository routes changes through the outbox', () => {
 
       expect(sentIds()).toEqual([]);
       expect(snapshotOf(parts.store, replyId())).toEqual(expect.objectContaining({state: 'dead-lettered'}));
-      expect(failedReasons.get(replyId())).toBe('generic');
+      expect(failedReasonOf(replyId())).toBe('generic');
     });
 
     it('lose the reaction, and keep the reply with its Retry, when the message is deleted', async () => {
