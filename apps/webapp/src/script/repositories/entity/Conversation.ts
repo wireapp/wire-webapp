@@ -80,11 +80,7 @@ const userSearchDebounceInMilliseconds = 100;
 const decimalRadix = 10;
 
 function isUnsent(message: Message): boolean {
-  if (!Conversation.keepUnsentMessagesLast) {
-    return false;
-  }
-  const status = message.status();
-  return status === StatusType.SENDING || status === StatusType.FAILED || status === StatusType.FEDERATION_ERROR;
+  return Conversation.keepUnsentMessagesLast && message.sendingState() !== 'sent';
 }
 
 export interface UnreadState {

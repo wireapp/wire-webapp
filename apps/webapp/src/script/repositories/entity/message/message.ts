@@ -460,7 +460,7 @@ export class Message {
       this.isContent() &&
       !this.isComposite() &&
       !this.isEphemeral() &&
-      (this.status() !== StatusType.SENDING || isPendingInOutbox) &&
+      (this.sendingState() !== 'outgoing' || isPendingInOutbox) &&
       !this.hasUnavailableAsset()
     );
   }
@@ -475,7 +475,7 @@ export class Message {
       this.isContent() &&
       !this.isComposite() &&
       !this.isEphemeral() &&
-      (this.status() !== StatusType.SENDING || isPendingInOutbox) &&
+      (this.sendingState() !== 'outgoing' || isPendingInOutbox) &&
       !this.hasUnavailableAsset()
     );
   }

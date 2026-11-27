@@ -182,16 +182,15 @@ export const ContentMessageComponent: FunctionComponent<ContentMessageProps> = (
   }, [translate]);
   const timeAgo = useRelativeTimestamp(message.timestamp(), false, relativeTimestampFormatter);
 
-  const isFailed = [StatusType.FAILED, StatusType.FEDERATION_ERROR].includes(status);
+  const sendingState = message.sendingState();
   // A message restored after a reload has no outbox state until the outbox started, but it already waits
-  const isWaitingForConnection = isOutboxEnabled && status === StatusType.SENDING && outboxState !== 'sending';
-  const isPendingInOutbox = outboxState === 'pending' && status === StatusType.SENDING;
-  const isDimmed = isOutboxEnabled && (status === StatusType.SENDING || isFailed);
+  const isWaitingForConnection = isOutboxEnabled && sendingState === 'outgoing' && outboxState !== 'sending';
+  const isPendingInOutbox = outboxState === 'pending' && sendingState === 'outgoing';
+  const isDimmed = isOutboxEnabled && sendingState !== 'sent';
   const writtenTimestamp = Date.parse(writtenTime ?? '');
   const showWrittenTime =
     isOutboxEnabled &&
-    status !== StatusType.SENDING &&
-    !isFailed &&
+    sendingState === 'sent' &&
     Number.isFinite(writtenTimestamp) &&
     timestamp - writtenTimestamp >= WRITTEN_TIME_SHOWN_AFTER_MILLISECONDS;
 
@@ -371,7 +370,7 @@ export const ContentMessageComponent: FunctionComponent<ContentMessageProps> = (
         )}
       </div>
 
-      {[StatusType.FAILED, StatusType.FEDERATION_ERROR].includes(status) && (
+      {sendingState === 'failed' && (
         <CompleteFailureToSendWarning
           {...(status === StatusType.FEDERATION_ERROR && {unreachableDomain: conversation.domain})}
           failedReason={failedReason}
