@@ -18,12 +18,14 @@
 
 import {memo, useEffect, type ComponentProps, type ReactElement} from 'react';
 
-import {act, fireEvent, render, waitFor, type RenderResult} from '@testing-library/react';
+import {act, fireEvent, render, waitFor, within, type RenderResult} from '@testing-library/react';
 
 import {ConversationContent} from './conversation';
 import {ConversationCells} from './conversationCells/conversationCells';
 import {
+  CELLS_ACTION,
   CELLS_SELF_USER_DRIVE_ROLE,
+  useCellsActionPermissions,
   useCellsSelfUserDriveRole,
 } from './conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 
@@ -61,8 +63,9 @@ const messagesUrl = `#/conversation/${conversationId}/${conversationDomain}`;
 const TestConversationCells: typeof ConversationCells = memo(
   (_: ComponentProps<typeof ConversationCells>): ReactElement => {
     const role = useCellsSelfUserDriveRole();
+    const canPerform = useCellsActionPermissions();
 
-    return <div data-uie-name="files-panel" data-drive-role={role} />;
+    return <div data-uie-name="files-panel" data-drive-role={role} data-can-create={canPerform(CELLS_ACTION.CREATE)} />;
   },
 );
 
@@ -132,6 +135,12 @@ describe('Conversation', () => {
 
   afterEach(() => {
     window.location.hash = '';
+    sessionStorage.removeItem(
+      `conversation-viewer-permission-banner-dismissed:${conversationId}@${conversationDomain}:offboarding`,
+    );
+    sessionStorage.removeItem(
+      `conversation-viewer-permission-banner-dismissed:${conversationId}@${conversationDomain}`,
+    );
   });
 
   const createConversation = (cellsState: CONVERSATION_CELLS_STATE): Conversation => {
@@ -146,18 +155,21 @@ describe('Conversation', () => {
     return conversation;
   };
 
-  const renderConversation = (cellsState: CONVERSATION_CELLS_STATE): RenderResult => {
+  const renderConversation = (
+    cellsState: CONVERSATION_CELLS_STATE,
+    {selfUserTeamId = 'team', isCellsEnabledForTeam = false, isOffboardingFlagEnabled = true} = {},
+  ): RenderResult => {
     const teamState = new TeamState();
-    teamState.teamFeatures({cells: {status: FEATURE_STATUS.DISABLED}});
+    teamState.teamFeatures({cells: {status: isCellsEnabledForTeam ? FEATURE_STATUS.ENABLED : FEATURE_STATUS.DISABLED}});
     const selfUser = new User('self-user', conversationDomain, translateForTest);
-    selfUser.teamId = 'team';
+    selfUser.teamId = selfUserTeamId;
     const activeConversation = createConversation(cellsState);
     activeConversation.selfUser(selfUser);
 
     const rootProviderWrapper = createRootProviderWrapperForTest(
       createRootContextValueForTest({
         isFeatureToggleEnabled: featureToggleName => {
-          return featureToggleName === driveOffboardingFeatureToggleName;
+          return isOffboardingFlagEnabled && featureToggleName === driveOffboardingFeatureToggleName;
         },
         mainViewModel,
         translate: translateForTest,
@@ -190,8 +202,9 @@ describe('Conversation', () => {
 
     expect(await firstView.findByTestId('files-panel')).toHaveAttribute(
       'data-drive-role',
-      CELLS_SELF_USER_DRIVE_ROLE.VIEWER,
+      CELLS_SELF_USER_DRIVE_ROLE.EDITOR,
     );
+    expect(firstView.getByTestId('files-panel')).toHaveAttribute('data-can-create', 'false');
     expect(firstView.getByRole('tab', {name: 'conversationDetailsActionCellsTitle'})).toHaveAttribute(
       'aria-selected',
       'true',
@@ -213,7 +226,7 @@ describe('Conversation', () => {
 
     expect(await readyView.findByTestId('files-panel')).toHaveAttribute(
       'data-drive-role',
-      CELLS_SELF_USER_DRIVE_ROLE.VIEWER,
+      CELLS_SELF_USER_DRIVE_ROLE.EDITOR,
     );
     fireEvent.click(readyView.getByRole('tab', {name: 'cells.tableRow.conversationName'}));
 
@@ -224,10 +237,90 @@ describe('Conversation', () => {
     await waitFor(() => {
       expect(composer).toHaveTextContent('Message remains available');
     });
+    expect(readyView.getByTestId('do-send-message')).toBeEnabled();
+    expect(readyView.queryByTestId('do-share-file')).not.toBeInTheDocument();
+    expect(readyView.queryByTestId('do-share-image')).not.toBeInTheDocument();
     expect(window.location.hash).toBe(messagesUrl);
 
     readyView.unmount();
     const disabledView = renderConversation(CONVERSATION_CELLS_STATE.DISABLED);
     expect(disabledView.queryByRole('tab', {name: 'conversationDetailsActionCellsTitle'})).not.toBeInTheDocument();
+  });
+  it('shows the offboarding notice in both tabs and a dismissible grey message above the composer', async () => {
+    sessionStorage.setItem(
+      `conversation-viewer-permission-banner-dismissed:${conversationId}@${conversationDomain}`,
+      'true',
+    );
+    window.location.hash = filesUrl;
+    const view = renderConversation(CONVERSATION_CELLS_STATE.READY);
+
+    expect(await view.findByTestId('drive-offboarding-banner')).toBeVisible();
+    expect(view.getAllByTestId('drive-offboarding-banner')).toHaveLength(1);
+    expect(view.container.querySelector('.conversation-viewer-permission-banner')).not.toBeInTheDocument();
+
+    fireEvent.click(view.getByRole('tab', {name: 'cells.tableRow.conversationName'}));
+    expect(await view.findByTestId('input-message')).toBeVisible();
+    expect(view.getByTestId('drive-offboarding-banner')).toBeVisible();
+    const composerBanner = view.container.querySelector('.conversation-viewer-permission-banner') as HTMLElement;
+    expect(composerBanner).toBeVisible();
+    expect(composerBanner).toHaveTextContent('conversationDriveOffboardingHint');
+    expect(view.queryByTestId('drive-offboarding-hint')).not.toBeInTheDocument();
+    expect(within(composerBanner).queryByRole('link')).not.toBeInTheDocument();
+    const composer = view.getByTestId('input-message');
+    expect(composerBanner.compareDocumentPosition(composer) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    fireEvent.click(within(composerBanner).getByRole('button', {name: 'accessibility.rightPanel.close'}));
+    expect(view.container.querySelector('.conversation-viewer-permission-banner')).not.toBeInTheDocument();
+    expect(view.getByTestId('drive-offboarding-banner')).toBeVisible();
+    sessionStorage.removeItem(
+      `conversation-viewer-permission-banner-dismissed:${conversationId}@${conversationDomain}`,
+    );
+  });
+
+  it.each([false, true])(
+    'shows the viewer banner in another team’s Drive when the signed-in team Cells is %s',
+    async isCellsEnabledForTeam => {
+      const view = renderConversation(CONVERSATION_CELLS_STATE.READY, {
+        selfUserTeamId: 'other-team',
+        isCellsEnabledForTeam,
+      });
+
+      await waitFor(() => {
+        expect(view.container.querySelector('.conversation-viewer-permission-banner')).toBeVisible();
+      });
+      expect(view.queryByTestId('drive-offboarding-banner')).not.toBeInTheDocument();
+      expect(view.queryByTestId('drive-offboarding-hint')).not.toBeInTheDocument();
+      expect(await view.findByTestId('input-message')).toBeVisible();
+      expect(view.queryByTestId('do-share-file')).not.toBeInTheDocument();
+      expect(view.queryByTestId('do-share-image')).not.toBeInTheDocument();
+      fireEvent.click(view.getByRole('tab', {name: 'conversationDetailsActionCellsTitle'}));
+      expect(await view.findByTestId('files-panel')).toHaveAttribute('data-drive-role', 'viewer');
+      expect(view.getByTestId('files-panel')).toHaveAttribute('data-can-create', 'false');
+    },
+  );
+
+  it('keeps a teamless guest on the viewer banner', async () => {
+    const view = renderConversation(CONVERSATION_CELLS_STATE.READY, {selfUserTeamId: ''});
+    await waitFor(() => {
+      expect(view.container.querySelector('.conversation-viewer-permission-banner')).toBeVisible();
+    });
+    expect(view.queryByTestId('drive-offboarding-banner')).not.toBeInTheDocument();
+  });
+
+  it.each([
+    {isCellsEnabledForTeam: true, isOffboardingFlagEnabled: true},
+    {isCellsEnabledForTeam: false, isOffboardingFlagEnabled: false},
+  ])('preserves existing behavior outside offboarding: %o', async options => {
+    const view = renderConversation(CONVERSATION_CELLS_STATE.READY, options);
+    expect(await view.findByTestId('input-message')).toBeVisible();
+    expect(view.queryByTestId('drive-offboarding-banner')).not.toBeInTheDocument();
+    expect(view.queryByTestId('drive-offboarding-hint')).not.toBeInTheDocument();
+    expect(view.container.querySelector('.conversation-viewer-permission-banner')).not.toBeInTheDocument();
+  });
+
+  it('omits offboarding UI after the conversation Drive becomes disabled', async () => {
+    const view = renderConversation(CONVERSATION_CELLS_STATE.DISABLED);
+    expect(await view.findByTestId('input-message')).toBeVisible();
+    expect(view.queryByTestId('drive-offboarding-banner')).not.toBeInTheDocument();
+    expect(view.queryByTestId('drive-offboarding-hint')).not.toBeInTheDocument();
   });
 });

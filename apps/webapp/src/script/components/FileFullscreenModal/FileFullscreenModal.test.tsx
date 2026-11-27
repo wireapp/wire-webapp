@@ -23,6 +23,7 @@ import {render, screen} from '@testing-library/react';
 
 import {
   CELLS_SELF_USER_DRIVE_ROLE,
+  CellsDriveAccessProvider,
   CellsSelfUserDriveRoleProvider,
   type CellsSelfUserDriveRole,
 } from '../conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
@@ -300,6 +301,24 @@ describe('FileFullscreenModal - File Version Restore', () => {
       render(<FileFullscreenModal {...defaultProps} filePreviewUrl={undefined} status="success" />, {wrapper});
 
       expect(screen.getByTestId('no-preview')).toBeInTheDocument();
+    });
+
+    it('shows viewer access for an offboarding editor and restores editor access when Drive is enabled', () => {
+      const modal = (isOffboarding: boolean): ReactNode => {
+        return (
+          <CellsDriveAccessProvider selfUserDriveRole="editor" isDriveOffboardingEnabled={isOffboarding}>
+            <FileFullscreenModal {...defaultProps} isEditMode />
+          </CellsDriveAccessProvider>
+        );
+      };
+      const view = render(modal(true), {wrapper});
+
+      expect(screen.getByTestId('file-header')).toHaveAttribute('data-show-view-only-label', 'true');
+      expect(screen.queryByTestId('file-editor')).not.toBeInTheDocument();
+
+      view.rerender(modal(false));
+      expect(screen.getByTestId('file-header')).toHaveAttribute('data-show-view-only-label', 'false');
+      expect(screen.getByTestId('file-editor')).toBeInTheDocument();
     });
 
     it('should pass viewer access state to header for restricted viewers when preview url is available', () => {

@@ -21,6 +21,8 @@ import {createContext, type ReactNode, useCallback, useContext, type FunctionCom
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
+import {CellsDriveOffboardingProvider, useCellsDriveOffboarding} from './cellsDriveOffboardingContext';
+
 export const CELLS_SELF_USER_DRIVE_ROLE = {
   EDITOR: 'editor',
   VIEWER: 'viewer',
@@ -31,18 +33,12 @@ export type CellsSelfUserDriveRole = (typeof CELLS_SELF_USER_DRIVE_ROLE)[keyof t
 interface GetSelfUserDriveRoleParams {
   conversationTeamId?: string;
   selfUserTeamId?: string;
-  isCellsEnabledForTeam?: boolean;
 }
 
 export const getSelfUserDriveRole = ({
   conversationTeamId,
   selfUserTeamId,
-  isCellsEnabledForTeam = true,
 }: GetSelfUserDriveRoleParams): CellsSelfUserDriveRole => {
-  if (!isCellsEnabledForTeam) {
-    return CELLS_SELF_USER_DRIVE_ROLE.VIEWER;
-  }
-
   if (!isNonEmptyString(conversationTeamId)) {
     return CELLS_SELF_USER_DRIVE_ROLE.EDITOR;
   }
@@ -123,20 +119,40 @@ export const CellsSelfUserDriveRoleProvider: FunctionComponent<CellsSelfUserDriv
   );
 };
 
+interface CellsDriveAccessProviderProps extends CellsSelfUserDriveRoleProviderProps {
+  isDriveOffboardingEnabled: boolean;
+}
+
+export const CellsDriveAccessProvider: FunctionComponent<CellsDriveAccessProviderProps> = ({
+  children,
+  selfUserDriveRole,
+  isDriveOffboardingEnabled,
+}) => {
+  return (
+    <CellsDriveOffboardingProvider value={isDriveOffboardingEnabled}>
+      <CellsSelfUserDriveRoleProvider selfUserDriveRole={selfUserDriveRole}>{children}</CellsSelfUserDriveRoleProvider>
+    </CellsDriveOffboardingProvider>
+  );
+};
+
 export const useCellsSelfUserDriveRole = (): CellsSelfUserDriveRole => {
   return useContext(CellsSelfUserDriveRoleContext);
 };
 
 export const useCellsActionPermissions = (): ((action: CellsAction) => boolean) => {
   const selfUserDriveRole = useCellsSelfUserDriveRole();
+  const isDriveOffboardingEnabled = useCellsDriveOffboarding();
 
   return useCallback(
     (action: CellsAction) => {
-      return canPerformCellsAction({
-        action,
-        selfUserDriveRole,
-      });
+      return (
+        !isDriveOffboardingEnabled &&
+        canPerformCellsAction({
+          action,
+          selfUserDriveRole,
+        })
+      );
     },
-    [selfUserDriveRole],
+    [isDriveOffboardingEnabled, selfUserDriveRole],
   );
 };

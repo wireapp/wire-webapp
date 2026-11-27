@@ -31,9 +31,8 @@ import {
   tabsWrapperStyles,
 } from './conversation.styles';
 import {
-  CellsSelfUserDriveRoleProvider,
+  CellsDriveAccessProvider,
   getSelfUserDriveRole,
-  shouldRestrictCellsViewerActions,
 } from './conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import {getCellsFilesPath} from './conversationCells/common/getCellsFilesPath/getCellsFilesPath';
 import {getCurrentFolderName} from './conversationCells/common/getCurrentFolderName/getCurrentFolderName';
@@ -45,12 +44,14 @@ import {
 } from './conversationCells/sharedDriveUploadController';
 import {SharedDriveUploadStatusScope} from './conversationCells/sharedDriveUploadStatusContext';
 import {SharedDriveUploadStatusPopupHost} from './conversationCells/sharedDriveUploadStatusPopupHost';
+import {ConversationDriveOffboardingBanner} from './conversationDriveOffboardingBanner/conversationDriveOffboardingBanner';
 import {ConversationFileDropzone} from './conversationFileDropzone/conversationFileDropzone';
 import {isConversationFileUploadAllowed} from './conversationFileDropzone/isConversationFileUploadAllowed/isConversationFileUploadAllowed';
 import {ConversationMessagesWrapper} from './conversationMessagesWrapper/conversationMessagesWrapper';
 import {ConversationTabPanel} from './conversationTabPanel/conversationTabPanel';
 import {ConversationTabs} from './conversationTabs/conversationTabs';
 import {ConversationViewerPermissionBanner} from './conversationViewerPermissionBanner/conversationViewerPermissionBanner';
+import {getConversationDriveRestriction} from './getConversationDriveRestriction';
 import {useReadReceiptSender} from './hooks/useReadReceipt';
 import {ReadOnlyConversationMessage} from './readOnlyConversationMessage';
 import {useFilesUploadDropzone} from './useFilesUploadDropzone/useFilesUploadDropzone';
@@ -710,10 +711,6 @@ export function ConversationContent({
   const isFileTabActive = activeTabIndex === 1;
 
   const isCellsEnabled = Config.getConfig().FEATURE.ENABLE_CELLS && cellsState !== CONVERSATION_CELLS_STATE.DISABLED;
-  const isDriveOffboardingEnabled =
-    isFeatureToggleEnabled(driveOffboardingFeatureToggleName) &&
-    !isCellsEnabledForTeam &&
-    cellsState === CONVERSATION_CELLS_STATE.READY;
   const isFileUploadAllowed = isConversationFileUploadAllowed({
     conversationTeamId: activeConversation?.teamId,
     selfUserTeamId: activeConversation?.selfUser()?.teamId,
@@ -742,16 +739,24 @@ export function ConversationContent({
   const selfUserDriveRole = getSelfUserDriveRole({
     conversationTeamId: activeConversation?.teamId,
     selfUserTeamId: selfUser.teamId,
-    isCellsEnabledForTeam: !isDriveOffboardingEnabled,
   });
-  const showViewerPermission =
-    isCellsEnabled &&
-    shouldRestrictCellsViewerActions({
-      selfUserDriveRole,
-    });
+  const driveRestriction = getConversationDriveRestriction({
+    conversationTeamId: Maybe.of(activeConversation.teamId),
+    selfUserTeamId: Maybe.of(selfUser.teamId),
+    selfUserDriveRole,
+    cellsState,
+    isCellsEnabled,
+    isCellsEnabledForTeam,
+    isDriveOffboardingFeatureEnabled: isFeatureToggleEnabled(driveOffboardingFeatureToggleName),
+  });
+  const isDriveOffboardingEnabled = driveRestriction === 'offboarding';
+  const showViewerPermission = driveRestriction === 'viewer';
 
   return (
-    <CellsSelfUserDriveRoleProvider selfUserDriveRole={selfUserDriveRole}>
+    <CellsDriveAccessProvider
+      selfUserDriveRole={selfUserDriveRole}
+      isDriveOffboardingEnabled={isDriveOffboardingEnabled}
+    >
       <ConversationFileDropzone
         isDragAccept={isDragAccept}
         isFileDropAllowed={isFileUploadAllowed}
@@ -811,6 +816,12 @@ export function ConversationContent({
                     </div>
                   )}
                 </div>
+                {isDriveOffboardingEnabled && (
+                  <ConversationDriveOffboardingBanner
+                    title={translate('conversationDriveOffboardingTitle')}
+                    description={translate('conversationDriveOffboardingDescription')}
+                  />
+                )}
                 <ConversationTabPanel id="files" isActive={isFileTabActive}>
                   {isFileTabActive && (
                     <SharedDriveUploadProvider controller={sharedDriveUploadController}>
@@ -888,9 +899,10 @@ export function ConversationContent({
                 cancelPendingReadReceiptsForConversation={cancelPendingReadReceiptsForConversation}
               />
 
-              {showViewerPermission && !isFileTabActive && (
+              {driveRestriction !== 'none' && !isFileTabActive && (
                 <ConversationViewerPermissionBanner
-                  key={`${activeConversation.qualifiedId.id}@${activeConversation.qualifiedId.domain}`}
+                  key={`${activeConversation.qualifiedId.id}@${activeConversation.qualifiedId.domain}:${driveRestriction}`}
+                  restrictionReason={driveRestriction}
                   conversationId={`${activeConversation.qualifiedId.id}@${activeConversation.qualifiedId.domain}`}
                 />
               )}
@@ -944,6 +956,6 @@ export function ConversationContent({
           <Giphy giphyRepository={repositories.giphy} inputValue={inputValue} onClose={closeGiphy} />
         )}
       </ConversationFileDropzone>
-    </CellsSelfUserDriveRoleProvider>
+    </CellsDriveAccessProvider>
   );
 }

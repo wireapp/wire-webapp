@@ -34,6 +34,7 @@ import {
 import {useApplicationContext, type RootContextValue} from '../../../../../page/rootProvider';
 import {BlockIcon} from '../../../../../uiKit/dataDisplay/icon/blockIcon';
 import {SaveIcon} from '../../../../../uiKit/dataDisplay/icon/saveIcon';
+import {useCellsDriveOffboarding} from '../../../conversationCells/common/cellsSelfUserDriveRole/cellsDriveOffboardingContext';
 
 export type FileDropzoneOverlayMode = 'upload' | 'restricted';
 
@@ -47,6 +48,7 @@ const getOverlayProperties = (
   mode: FileDropzoneOverlayMode,
   isActive: boolean,
   translate: RootContextValue['translate'],
+  isDriveOffboardingEnabled: boolean,
 ): GetOverlayPropertiesResult => {
   let styles = overlayStyles;
   if (isActive) {
@@ -58,7 +60,11 @@ const getOverlayProperties = (
       styles,
       icon: <BlockIcon width={24} height={24} css={iconStyles} aria-hidden="true" />,
       title: translate('conversationFileUploadRestrictedOverlayTitle'),
-      description: translate('conversationFileUploadRestrictedOverlayDescription'),
+      description: translate(
+        isDriveOffboardingEnabled
+          ? 'conversationDriveOffboardingHint'
+          : 'conversationFileUploadRestrictedOverlayDescription',
+      ),
     };
   }
 
@@ -75,7 +81,8 @@ export const FileDropzoneOverlay: FunctionComponent<FileDropzoneOverlayProps> = 
   mode,
 }: FileDropzoneOverlayProps) => {
   const {translate} = useApplicationContext();
-  const {styles, icon, title, description} = getOverlayProperties(mode, isActive, translate);
+  const isDriveOffboardingEnabled = useCellsDriveOffboarding();
+  const {styles, icon, title, description} = getOverlayProperties(mode, isActive, translate, isDriveOffboardingEnabled);
 
   return (
     <div css={styles} aria-hidden={!isActive} role="status" aria-live="polite">

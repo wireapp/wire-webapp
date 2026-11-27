@@ -27,10 +27,6 @@ import {CellsLoader} from './cellsLoader/cellsLoader';
 import {CellsPagination} from './cellsPagination/cellsPagination';
 import {CellsStateInfo} from './cellsStateInfo/cellsStateInfo';
 import {CellsTable} from './cellsTable/cellsTable';
-import {
-  CellsSelfUserDriveRoleProvider,
-  getSelfUserDriveRole,
-} from './common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import {getCellsApiPath} from './common/getCellsApiPath/getCellsApiPath';
 import {getCellsFilesPath} from './common/getCellsFilesPath/getCellsFilesPath';
 import {getConversationCellsNodesForTeamAccess} from './common/getConversationCellsNodesForTeamAccess';
@@ -115,11 +111,7 @@ export const ConversationCells = memo(
     const onUploadFolder = (): void | undefined => {
       return folderUploadInput.current?.click();
     };
-    const {
-      cellsState: initialCellState,
-      name,
-      selfUser,
-    } = useKoSubscribableChildren(activeConversation, ['cellsState', 'name', 'selfUser']);
+    const {cellsState: initialCellState, name} = useKoSubscribableChildren(activeConversation, ['cellsState', 'name']);
 
     const {getNodes, status: nodesStatus, getPagination, error: storeError, clearAll} = useCellsStore();
 
@@ -283,7 +275,7 @@ export const ConversationCells = memo(
     useEffect(() => {
       sharedDriveUploadController.updateRefresh(sharedDriveConversationQualifiedId, handleRefresh);
     }, [handleRefresh, sharedDriveConversationQualifiedId, sharedDriveUploadController]);
-    const canUploadToSharedDrive = isFileUploadAllowed && !showViewerPermission;
+    const canUploadToSharedDrive = isFileUploadAllowed;
     const maxSharedDriveUploadFileSize = Config.getConfig().MAXIMUM_ASSET_FILE_SIZE_CELLS;
     const handleSharedDriveUploadRejection = useCallback(
       (rejection: SharedDriveDropRejection): void => {
@@ -384,125 +376,118 @@ export const ConversationCells = memo(
     const isLoadMoreVisible =
       isSearchMode && !isLoading && !isFetchingMore && !emptyView && isSuccess && hasMorePages && !hasAppendError;
     const isLoadMoreErrorVisible = isSearchMode && hasAppendError && hasMorePages;
-    const selfUserDriveRole = getSelfUserDriveRole({
-      conversationTeamId: activeConversation.teamId,
-      selfUserTeamId: selfUser?.teamId,
-      isCellsEnabledForTeam: !isDriveOffboardingEnabled,
-    });
     const displayedNodes = getConversationCellsNodesForTeamAccess(nodes, isDriveOffboardingEnabled);
 
     return (
-      <CellsSelfUserDriveRoleProvider selfUserDriveRole={selfUserDriveRole}>
-        <SharedDriveDropzone
-          dragStateResetKey={folderDropResetKey}
-          isEnabled={isCellsStateReady && !isInRecycleBin}
-          isFileDropAllowed={canUploadToSharedDrive}
-          isOverlaySuppressed={activeFolderDropTargetName !== null}
-          onDragStateReset={resetSharedDriveDropState}
-          onDropFiles={handleDroppedFiles}
-          onDropReadError={handleSharedDriveDropReadError}
-        >
-          <div css={wrapperStyles}>
-            <SharedDriveUploadInput ref={uploadInput} {...sharedDriveUploadInputDependencies} selectionMode="files" />
-            <SharedDriveUploadInput
-              ref={folderUploadInput}
-              {...sharedDriveUploadInputDependencies}
-              selectionMode="folder"
-            />
-            <CellsHeader
-              onRefresh={handleRefresh}
-              onRefreshAfterEmptyBinOutcome={handleRefreshAndReportSuccess}
-              onEmptyBinSubmitted={handleEmptyBinSubmitted}
-              onEmptyBinInProgressChange={setIsEmptyBinInProgress}
-              getCurrentCellsPath={getCellsFilesPath}
-              conversationName={name}
-              conversationQualifiedId={conversationQualifiedId}
+      <SharedDriveDropzone
+        dragStateResetKey={folderDropResetKey}
+        isEnabled={isCellsStateReady && !isInRecycleBin}
+        isFileDropAllowed={canUploadToSharedDrive}
+        isOverlaySuppressed={activeFolderDropTargetName !== null}
+        onDragStateReset={resetSharedDriveDropState}
+        onDropFiles={handleDroppedFiles}
+        onDropReadError={handleSharedDriveDropReadError}
+      >
+        <div css={wrapperStyles}>
+          <SharedDriveUploadInput ref={uploadInput} {...sharedDriveUploadInputDependencies} selectionMode="files" />
+          <SharedDriveUploadInput
+            ref={folderUploadInput}
+            {...sharedDriveUploadInputDependencies}
+            selectionMode="folder"
+          />
+          <CellsHeader
+            onRefresh={handleRefresh}
+            onRefreshAfterEmptyBinOutcome={handleRefreshAndReportSuccess}
+            onEmptyBinSubmitted={handleEmptyBinSubmitted}
+            onEmptyBinInProgressChange={setIsEmptyBinInProgress}
+            getCurrentCellsPath={getCellsFilesPath}
+            conversationName={name}
+            conversationQualifiedId={conversationQualifiedId}
+            cellsRepository={cellsRepository}
+            isSearchViewOpen={isSearchMode}
+            isInRecycleBin={isInRecycleBin}
+            onOpenSearchView={onOpenSearchView}
+            searchValue={searchValue}
+            onSearchChange={handleSearch}
+            onSearchClear={handleClearSearch}
+            onUploadFiles={onUploadFiles}
+            onUploadFolder={onUploadFolder}
+            isUploadFilesEnabled={canUploadToSharedDrive}
+            filters={filters}
+            showViewerPermission={showViewerPermission}
+            onSelectionBarAnchorChange={setSelectionBarAnchor}
+          />
+          {isTableVisible && (
+            <CellsTable
+              nodes={isLoading ? [] : displayedNodes}
+              isNodesLoading={isLoading}
               cellsRepository={cellsRepository}
-              isSearchViewOpen={isSearchMode}
-              isInRecycleBin={isInRecycleBin}
-              onOpenSearchView={onOpenSearchView}
-              searchValue={searchValue}
-              onSearchChange={handleSearch}
-              onSearchClear={handleClearSearch}
-              onUploadFiles={onUploadFiles}
-              onUploadFolder={onUploadFolder}
-              isUploadFilesEnabled={canUploadToSharedDrive}
-              filters={filters}
-              showViewerPermission={showViewerPermission}
-              onSelectionBarAnchorChange={setSelectionBarAnchor}
+              conversation={activeConversation}
+              conversationQualifiedId={conversationQualifiedId}
+              conversationName={name}
+              onRefresh={handleRefresh}
+              onRefreshAndReportSuccess={handleRefreshAndReportSuccess}
+              onRefreshAfterBulkMoveToBinOutcome={handleRefreshAfterBulkMoveToBinOutcome}
+              // opening a folder must close search view and open the browse view
+              // with that folder (and breadcrumbs)
+              onCloseSearchView={handleSearchViewClosure}
+              folderDropResetKey={folderDropResetKey}
+              getDirectionFor={getDirectionFor}
+              isSortingEnabled={!isInRecycleBin}
+              onToggleSort={toggleSort}
+              selectionEnabled={!isSearchMode && !isEmptyBinInProgress}
+              selectionScopeKey={`${conversationId}:${getCellsFilesPath()}:${isInRecycleBin ? 'bin' : 'files'}:${emptyBinSelectionResetKey}`}
+              selectionBarAnchor={selectionBarAnchor}
+              onFolderDropTargetChange={setActiveFolderDropTargetName}
+              onDropFilesToFolder={!isInRecycleBin && canUploadToSharedDrive ? handleDropFilesToFolder : undefined}
+              onDropReadError={handleSharedDriveDropReadError}
             />
-            {isTableVisible && (
-              <CellsTable
-                nodes={isLoading ? [] : displayedNodes}
-                isNodesLoading={isLoading}
-                cellsRepository={cellsRepository}
-                conversation={activeConversation}
-                conversationQualifiedId={conversationQualifiedId}
-                conversationName={name}
-                onRefresh={handleRefresh}
-                onRefreshAndReportSuccess={handleRefreshAndReportSuccess}
-                onRefreshAfterBulkMoveToBinOutcome={handleRefreshAfterBulkMoveToBinOutcome}
-                // opening a folder must close search view and open the browse view
-                // with that folder (and breadcrumbs)
-                onCloseSearchView={handleSearchViewClosure}
-                folderDropResetKey={folderDropResetKey}
-                getDirectionFor={getDirectionFor}
-                isSortingEnabled={!isInRecycleBin}
-                onToggleSort={toggleSort}
-                selectionEnabled={!isSearchMode && !isEmptyBinInProgress}
-                selectionScopeKey={`${conversationId}:${getCellsFilesPath()}:${isInRecycleBin ? 'bin' : 'files'}:${emptyBinSelectionResetKey}`}
-                selectionBarAnchor={selectionBarAnchor}
-                onFolderDropTargetChange={setActiveFolderDropTargetName}
-                onDropFilesToFolder={!isInRecycleBin && canUploadToSharedDrive ? handleDropFilesToFolder : undefined}
-                onDropReadError={handleSharedDriveDropReadError}
-              />
-            )}
-            {isCellsStatePending && !isRefreshing && (
-              <CellsStateInfo
-                heading={translate('cells.pending.heading')}
-                description={translate('cells.pending.description')}
-              />
-            )}
-            {isNoNodesVisible && !isEmptySearchResultsVisible && (
-              <CellsStateInfo
-                heading={translate('cells.noNodes.heading')}
-                description={translate('cells.noNodes.description')}
-              />
-            )}
-            {isEmptySearchResultsVisible && (
-              <CellsStateInfo
-                variant="search"
-                heading={translate('cells.emptySearchResults.heading')}
-                description={translate('cells.emptySearchResults.description')}
-              />
-            )}
-            {isEmptyRecycleBin && <CellsStateInfo description={translate('cells.emptyRecycleBin.description')} />}
-            {(isLoadingVisible || isRefreshing || isFetchingMoreVisible) && <CellsLoader />}
-            {isError && (
-              <CellsStateInfo
-                heading={translate('cells.error.heading')}
-                description={translate('cells.error.description')}
-              />
-            )}
-            {isPaginationVisible && <CellsPagination {...getPaginationProps()} goToPage={goToPage} />}
-            {isLoadMoreVisible && (
-              <div css={loadMoreWrapperStyles}>
-                <Button variant={ButtonVariant.TERTIARY} onClick={handleLoadMore}>
-                  {translate('cells.pagination.loadMoreResults')}
-                </Button>
-              </div>
-            )}
-            {isLoadMoreErrorVisible && (
-              <div css={loadMoreErrorWrapperStyles} role="alert">
-                <span css={loadMoreErrorMessageStyles}>{translate('cells.pagination.loadMoreError.heading')}</span>
-                <Button variant={ButtonVariant.TERTIARY} onClick={handleLoadMore}>
-                  {translate('cells.pagination.loadMoreError.retry')}
-                </Button>
-              </div>
-            )}
-          </div>
-        </SharedDriveDropzone>
-      </CellsSelfUserDriveRoleProvider>
+          )}
+          {isCellsStatePending && !isRefreshing && (
+            <CellsStateInfo
+              heading={translate('cells.pending.heading')}
+              description={translate('cells.pending.description')}
+            />
+          )}
+          {isNoNodesVisible && !isEmptySearchResultsVisible && (
+            <CellsStateInfo
+              heading={translate('cells.noNodes.heading')}
+              description={translate('cells.noNodes.description')}
+            />
+          )}
+          {isEmptySearchResultsVisible && (
+            <CellsStateInfo
+              variant="search"
+              heading={translate('cells.emptySearchResults.heading')}
+              description={translate('cells.emptySearchResults.description')}
+            />
+          )}
+          {isEmptyRecycleBin && <CellsStateInfo description={translate('cells.emptyRecycleBin.description')} />}
+          {(isLoadingVisible || isRefreshing || isFetchingMoreVisible) && <CellsLoader />}
+          {isError && (
+            <CellsStateInfo
+              heading={translate('cells.error.heading')}
+              description={translate('cells.error.description')}
+            />
+          )}
+          {isPaginationVisible && <CellsPagination {...getPaginationProps()} goToPage={goToPage} />}
+          {isLoadMoreVisible && (
+            <div css={loadMoreWrapperStyles}>
+              <Button variant={ButtonVariant.TERTIARY} onClick={handleLoadMore}>
+                {translate('cells.pagination.loadMoreResults')}
+              </Button>
+            </div>
+          )}
+          {isLoadMoreErrorVisible && (
+            <div css={loadMoreErrorWrapperStyles} role="alert">
+              <span css={loadMoreErrorMessageStyles}>{translate('cells.pagination.loadMoreError.heading')}</span>
+              <Button variant={ButtonVariant.TERTIARY} onClick={handleLoadMore}>
+                {translate('cells.pagination.loadMoreError.retry')}
+              </Button>
+            </div>
+          )}
+        </div>
+      </SharedDriveDropzone>
     );
   },
 );
