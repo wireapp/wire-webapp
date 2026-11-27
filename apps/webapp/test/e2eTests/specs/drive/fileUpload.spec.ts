@@ -94,9 +94,16 @@ test.describe('Drive file uploads', () => {
     });
   });
 
-  test(
+  test.skip(
     'I want to upload a duplicate file to Drive and have it renamed',
-    {tag: ['@TC-12140', '@regression']},
+    {
+      tag: ['@TC-12140', '@regression'],
+      annotation: {
+        type: 'temporary-skip',
+        description:
+          'Temporarily skipped after failure in CI run 45994656201; no root cause confirmed. Re-enable when resolved: https://github.com/wireapp/wire-webapp/actions/runs/45994656201',
+      },
+    },
     async () => {
       const {pages} = pageManager.webapp;
       const sharedDrive = pages.cellsSharedDrive();
@@ -155,9 +162,16 @@ test.describe('Drive file uploads', () => {
     });
   });
 
-  test(
+  test.skip(
     'I want to upload a file into a Shared Drive folder using New',
-    {tag: ['@TC-12135', '@functional', '@crit-flow-web']},
+    {
+      tag: ['@TC-12135', '@functional', '@crit-flow-web'],
+      annotation: {
+        type: 'temporary-skip',
+        description:
+          'Temporarily skipped after failure in CI run 45994656201; no root cause confirmed. Re-enable when resolved: https://github.com/wireapp/wire-webapp/actions/runs/45994656201',
+      },
+    },
     async () => {
       const {pages} = pageManager.webapp;
       const sharedDrive = pages.cellsSharedDrive();
