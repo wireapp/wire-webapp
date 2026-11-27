@@ -75,7 +75,7 @@ import {useActiveWindowState} from '../../hooks/useActiveWindow';
 import {buildMediaDevicesHandler, createConversation, createSelfParticipant} from '../../auth/util/test/testUtil';
 import {Core} from '../../service/coreSingleton';
 import {createCoreTestFixture} from '../../util/test/createCoreTestFixture';
-import {Warnings} from '../../view_model/WarningsContainer';
+import {Warnings} from '../../viewModel/warningsContainer';
 import {z} from 'zod';
 import {translateForTest} from '../../util/test/translateForTest';
 import {MessageRepository} from '../conversation/MessageRepository';

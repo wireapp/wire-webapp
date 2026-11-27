@@ -24,7 +24,7 @@ import {FormattedMessage} from 'react-intl';
 import {objectHasOwn} from 'ts-extras';
 
 import {ErrorMessage} from '../../uiKit/inputs/errorMessage/errorMessage';
-import {errorHandlerStrings} from '../../util/errorUtil';
+import {errorHandlerDefaultMessages, errorHandlerStrings} from '../../util/errorUtil';
 import {validationErrorStrings} from '../../util/validationUtil';
 
 type LabelledErrorValue = {
@@ -64,7 +64,10 @@ export function parseError(error: unknown): ReactElement | null {
     if (hasLabel(error) && objectHasOwn(errorHandlerStrings, error.label)) {
       return (
         <ErrorMessage data-uie-name="error-message" data-uie-value={error.label}>
-          <FormattedMessage id={errorHandlerStrings[error.label]} />
+          <FormattedMessage
+            id={errorHandlerStrings[error.label]}
+            defaultMessage={errorHandlerDefaultMessages[error.label]}
+          />
         </ErrorMessage>
       );
     }

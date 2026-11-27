@@ -23,7 +23,7 @@ import {noop} from 'noop-esm';
 import {match} from 'ts-pattern';
 import {Maybe} from 'true-myth';
 
-import {readFileSync, readdirSync} from 'node:fs';
+import {existsSync, readFileSync, readdirSync} from 'node:fs';
 import {resolve} from 'node:path';
 import {z} from 'zod';
 
@@ -476,7 +476,7 @@ test('bundles the application and authentication entrypoints selected for the ar
     expect(sourceMapText).not.toContain(`/${directory}/${excludedEntrypoint}Entrypoint.tsx`);
     expect(sourceMapText).not.toContain('/browser/coreCryptoUpgradeModal.tsx');
     expect(sourceMapText).not.toContain('/browser/showCoreCryptoUpgrade.tsx');
-    expect(sourceMapText).not.toContain('/localization/Localizer.ts');
+    expect(sourceMapText).not.toContain('/localization/localizer.ts');
     expect(sourceMapText).not.toContain('/util/util.ts');
   }
 });
@@ -657,4 +657,36 @@ test('bundles browser API-client adapters without Node implementations', async (
   });
 
   expect(nodeImplementationSources).toEqual([]);
+});
+
+test('publishes legacy asset paths without camelCase duplicates', ({}, testInfo) => {
+  const buildVariant = testInfo.project.name === 'rspack-internal' ? 'internal' : 'public';
+  const buildDirectory = resolve(__dirname, '../../dist', buildVariant);
+  const publishedAssetPaths = [
+    'assets/images/backgrounds/office-1.png',
+    'assets/images/backgrounds/office-2.png',
+    'assets/images/backgrounds/wire-1.png',
+    'assets/mediapipe-models/selfie_multiclass_256x256.tflite',
+    'assets/mediapipe-models/selfie_segmenter_landscape.tflite',
+  ];
+  const camelCaseAssetPaths = [
+    'assets/images/backgrounds/office1.png',
+    'assets/images/backgrounds/office2.png',
+    'assets/images/backgrounds/wire1.png',
+    'assets/mediapipeModels/selfieMulticlass256x256.tflite',
+    'assets/mediapipeModels/selfieSegmenterLandscape.tflite',
+  ];
+
+  for (const assetPath of publishedAssetPaths) {
+    expect(existsSync(resolve(buildDirectory, assetPath)), `${buildVariant} build should publish ${assetPath}`).toBe(
+      true,
+    );
+  }
+
+  for (const assetPath of camelCaseAssetPaths) {
+    expect(
+      existsSync(resolve(buildDirectory, assetPath)),
+      `${buildVariant} build should not publish ${assetPath}`,
+    ).toBe(false);
+  }
 });

@@ -90,7 +90,7 @@ test.describe('Accessibility', () => {
       'I should not lose a drafted message when switching between conversations in collapsed view',
       {tag: ['@TC-51', '@regression']},
       async ({createPage}) => {
-        const page = await createPage(withLogin(userA));
+        const [page] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
         await connectWithUser(page, userB);
 
         const {pages} = PageManager.from(page).webapp;

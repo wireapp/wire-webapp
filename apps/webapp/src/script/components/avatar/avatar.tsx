@@ -29,7 +29,7 @@ import {ServiceAvatar} from './serviceAvatar';
 import {TemporaryGuestAvatar} from './temporaryGuestAvatar';
 import {UserAvatar} from './userAvatar';
 
-import {isAppOrServiceEntity} from '../../guards/Service';
+import {isAppOrServiceEntity} from '../../guards/service';
 import {User} from '../../repositories/entity/User';
 import {ServiceEntity} from '../../repositories/integration/ServiceEntity';
 import {useKoSubscribableChildren} from '../../util/componentUtil';

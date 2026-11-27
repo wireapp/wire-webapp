@@ -18,8 +18,8 @@
  */
 
 import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
-import {isMLSSupportedByEnvironment} from '../../../mls/isMLSSupportedByEnvironment';
-import {MLSMigrationStatus} from '../../../mls/MLSMigration/migrationStatus';
+import {isMLSSupportedByEnvironment} from '../../../mls/isMlsSupportedByEnvironment';
+import {MLSMigrationStatus} from '../../../mls/mlsMigration/migrationStatus';
 
 interface SelfSupportedProtocolsTeamHandler {
   getTeamSupportedProtocols: () => CONVERSATION_PROTOCOL[];

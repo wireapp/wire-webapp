@@ -100,7 +100,11 @@ test.describe('Calling', () => {
     'Verify that current call is terminated if you want to call someone else (as caller)',
     {tag: ['@TC-2802', '@regression']},
     async ({createPage}) => {
-      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      const [userAPage, userBPage] = await Promise.all([
+        createPage(withLogin(userA)),
+        createPage(withLogin(userB)),
+        createPage(withLogin(userC)),
+      ]);
       await connectWithUser(userAPage, userB);
       await connectWithUser(userAPage, userC);
 
@@ -279,7 +283,11 @@ test.describe('Calling', () => {
     'Verify I can make another call while current one is ignored',
     {tag: ['@TC-2803', '@regression']},
     async ({createPage}) => {
-      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      const [userAPage, userBPage] = await Promise.all([
+        createPage(withLogin(userA)),
+        createPage(withLogin(userB)),
+        createPage(withLogin(userC)),
+      ]);
       await connectWithUser(userAPage, userB);
       await connectWithUser(userBPage, userC);
 

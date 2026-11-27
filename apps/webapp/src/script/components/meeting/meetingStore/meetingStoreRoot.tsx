@@ -32,6 +32,7 @@ import {subscribeToMeetingLifecycleEvents} from './subscribeToMeetingLifecycleEv
 import {createBrowserSystemNotificationApi} from '../../../browser/notification/createSystemNotificationApiFromBrowserNotification';
 import {useApplicationContext} from '../../../page/rootProvider';
 import {UserState} from '../../../repositories/user/userState';
+import {ThemeProvider} from '../../../uiKit';
 import {getLogger} from '../../../util/logger';
 import {formatTimeShort} from '../../../util/timeUtil';
 import {useMeetingsFeatureFlag} from '../../../util/useMeetingsFeatureFlag';
@@ -44,6 +45,7 @@ import {
   MeetingNotificationKind,
   useMeetingNotificationStore,
 } from '../meetingNotificationStore/meetingNotificationStore';
+import {MeetingPrepModalHost} from '../meetingPrep/meetingPrepModalHost';
 import {useMeetingPrepModal} from '../meetingPrep/useMeetingPrepModal';
 import {resolveCurrentMeetingReminderPayload} from '../resolveCurrentMeetingReminderPayload';
 import {deleteMeetingForAll, deleteMeetingForMe} from '../shared/service/deleteMeeting';
@@ -62,6 +64,9 @@ type MeetingStoreRootProps = {
 export const MeetingStoreRoot: FunctionComponent<MeetingStoreRootProps> = ({children}: MeetingStoreRootProps) => {
   const {mainViewModel, clock, translate} = useApplicationContext();
   const {isMeetingsEnabled} = useMeetingsFeatureFlag();
+  const meetingPrepSession = useMeetingPrepModal(state => {
+    return state.session;
+  });
   const {
     meetings: meetingsRepository,
     conversation: conversationRepository,
@@ -166,12 +171,30 @@ export const MeetingStoreRoot: FunctionComponent<MeetingStoreRootProps> = ({chil
     const reminderScheduler = createMeetingReminderScheduler({
       clock,
       onReminder: payload => {
+        const notificationCountBefore = useMeetingNotificationStore.getState().notifications.length;
         addNotificationUnlessAway({
           ...payload,
           kind: MeetingNotificationKind.REMINDER,
         });
+        logger.debug('meeting reminder reached notification store', {
+          availability: getAvailability(),
+          notificationCountBefore,
+          notificationCountAfter: useMeetingNotificationStore.getState().notifications.length,
+        });
         reminderOsNotifier.notify(payload);
       },
+    });
+
+    const unsubscribeFromNotificationStore = useMeetingNotificationStore.subscribe((state, previousState) => {
+      if (state.notifications !== previousState.notifications) {
+        logger.debug('meeting notification store changed', {
+          notificationCountBefore: previousState.notifications.length,
+          notificationCountAfter: state.notifications.length,
+          reminderCount: state.notifications.filter(notification => {
+            return notification.kind === MeetingNotificationKind.REMINDER;
+          }).length,
+        });
+      }
     });
 
     type GetSelfUserQualifiedIdResult = {domain: string; id: string};
@@ -207,10 +230,20 @@ export const MeetingStoreRoot: FunctionComponent<MeetingStoreRootProps> = ({chil
       unsubscribeFromMeetingLifecycleEvents();
       unsubscribeFromMeetingConversationEvents();
       unsubscribeFromMeetingStore();
+      unsubscribeFromNotificationStore();
       reminderScheduler.stop();
       reminderOsNotifier.stop();
     };
   }, [isMeetingsEnabled, store, clock, mainViewModel, translate]);
 
-  return <MeetingStoreProvider store={store}>{children}</MeetingStoreProvider>;
+  return (
+    <MeetingStoreProvider store={store}>
+      {children}
+      {meetingPrepSession.isJust && (
+        <ThemeProvider>
+          <MeetingPrepModalHost />
+        </ThemeProvider>
+      )}
+    </MeetingStoreProvider>
+  );
 };

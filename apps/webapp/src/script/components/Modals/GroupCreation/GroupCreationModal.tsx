@@ -29,7 +29,7 @@ import {mapToConversationProtocol} from '../../../apiClient/team/feature/feature
 import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
 import {Config} from '../../../Config';
 import {isNonFederatingBackendsError} from '../../../core/errors';
-import {isProtocolOption, ProtocolOption} from '../../../guards/Protocol';
+import {isProtocolOption, ProtocolOption} from '../../../guards/protocol';
 import {SidebarTabs, useSidebarStore} from '../../../page/leftSidebar/panels/conversations/useSidebarStore';
 import {useApplicationContext} from '../../../page/rootProvider';
 import {ACCESS_STATE} from '../../../repositories/conversation/AccessState';

@@ -48,7 +48,7 @@ import {UnlockedIcon} from '../../../../../uiKit/dataDisplay/icon/unlockedIcon';
 import {useKoSubscribableChildren} from '../../../../../util/componentUtil';
 import {replaceReactComponents} from '../../../../../util/localizerUtil/reactLocalizerUtil';
 import {useChannelsFeatureFlag} from '../../../../../util/useChannelsFeatureFlag';
-import {ActionsViewModel} from '../../../../../view_model/ActionsViewModel';
+import {ActionsViewModel} from '../../../../../viewModel/actionsViewModel';
 import {WebAppEvents} from '../../../../../webAppEvents';
 import {useApplicationContext} from '../../../../rootProvider';
 import {PanelEntity, PanelState} from '../../../rightSidebar';

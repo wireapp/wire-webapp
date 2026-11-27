@@ -43,7 +43,7 @@ import {
   ConversationProtocolUpdateEvent,
 } from '../../apiClient/event/conversationEvent';
 import {ConversationError} from '../../error/conversationError';
-import {isContentMessage} from '../../guards/Message';
+import {isContentMessage} from '../../guards/message';
 import {CALL_MESSAGE_TYPE} from '../../message/callMessageType';
 import {MentionEntity} from '../../message/mentionEntity';
 import {MessageCategory} from '../../message/messageCategory';

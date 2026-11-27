@@ -17,21 +17,25 @@
  *
  */
 
+import {isString} from '@sindresorhus/is';
+
 export class LabeledError extends Error {
   public label: string;
 
   constructor(label: string, error: Error);
   constructor(label: string, message: string);
   constructor(label: string, messageOrError: string | Error) {
-    super();
+    const hasPlainMessage = isString(messageOrError);
+    super(
+      hasPlainMessage ? messageOrError : messageOrError.message,
+      hasPlainMessage ? undefined : {cause: messageOrError},
+    );
     this.label = label;
 
-    if (typeof messageOrError === 'string') {
+    if (hasPlainMessage) {
       this.name = this.constructor.name;
-      this.message = messageOrError;
     } else {
       this.name = messageOrError.name;
-      this.message = messageOrError.message;
       this.stack = messageOrError.stack;
     }
   }
@@ -39,5 +43,6 @@ export class LabeledError extends Error {
   static GENERAL_ERRORS = {
     LOW_DISK_SPACE: 'low-disk-space',
     SYSTEM_KEYCHAIN_ACCESS: 'system-keychain-access',
+    CORE_CRYPTO_DATABASE_OPEN: 'core-crypto-database-open',
   };
 }

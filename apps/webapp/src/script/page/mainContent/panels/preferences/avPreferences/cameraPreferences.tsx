@@ -17,22 +17,18 @@
  *
  */
 
-import {memo, useCallback, useEffect, useRef, useState, type FunctionComponent, ReactNode} from 'react';
+import {memo, useCallback, useEffect, useRef, useState, type FunctionComponent} from 'react';
 
 import {useDebouncedCallback} from 'use-debounce';
 
 import {DeviceSelect} from './deviceSelect';
 
 import * as Icon from '../../../../../components/icon';
+import {NoCameraMessage} from '../../../../../components/noCameraMessage';
 import {Config} from '../../../../../Config';
 import {MediaStreamHandler} from '../../../../../repositories/media/MediaStreamHandler';
 import {MediaType} from '../../../../../repositories/media/MediaType';
 import {useMediaDevicesStore} from '../../../../../repositories/media/useMediaDevicesStore';
-import {
-  createReactTranslationMarker,
-  renderReactTranslation,
-} from '../../../../../util/localizerUtil/reactLocalizerUtil';
-import type {Translate} from '../../../../../util/localizerUtil/translationTypes';
 import {getLogger} from '../../../../../util/logger';
 import {useApplicationContext} from '../../../../rootProvider';
 import {PreferencesSection} from '../components/preferencesSection';
@@ -46,63 +42,6 @@ interface CameraPreferencesProps {
 }
 
 const DEBOUNCE_TIMEOUT = 100;
-
-const cameraBrandNameMarker = createReactTranslationMarker('camera-brand-name');
-const cameraLineBreakMarker = createReactTranslationMarker('camera-line-break');
-const cameraFaqLinkMarker = createReactTranslationMarker('camera-faq-link');
-
-type RenderNoCameraMessageOptions = {
-  readonly brandName: string;
-  readonly translate: Translate;
-};
-
-export function renderNoCameraMessage(options: RenderNoCameraMessageOptions): ReactNode {
-  const {brandName, translate} = options;
-  const translatedText = translate(
-    'preferencesAVNoCamera',
-    {brandName: cameraBrandNameMarker.substitution},
-    {
-      '/faqLink': cameraFaqLinkMarker.end,
-      br: cameraLineBreakMarker.substitution,
-      faqLink: cameraFaqLinkMarker.start,
-    },
-  );
-
-  return (
-    <div className="preferences-av-video-disabled__info">
-      {renderReactTranslation({
-        translatedText,
-        componentReplacements: [
-          {
-            start: cameraFaqLinkMarker.start,
-            end: cameraFaqLinkMarker.end,
-            render(children): ReactNode {
-              return (
-                <a
-                  href={Config.getConfig().URL.SUPPORT.CAMERA_ACCESS_DENIED}
-                  data-uie-name="go-no-camera-faq"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {children}
-                </a>
-              );
-            },
-          },
-        ],
-        nodeReplacements: [
-          {
-            marker: cameraLineBreakMarker,
-            render(): ReactNode {
-              return <br />;
-            },
-          },
-        ],
-        valueReplacements: [{marker: cameraBrandNameMarker, runtimeText: brandName}],
-      })}
-    </div>
-  );
-}
 
 const CameraPreferencesComponent: FunctionComponent<CameraPreferencesProps> = ({
   streamHandler,
@@ -218,7 +157,7 @@ const CameraPreferencesComponent: FunctionComponent<CameraPreferencesProps> = ({
             <video className="preferences-av-video mirror" autoPlay playsInline muted ref={videoElement} />
           ) : (
             <div className="preferences-av-video-disabled">
-              {renderNoCameraMessage({brandName, translate})}
+              <NoCameraMessage brandName={brandName} translate={translate} />
               <button
                 type="button"
                 className="button-reset-default preferences-av-video-disabled__try-again"

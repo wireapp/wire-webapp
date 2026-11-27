@@ -35,7 +35,7 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from '../../../page/testSupport/rootContextTestSupport';
-import type {MainViewModel} from '../../../view_model/MainViewModel';
+import type {MainViewModel} from '../../../viewModel/mainViewModel';
 import {translateForTest} from '../../../util/test/translateForTest';
 
 import {useScheduleMeetingSubmit} from './useScheduleMeetingSubmit';

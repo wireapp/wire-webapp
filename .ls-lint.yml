@@ -70,6 +70,14 @@ ls:
     .tsx: camelCase
     .test.tsx: camelCase
     .types.ts: camelCase
+  apps/webapp/src/script/components/calling/**:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .styles.ts: camelCase
+    .styles.tsx: camelCase
+    .test.ts: camelCase
+    .test.tsx: camelCase
   apps/webapp/src/script/util/connectionQualityHandler:
     .dir: camelCase
     .ts: camelCase
@@ -1749,3 +1757,141 @@ ls:
   apps/webapp/src/script/components/inputBar/util:
     .dir: camelCase
     .tsx: camelCase
+  apps/webapp/src/style:
+    .dir: camelCase
+    .less: camelCase
+  apps/webapp/src/style/fonts:
+    .dir: camelCase
+    .css: camelCase
+    .md: regex:README
+  apps/webapp/src/style/common:
+    .dir: camelCase
+    .less: camelCase
+  apps/webapp/src/style/panel:
+    .dir: camelCase
+    .less: camelCase
+  apps/webapp/src/style/foundation:
+    .dir: camelCase
+    .less: camelCase
+  apps/webapp/src/style/content:
+    .dir: camelCase
+    .less: camelCase
+  apps/webapp/src/style/content/preferences:
+    .dir: camelCase
+    .less: camelCase
+  apps/webapp/src/style/content/conversation:
+    .dir: camelCase
+    .less: camelCase
+  apps/webapp/src/style/components:
+    .dir: camelCase
+    .less: camelCase
+  apps/webapp/src/style/components/calling:
+    .dir: camelCase
+    .less: camelCase
+  apps/webapp/src/style/components/asset:
+    .dir: camelCase
+    .less: camelCase
+  apps/webapp/src/style/components/asset/controls:
+    .dir: camelCase
+    .less: camelCase
+  apps/webapp/src/style/components/asset/common:
+    .dir: camelCase
+    .less: camelCase
+  apps/webapp/src/style/components/list:
+    .dir: camelCase
+    .less: camelCase
+  apps/webapp/src/style/list:
+    .dir: camelCase
+    .less: camelCase
+  apps/webapp/src/style/modal:
+    .dir: camelCase
+    .less: camelCase
+  apps/webapp/assets:
+    .dir: camelCase
+  apps/webapp/assets/images:
+    .dir: camelCase
+  apps/webapp/assets/images/backgrounds:
+    .dir: camelCase
+    .png: camelCase
+  apps/webapp/assets/mediapipeModels:
+    .dir: camelCase
+    .tflite: camelCase
+  apps/webapp/bin:
+    .ts: camelCase
+    .test.ts: camelCase
+    .js: camelCase
+    .test.js: camelCase
+  apps/webapp/src/types:
+    .dir: camelCase
+    .ts: camelCase
+    .types.ts: camelCase
+    .d.ts: camelCase
+  apps/webapp/src/script/{viewModel,ViewModel,view_model,view-model}:
+    .dir: camelCase
+    .mocks.ts: camelCase
+    .*.test.ts: exists:0
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/viewModel/bindings:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/viewModel/warningsContainer:
+    .dir: camelCase
+    .test.ts: camelCase
+    .test.tsx: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/mls:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/mls/mlsMigration:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/mls/mlsMigration/migrationFinaliser:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/mls/mlsMigration/migrationFinaliser/joinConversationsAfterMigrationFinalisation:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/mls/mlsMigration/migrationInitialiser:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/mls/mlsMigration/migrationInitialiser/joinUnestablishedMixedConversations:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/guards:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/telemetry:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/telemetry/appInit:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/{legalHold,LegalHold,legal-hold,legal_hold}:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/localization:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/router:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/motion:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/ephemeral:
+    .dir: camelCase
+    .ts: camelCase

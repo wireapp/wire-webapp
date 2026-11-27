@@ -30,7 +30,7 @@ import {MeetingNotificationHost} from '../../components/meeting/meetingNotificat
 import {conversationListCollapseFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
 import {User} from '../../repositories/entity/User';
 import {useMatchMedia} from '../../uiKit/layout/matchMedia/matchMedia';
-import {ListViewModel} from '../../view_model/ListViewModel';
+import {ListViewModel} from '../../viewModel/listViewModel';
 import {WebAppEvents} from '../../webAppEvents';
 import {useApplicationContext} from '../rootProvider';
 import {ListState, useAppState} from '../useAppState';

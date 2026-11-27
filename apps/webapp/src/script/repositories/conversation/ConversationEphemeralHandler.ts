@@ -167,6 +167,11 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
 
       return messageEntity;
     }
+
+    // Own messages are obfuscated instead of deleted, so they stay in the conversation as expired placeholders
+    if (messageEntity.isExpired()) {
+      return messageEntity;
+    }
   }
 
   async validateMessages(messageEntities: ContentMessage[]): Promise<Message[]> {

@@ -23,7 +23,7 @@ import {CSSObject} from '@emotion/react';
 
 import {containerStyle, imageStyle} from './ZoomableImage.style';
 
-import {isHTMLImageElement} from '../../guards/HTMLElement';
+import {isHTMLImageElement} from '../../guards/htmlElement';
 
 const centerCoordinateDivisor = 2;
 const imageTransitionDurationInMilliseconds = 300;

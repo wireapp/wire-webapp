@@ -208,7 +208,7 @@ test.describe('Conversations', () => {
     'recovers from a failed bulk move after an explicit Drive refresh',
     {tag: ['@crit-flow-cells', '@regression']},
     async ({createPage}) => {
-      const page = await createPage(withLogin(userA));
+      const [page] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
       const pageManager = await PageManager.from(page);
       await connectWithUser(pageManager, userB);
       const {pages} = pageManager.webapp;

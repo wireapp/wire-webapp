@@ -40,7 +40,7 @@ test.describe('Delete', () => {
     'I can delete my message in 1:1 and from second device',
     {tag: ['@TC-569', '@regression']},
     async ({createPage}) => {
-      const deviceAPage = await createPage(withLogin(userA));
+      const [deviceAPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
       const deviceBPage = await createPage(withLogin(userA, {confirmNewHistory: true}));
       await connectWithUser(deviceAPage, userB);
 
@@ -124,7 +124,7 @@ test.describe('Delete', () => {
     'Deleted messages remain deleted after I archive and unarchive the conversation',
     {tag: ['@TC-572', '@regression']},
     async ({createPage}) => {
-      const page = await createPage(withLogin(userA));
+      const [page] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
       await connectWithUser(page, userB);
 
       const {components, pages} = PageManager.from(page).webapp;

@@ -80,7 +80,7 @@ test.describe('Conversations', () => {
     'I want to see "No matching results. Try entering a different name." when I search for non existent users',
     {tag: ['@TC-2987', '@regression']},
     async ({createPage}) => {
-      const userAPage = await createPage(withLogin(userA));
+      const [userAPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
       await connectWithUser(userAPage, userB);
 
       const userAPages = PageManager.from(userAPage).webapp.pages;
@@ -111,7 +111,7 @@ test.describe('Conversations', () => {
     'Verify the name of the group conversation can be edited',
     {tag: ['@TC-418', '@regression']},
     async ({createPage}) => {
-      const userAPage = await createPage(withLogin(userA));
+      const [userAPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
       await connectWithUser(userAPage, userB);
 
       const userAPages = PageManager.from(userAPage).webapp.pages;
@@ -326,7 +326,11 @@ test.describe('Conversations', () => {
     'Verify conversation scrolls to first unread message when opening',
     {tag: ['@TC-487', '@regression']},
     async ({createPage}) => {
-      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      const [userAPage, userBPage] = await Promise.all([
+        createPage(withLogin(userA)),
+        createPage(withLogin(userB)),
+        createPage(withLogin(userC)),
+      ]);
       await connectWithUser(userBPage, userA);
       await connectWithUser(userBPage, userC);
 
@@ -477,7 +481,7 @@ test.describe('Conversations', () => {
   );
 
   test('Verify emoji autocomplete', {tag: ['@TC-495', '@regression']}, async ({createPage}) => {
-    const userAPage = await createPage(withLogin(userA));
+    const [userAPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
     await connectWithUser(userAPage, userB);
 
     const userAPages = PageManager.from(userAPage).webapp.pages;
@@ -491,7 +495,7 @@ test.describe('Conversations', () => {
   });
 
   test('Verify emoji picker selection replaces an emoji alias', {tag: ['@regression']}, async ({createPage}) => {
-    const userAPage = await createPage(withLogin(userA));
+    const [userAPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
     await connectWithUser(userAPage, userB);
 
     const userAPages = PageManager.from(userAPage).webapp.pages;

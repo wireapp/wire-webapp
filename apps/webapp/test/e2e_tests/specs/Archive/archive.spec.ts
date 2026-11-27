@@ -37,7 +37,7 @@ test.describe('Archive', () => {
     'I want to archive and unarchive conversation via conversation list',
     {tag: ['@TC-97', '@regression']},
     async ({createPage}) => {
-      const page = await createPage(withLogin(memberA));
+      const [page] = await Promise.all([createPage(withLogin(memberA)), createPage(withLogin(memberB))]);
       await connectWithUser(page, memberB);
       const {pages, components} = PageManager.from(page).webapp;
 
@@ -102,7 +102,7 @@ test.describe('Archive', () => {
     ] as const
   ).forEach(({title, tag}) => {
     test(title, {tag: [tag, '@regression']}, async ({createPage}) => {
-      const page = await createPage(withLogin(memberA));
+      const [page] = await Promise.all([createPage(withLogin(memberA)), createPage(withLogin(memberB))]);
       await connectWithUser(page, memberB);
       const {pages, components} = PageManager.from(page).webapp;
 
@@ -144,7 +144,10 @@ test.describe('Archive', () => {
       `I want to archive the ${type} conversation from conversation details`,
       {tag: [tag, '@regression']},
       async ({createPage}) => {
-        const pageManager = PageManager.from(await createPage(withLogin(memberA)));
+        const [pageManager] = await Promise.all([
+          PageManager.from(createPage(withLogin(memberA))),
+          createPage(withLogin(memberB)),
+        ]);
         const {pages, components} = pageManager.webapp;
 
         let conversation: Locator;

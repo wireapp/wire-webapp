@@ -32,7 +32,7 @@ import {UrlUtil} from '../../commons/util';
 import {LogoFullIcon} from '../../components/icon';
 import {Config} from '../../Config';
 import {useSingleInstance} from '../../hooks/useSingleInstance';
-import '../../localization/Localizer';
+import '../../localization/localizer';
 import {useApplicationContext} from '../../page/rootProvider';
 import {Core} from '../../service/coreSingleton';
 import {Button, ButtonVariant} from '../../uiKit/inputs/button/button';

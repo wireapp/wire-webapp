@@ -1,0 +1,320 @@
+/*
+ * Wire
+ * Copyright (C) 2026 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import ko from 'knockout';
+import {DefaultConversationRoleName} from '../apiClient/conversation/conversationRole';
+import {FEATURE_KEY, FEATURE_STATUS, type FeatureList} from '../apiClient/team/feature/featureList.types';
+
+import {useLeaveGroupAdminModalStore} from '../components/Modals/LeaveGroupAdminModal/useLeaveGroupAdminModalStore';
+import {PrimaryModal} from '../components/Modals/PrimaryModal';
+import {CellsRepository} from '../repositories/cells/cellsRepository';
+import {ConnectionRepository} from '../repositories/connection/connectionRepository';
+import {ConversationRepository} from '../repositories/conversation/ConversationRepository';
+import {MessageRepository} from '../repositories/conversation/MessageRepository';
+import {User} from '../repositories/entity/User';
+import {IntegrationRepository} from '../repositories/integration/IntegrationRepository';
+import {SelfRepository} from '../repositories/self/SelfRepository';
+import {TeamState} from '../repositories/team/TeamState';
+import {UserState} from '../repositories/user/userState';
+import {generateConversation} from '../../../test/helper/ConversationGenerator';
+import type {Translate} from '../util/localizerUtil';
+import {translateForTest} from '../util/test/translateForTest';
+import {createUuid} from '../util/uuid';
+
+import {ActionsViewModel} from './actionsViewModel';
+import {MainViewModel} from './mainViewModel';
+import {UserType} from '../apiClient/user/user';
+
+// ─── helpers ────────────────────────────────────────────────────────────────
+
+type ActionsViewModelTestFixture = {
+  readonly vm: ActionsViewModel;
+  readonly setMemberConversationRole: jest.Mock;
+  readonly leaveConversationMock: jest.Mock;
+};
+type BuildActionsViewModelOptions = {
+  selfUser?: User;
+  teamFeatures?: FeatureList;
+  setMemberConversationRole?: jest.Mock;
+  leaveConversationMock?: jest.Mock;
+  translate: Translate;
+};
+
+/** Create a User that passes every eligibility criterion in leaveConversation. */
+function makeEligibleUser(id = createUuid()): User {
+  const user = new User(id, 'example.com', translateForTest);
+  user.name('Test User ' + id);
+  user.username('testuser.' + id);
+  user.isFederated = false;
+  user.isService = false;
+  user.isTemporaryGuest(false);
+  user.type = UserType.REGULAR;
+  return user;
+}
+
+const featureWithPreventAdminLessGroups = {
+  [FEATURE_KEY.PREVENT_ADMIN_LESS_GROUPS]: {status: FEATURE_STATUS.ENABLED},
+} as any;
+
+function buildActionsViewModel(options: BuildActionsViewModelOptions): ActionsViewModelTestFixture {
+  const {
+    selfUser = new User('self-id', 'example.com', translateForTest),
+    teamFeatures,
+    setMemberConversationRole = jest.fn().mockResolvedValue(undefined),
+    leaveConversationMock = jest.fn().mockResolvedValue(undefined),
+    translate,
+  } = options;
+  const mockUserState = {self: ko.observable(selfUser)} as unknown as UserState;
+  const mockTeamState = {teamFeatures: ko.observable(teamFeatures)} as unknown as TeamState;
+
+  const conversationRepository = {
+    leaveConversation: leaveConversationMock,
+    clearConversation: jest.fn().mockResolvedValue(undefined),
+    conversationRoleRepository: {setMemberConversationRole},
+  } as unknown as ConversationRepository;
+
+  const vm = new ActionsViewModel(
+    {} as SelfRepository,
+    {} as CellsRepository,
+    {} as ConnectionRepository,
+    conversationRepository,
+    {} as IntegrationRepository,
+    {} as MessageRepository,
+    mockUserState,
+    mockTeamState,
+    {} as MainViewModel,
+    translate,
+  );
+
+  return {vm, setMemberConversationRole, leaveConversationMock};
+}
+
+// ─── tests ───────────────────────────────────────────────────────────────────
+
+describe('ActionsViewModel.leaveConversation', () => {
+  let mockShow: jest.Mock;
+
+  beforeEach(() => {
+    mockShow = jest.fn();
+    jest.spyOn(useLeaveGroupAdminModalStore, 'getState').mockReturnValue({show: mockShow} as any);
+    jest.spyOn(PrimaryModal, 'show').mockReturnValue(undefined);
+  });
+
+  afterEach(() => {
+    return jest.restoreAllMocks();
+  });
+
+  it('uses the injected translate function for modal copy', () => {
+    const selfUser = new User('self-id', 'example.com', translateForTest);
+    const userToBlock = makeEligibleUser('blocked-user');
+    const translate = jest.fn((translationKey: Parameters<Translate>[0]) => {
+      return `translated:${translationKey}`;
+    }) as Translate;
+
+    const {vm} = buildActionsViewModel({selfUser, translate});
+
+    void vm.blockUser(userToBlock);
+
+    expect(translate).toHaveBeenCalledWith('modalUserBlockAction');
+    expect(translate).toHaveBeenCalledWith('modalUserBlockMessage', {user: userToBlock.name()});
+    expect(translate).toHaveBeenCalledWith('modalUserBlockHeadline', {user: userToBlock.name()});
+    expect(PrimaryModal.show).toHaveBeenCalledWith(
+      PrimaryModal.type.CONFIRM,
+      expect.objectContaining({
+        primaryAction: expect.objectContaining({text: 'translated:modalUserBlockAction'}),
+        text: expect.objectContaining({
+          message: 'translated:modalUserBlockMessage',
+          title: 'translated:modalUserBlockHeadline',
+        }),
+      }),
+      undefined,
+      translate,
+    );
+  });
+
+  describe('feature flag off', () => {
+    it('shows the standard PrimaryModal leave flow when PREVENT_ADMIN_LESS_GROUPS is disabled', () => {
+      const selfUser = new User('self-id', 'example.com', translateForTest);
+      const conversation = generateConversation({users: [makeEligibleUser()]});
+      conversation.roles({[selfUser.id]: DefaultConversationRoleName.WIRE_ADMIN});
+
+      const {vm} = buildActionsViewModel({translate: translateForTest, selfUser, teamFeatures: undefined});
+
+      void vm.leaveConversation(conversation);
+
+      expect(PrimaryModal.show).toHaveBeenCalledWith(
+        PrimaryModal.type.OPTION,
+        expect.any(Object),
+        undefined,
+        translateForTest,
+      );
+      expect(mockShow).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('feature flag on', () => {
+    it('shows the standard PrimaryModal leave flow when the self user is not the last admin', () => {
+      const selfUser = new User('self-id', 'example.com', translateForTest);
+      const otherAdmin = makeEligibleUser('other-admin');
+      const conversation = generateConversation({users: [otherAdmin]});
+      // Both users are admins → self is NOT the last admin
+      conversation.roles({
+        [selfUser.id]: DefaultConversationRoleName.WIRE_ADMIN,
+        [otherAdmin.id]: DefaultConversationRoleName.WIRE_ADMIN,
+      });
+
+      const {vm} = buildActionsViewModel({
+        translate: translateForTest,
+        selfUser,
+        teamFeatures: featureWithPreventAdminLessGroups,
+      });
+
+      void vm.leaveConversation(conversation);
+
+      expect(PrimaryModal.show).toHaveBeenCalledWith(
+        PrimaryModal.type.OPTION,
+        expect.any(Object),
+        undefined,
+        translateForTest,
+      );
+      expect(mockShow).not.toHaveBeenCalled();
+    });
+
+    it('opens the LeaveGroupAdminModal when the self user is the last admin and eligible users exist', async () => {
+      const selfUser = new User('self-id', 'example.com', translateForTest);
+      const conversation = generateConversation({users: [makeEligibleUser()]});
+      conversation.roles({[selfUser.id]: DefaultConversationRoleName.WIRE_ADMIN});
+
+      const {vm} = buildActionsViewModel({
+        translate: translateForTest,
+        selfUser,
+        teamFeatures: featureWithPreventAdminLessGroups,
+      });
+
+      await vm.leaveConversation(conversation);
+
+      expect(mockShow).toHaveBeenCalledTimes(1);
+      expect(PrimaryModal.show).not.toHaveBeenCalled();
+    });
+
+    it('excludes the self user from the eligible users list passed to the modal', async () => {
+      const selfUser = new User('self-id', 'example.com', translateForTest);
+      // participating_user_ets never includes self, but add an eligible other user
+      const otherUser = makeEligibleUser('other-id');
+      const conversation = generateConversation({users: [otherUser]});
+      conversation.roles({[selfUser.id]: DefaultConversationRoleName.WIRE_ADMIN});
+
+      const {vm} = buildActionsViewModel({
+        translate: translateForTest,
+        selfUser,
+        teamFeatures: featureWithPreventAdminLessGroups,
+      });
+
+      await vm.leaveConversation(conversation);
+
+      const {eligibleUsers} = mockShow.mock.calls[0][0] as {eligibleUsers: User[]};
+      expect(
+        eligibleUsers.every(u => {
+          return u.id !== selfUser.id;
+        }),
+      ).toBe(true);
+    });
+
+    it('passes an empty eligibleUsers list to the modal when no participant meets eligibility criteria', async () => {
+      const selfUser = new User('self-id', 'example.com', translateForTest);
+      // Federated users are ineligible
+      const federatedUser = new User('fed-id', 'external.com', translateForTest);
+      federatedUser.isFederated = true;
+      federatedUser.name('Fed User');
+      federatedUser.username('fed.user');
+      const conversation = generateConversation({users: [federatedUser]});
+      conversation.roles({[selfUser.id]: DefaultConversationRoleName.WIRE_ADMIN});
+
+      const {vm} = buildActionsViewModel({
+        translate: translateForTest,
+        selfUser,
+        teamFeatures: featureWithPreventAdminLessGroups,
+      });
+
+      await vm.leaveConversation(conversation);
+
+      const {eligibleUsers} = mockShow.mock.calls[0][0] as {eligibleUsers: User[]};
+      expect(eligibleUsers).toHaveLength(0);
+    });
+
+    it('assigns the admin role to the selected user before calling leaveConversation', async () => {
+      const selfUser = new User('self-id', 'example.com', translateForTest);
+      const newAdmin = makeEligibleUser('new-admin-id');
+      const conversation = generateConversation({users: [newAdmin]});
+      conversation.roles({[selfUser.id]: DefaultConversationRoleName.WIRE_ADMIN});
+
+      const callOrder: string[] = [];
+      const setMemberConversationRole = jest.fn().mockImplementation(async () => {
+        return callOrder.push('setRole');
+      });
+      const leaveConversationMock = jest.fn().mockImplementation(async () => {
+        return callOrder.push('leave');
+      });
+
+      const {vm} = buildActionsViewModel({
+        selfUser,
+        teamFeatures: featureWithPreventAdminLessGroups,
+        setMemberConversationRole,
+        leaveConversationMock,
+        translate: translateForTest,
+      });
+
+      await vm.leaveConversation(conversation);
+      const {onLeave} = mockShow.mock.calls[0][0] as {onLeave: (clear: boolean, user: User) => Promise<void>};
+      await onLeave(false, newAdmin);
+
+      expect(setMemberConversationRole).toHaveBeenCalledWith(
+        conversation,
+        newAdmin.qualifiedId,
+        DefaultConversationRoleName.WIRE_ADMIN,
+      );
+      expect(leaveConversationMock).toHaveBeenCalledWith(conversation);
+      expect(callOrder).toEqual(['setRole', 'leave']);
+    });
+
+    it('does not call leaveConversation when role assignment fails', async () => {
+      const selfUser = new User('self-id', 'example.com', translateForTest);
+      const newAdmin = makeEligibleUser('new-admin-id');
+      const conversation = generateConversation({users: [newAdmin]});
+      conversation.roles({[selfUser.id]: DefaultConversationRoleName.WIRE_ADMIN});
+
+      const setMemberConversationRole = jest.fn().mockRejectedValue(new Error('Role assignment failed'));
+      const leaveConversationMock = jest.fn().mockResolvedValue(undefined);
+
+      const {vm} = buildActionsViewModel({
+        selfUser,
+        teamFeatures: featureWithPreventAdminLessGroups,
+        setMemberConversationRole,
+        leaveConversationMock,
+        translate: translateForTest,
+      });
+
+      await vm.leaveConversation(conversation);
+      const {onLeave} = mockShow.mock.calls[0][0] as {onLeave: (clear: boolean, user: User) => Promise<void>};
+
+      await expect(onLeave(false, newAdmin)).rejects.toThrow('Role assignment failed');
+      expect(leaveConversationMock).not.toHaveBeenCalled();
+    });
+  });
+});

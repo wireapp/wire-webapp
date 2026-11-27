@@ -33,7 +33,7 @@ test.describe('Edit', () => {
   });
 
   test('I can edit my message in 1:1', {tag: ['@TC-679', '@regression']}, async ({createPage}) => {
-    const page = await createPage(withLogin(userA));
+    const [page] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
     await connectWithUser(page, userB);
 
     const {pages} = PageManager.from(page).webapp;
@@ -72,7 +72,7 @@ test.describe('Edit', () => {
     'I see changed message if message was edited from another device',
     {tag: ['@TC-682', '@regression']},
     async ({createPage}) => {
-      const deviceAPage = await createPage(withLogin(userA));
+      const [deviceAPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
       await connectWithUser(deviceAPage, userB);
 
       const deviceA = PageManager.from(deviceAPage).webapp.pages;
@@ -119,7 +119,7 @@ test.describe('Edit', () => {
     'I can edit my last message by pressing the up arrow key',
     {tag: ['@TC-686', '@regression']},
     async ({createPage}) => {
-      const page = await createPage(withLogin(userA));
+      const [page] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
       await connectWithUser(page, userB);
 
       const pages = PageManager.from(page).webapp.pages;

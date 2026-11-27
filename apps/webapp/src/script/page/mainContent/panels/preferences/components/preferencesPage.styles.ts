@@ -38,9 +38,11 @@ export const buttonsStyle: CSSObject = {
 
 export const contentStyle: CSSObject = {
   width: '100%',
-  height: '100%',
+  flex: 1,
+  minHeight: 0,
   padding: '32px 32px 32px 72px',
   overflowX: 'hidden',
+  overflowY: 'auto',
 
   // Rely on viewport media queries if container queries are not supported by the browser
   '@media (max-width: 768px)': {

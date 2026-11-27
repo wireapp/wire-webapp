@@ -23,19 +23,20 @@ import {DeviceSelect} from './deviceSelect';
 
 import * as Icon from '../../../../../components/icon';
 import {useMediaDevicesStore} from '../../../../../repositories/media/useMediaDevicesStore';
-import {useApplicationContext} from '../../../../rootProvider';
+import type {Translate} from '../../../../../util/localizerUtil/translationTypes';
 import {PreferencesSection} from '../components/preferencesSection';
 
 interface AudioOutPreferencesProps {
   refreshCallOutputSpeaker: () => void;
   hasActiveCall: boolean;
+  translate: Translate;
 }
 
 const AudioOutPreferences: FunctionComponent<AudioOutPreferencesProps> = ({
   refreshCallOutputSpeaker,
   hasActiveCall,
+  translate,
 }: AudioOutPreferencesProps) => {
-  const {translate} = useApplicationContext();
   const {audioOutputDeviceId, setAudioOutputDeviceId, audioOutputDevices} = useMediaDevicesStore(state => {
     return {
       audioOutputDeviceId: state.audio.output.activeId,

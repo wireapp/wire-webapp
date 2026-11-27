@@ -276,9 +276,39 @@ function createRspackConfiguration(mode: 'development' | 'production' = 'product
             to: '.',
           },
           {
+            from: path.resolve(configDirectoryPath, 'assets/images/backgrounds/office1.png'),
+            to: 'assets/images/backgrounds/office-1.png',
+          },
+          {
+            from: path.resolve(configDirectoryPath, 'assets/images/backgrounds/office2.png'),
+            to: 'assets/images/backgrounds/office-2.png',
+          },
+          {
+            from: path.resolve(configDirectoryPath, 'assets/images/backgrounds/wire1.png'),
+            to: 'assets/images/backgrounds/wire-1.png',
+          },
+          {
+            from: path.resolve(configDirectoryPath, 'assets/mediapipeModels/selfieMulticlass256x256.tflite'),
+            to: 'assets/mediapipe-models/selfie_multiclass_256x256.tflite',
+          },
+          {
+            from: path.resolve(configDirectoryPath, 'assets/mediapipeModels/selfieSegmenterLandscape.tflite'),
+            to: 'assets/mediapipe-models/selfie_segmenter_landscape.tflite',
+          },
+          {
             context: path.resolve(configDirectoryPath, 'assets'),
             from: '**/*',
+            noErrorOnMissing: true,
             to: 'assets',
+            globOptions: {
+              ignore: [
+                '**/images/backgrounds/office1.png',
+                '**/images/backgrounds/office2.png',
+                '**/images/backgrounds/wire1.png',
+                '**/mediapipeModels/selfieMulticlass256x256.tflite',
+                '**/mediapipeModels/selfieSegmenterLandscape.tflite',
+              ],
+            },
           },
           {from: path.resolve(srcPath, 'page/basicBrowserFeatureCheck.js'), to: 'min/'},
           {from: path.resolve(srcPath, 'page/loader.js'), to: 'min/'},

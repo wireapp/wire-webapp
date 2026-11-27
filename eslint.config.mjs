@@ -145,12 +145,6 @@ const legacyRules = {
   curly: 'error',
   'header-tony/header': 'off',
   'no-cond-assign': 'error',
-  'no-console': [
-    'error',
-    {
-      allow: ['error', 'info', 'warn'],
-    },
-  ],
   'no-const-assign': 'error',
   'no-dupe-class-members': 'error',
   'no-duplicate-case': 'error',
@@ -789,9 +783,9 @@ const productionConfigs = [
       'apps/webapp/src/script/components/Modals/FileHistoryModal/hooks/useFileVersions.ts',
       'apps/webapp/src/script/components/Modals/DetailViewModal/DetailViewModalFooter.tsx',
       'apps/webapp/src/script/components/UserSearchableList/UserSearchableList.tsx',
-      'apps/webapp/src/script/components/calling/CallingCell/CallingCell.tsx',
-      'apps/webapp/src/script/components/calling/CallingOverlayContainer.tsx',
-      'apps/webapp/src/script/components/calling/FullscreenVideoCall.tsx',
+      'apps/webapp/src/script/components/calling/callingCell/callingCell.tsx',
+      'apps/webapp/src/script/components/calling/callingOverlayContainer.tsx',
+      'apps/webapp/src/script/components/calling/fullscreenVideoCall.tsx',
     ],
     rules: {
       '@typescript-eslint/no-floating-promises': 'error',
@@ -896,6 +890,7 @@ const config = [
     },
     settings: importSettings,
     rules: {
+      'no-console': 'warn',
       'import/no-named-as-default-member': 'error',
       'import/no-named-as-default': 'error',
       'no-restricted-properties': [

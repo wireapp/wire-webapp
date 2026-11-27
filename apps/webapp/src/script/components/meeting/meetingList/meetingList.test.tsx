@@ -34,7 +34,7 @@ import {
   createRootProviderWrapperForTest,
   requireValueForTest,
 } from '../../../page/testSupport/rootContextTestSupport';
-import {MainViewModel} from '../../../view_model/MainViewModel';
+import {MainViewModel} from '../../../viewModel/mainViewModel';
 import {translateForTest} from '../../../util/test/translateForTest';
 
 import {isMeetingListItemLastInDay, MeetingList, type MeetingListProps} from './meetingList';

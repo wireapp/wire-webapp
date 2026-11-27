@@ -56,7 +56,7 @@ import {Runtime} from '../../commons/util/Runtime';
 import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 import {Config} from '../../Config';
 import {scheduleRecurringTask, updateRemoteConfigLogger} from '../../lifecycle/updateRemoteConfigs';
-import {getMLSMigrationStatus, MLSMigrationStatus} from '../../mls/MLSMigration/migrationStatus';
+import {getMLSMigrationStatus, MLSMigrationStatus} from '../../mls/mlsMigration/migrationStatus';
 import {APIClient} from '../../service/apiClientSingleton';
 import {Environment} from '../../util/environment';
 import {type Translate} from '../../util/localizerUtil';

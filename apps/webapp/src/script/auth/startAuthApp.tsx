@@ -44,7 +44,7 @@ import {Runtime} from '../commons/util/Runtime';
 import {Config} from '../Config';
 import {retireLegacyServiceWorker} from '../lifecycle/retireLegacyServiceWorker';
 import {updateApiVersion} from '../lifecycle/updateRemoteConfigs';
-import {setAppLocale} from '../localization/Localizer';
+import {setAppLocale} from '../localization/localizer';
 import {createBrowserLogPersistence, createLogWorkerConnection} from '../logger/createBrowserLogPersistence';
 import {configureLogging} from '../logger/getLogger';
 import {initializeLogging, type StartupLoggingOptions} from '../logger/initializeLogging';

@@ -42,9 +42,9 @@ import {useAppMainState, ViewType} from './state';
 import {ContentState, useAppState} from './useAppState';
 
 import {isUUID} from '../auth/util/stringUtil';
-import {CallingContainer} from '../components/calling/CallingOverlayContainer';
-import {ChooseScreen} from '../components/calling/ChooseScreen';
-import {DetachedCallingCell} from '../components/calling/DetachedCallingCell';
+import {CallingContainer} from '../components/calling/callingOverlayContainer';
+import {ChooseScreen} from '../components/calling/chooseScreen';
+import {DetachedCallingCell} from '../components/calling/detachedCallingCell';
 import {ConfigToolbar} from '../components/configToolbar/configToolbar';
 import {SharedDriveUploadStatusScope} from '../components/conversation/conversationCells/sharedDriveUploadStatusContext';
 import {ErrorFallback} from '../components/errorFallback';
@@ -62,13 +62,13 @@ import {
 import {useActiveWindow} from '../hooks/useActiveWindow';
 import {useInitializeRootFontSize} from '../hooks/useRootFontSize';
 import {App} from '../main/app';
-import {isMLSSupportedByEnvironment} from '../mls/isMLSSupportedByEnvironment';
-import {initialiseMLSMigrationFlow} from '../mls/MLSMigration';
-import {finaliseMigrationOfMixedConversations} from '../mls/MLSMigration/migrationFinaliser';
+import {isMLSSupportedByEnvironment} from '../mls/isMlsSupportedByEnvironment';
+import {initialiseMLSMigrationFlow} from '../mls/mlsMigration';
+import {finaliseMigrationOfMixedConversations} from '../mls/mlsMigration/migrationFinaliser';
 import {
   initialiseMigrationOfProteusConversations,
   joinUnestablishedMixedConversations,
-} from '../mls/MLSMigration/migrationInitialiser';
+} from '../mls/mlsMigration/migrationInitialiser';
 import {CallingViewMode, CallState, DesktopScreenShareMenu} from '../repositories/calling/CallState';
 import {ConversationState} from '../repositories/conversation/ConversationState';
 import {User} from '../repositories/entity/User';
@@ -77,7 +77,7 @@ import {AppLockRepository} from '../repositories/user/appLockRepository';
 import {showInitialModal} from '../repositories/user/availabilityModal';
 import {UserState} from '../repositories/user/userState';
 import {generateConversationUrl} from '../router/routeGenerator';
-import {configureRouterClock, configureRoutes, navigate} from '../router/Router';
+import {configureRouterClock, configureRoutes, navigate} from '../router/router';
 import {Core} from '../service/coreSingleton';
 import {THEME_ID} from '../uiKit/identity/theme/theme';
 import {useMatchMedia} from '../uiKit/layout/matchMedia/matchMedia';
@@ -87,9 +87,9 @@ import {canUseMeetings} from '../util/canUseMeetings';
 import {canUseTroubleshooter} from '../util/canUseTroubleshooter';
 import {useKoSubscribableChildren} from '../util/componentUtil';
 import {isDetachedCallingFeatureEnabled} from '../util/isDetachedCallingFeatureEnabled';
-import {MainViewModel} from '../view_model/MainViewModel';
-import {useWarningOffset} from '../view_model/WarningsContainer/useWarningOffset';
-import {WarningsContainer} from '../view_model/WarningsContainer/WarningsContainer';
+import {MainViewModel} from '../viewModel/mainViewModel';
+import {useWarningOffset} from '../viewModel/warningsContainer/useWarningOffset';
+import {WarningsContainer} from '../viewModel/warningsContainer/warningsContainer';
 import {WebAppEvents} from '../webAppEvents';
 
 export type RightSidebarParams = {

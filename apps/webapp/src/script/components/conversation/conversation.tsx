@@ -65,9 +65,9 @@ import {
   driveBulkActionProgressFeatureToggleName,
   driveOffboardingFeatureToggleName,
 } from '../../featureToggles/startupFeatureToggleNames';
-import {isMouseRightClickEvent, isAuxRightClickEvent} from '../../guards/Mouse';
-import {isServiceEntity} from '../../guards/Service';
-import {MotionDuration} from '../../motion/MotionDuration';
+import {isMouseRightClickEvent, isAuxRightClickEvent} from '../../guards/mouse';
+import {isServiceEntity} from '../../guards/service';
+import {MotionDuration} from '../../motion/motionDuration';
 import {RightSidebarParams} from '../../page/appMain';
 import {PanelState} from '../../page/rightSidebar';
 import {useApplicationContext, useMainViewModel} from '../../page/rootProvider';
@@ -93,7 +93,7 @@ import {safeMailOpen, safeWindowOpen} from '../../util/sanitizationUtil';
 import {formatBytes} from '../../util/util';
 import {createUuid} from '../../util/uuid';
 import {WebAppEvents} from '../../webAppEvents';
-import {CallingCell} from '../calling/CallingCell';
+import {CallingCell} from '../calling/callingCell';
 import {Giphy} from '../giphy';
 import {InputBar} from '../inputBar';
 import {ElementType, MessageDetails} from '../messagesList/message/contentMessage/asset/textMessageRenderer';

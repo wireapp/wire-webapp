@@ -25,7 +25,7 @@ import {ServiceEntity} from '../../../repositories/integration/ServiceEntity';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {Translate} from '../../../util/localizerUtil';
 import {renderElement} from '../../../util/renderElement';
-import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
+import {ActionsViewModel} from '../../../viewModel/actionsViewModel';
 import {Avatar, AVATAR_SIZE} from '../../avatar';
 import * as Icon from '../../icon';
 import {ModalComponent} from '../ModalComponent';

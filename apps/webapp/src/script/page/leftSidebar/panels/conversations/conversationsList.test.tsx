@@ -55,7 +55,7 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from '../../../testSupport/rootContextTestSupport';
-import {ListViewModel} from '../../../../view_model/ListViewModel';
+import {ListViewModel} from '../../../../viewModel/listViewModel';
 import {SidebarTabs, useSidebarStore} from './useSidebarStore';
 
 import {ConversationsList} from './conversationsList';

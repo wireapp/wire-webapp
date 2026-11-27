@@ -31,7 +31,7 @@ import {
   createRootProviderWrapperForTest,
 } from '../../../../page/testSupport/rootContextTestSupport';
 import {translateForTest} from '../../../../util/test/translateForTest';
-import type {MainViewModel} from '../../../../view_model/MainViewModel';
+import type {MainViewModel} from '../../../../viewModel/mainViewModel';
 import {usePrimaryModalState} from '../../PrimaryModal';
 import {withIsolatedCreateConversationTest} from './createConversationTestSupport';
 import {ConversationCreationStep} from '../types';

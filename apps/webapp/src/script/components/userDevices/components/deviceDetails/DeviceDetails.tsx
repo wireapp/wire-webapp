@@ -25,7 +25,7 @@ import {container} from 'tsyringe';
 
 import {Config} from '../../../../Config';
 import {WireIdentity} from '../../../../e2eIdentity';
-import {MotionDuration} from '../../../../motion/MotionDuration';
+import {MotionDuration} from '../../../../motion/motionDuration';
 import {FormattedId} from '../../../../page/mainContent/panels/preferences/devicesPreferences/components/formattedId';
 import {MLSDeviceDetails} from '../../../../page/mainContent/panels/preferences/devicesPreferences/components/mlsDeviceDetails';
 import {useApplicationContext} from '../../../../page/rootProvider';

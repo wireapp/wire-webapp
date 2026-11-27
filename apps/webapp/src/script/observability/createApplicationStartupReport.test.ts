@@ -19,8 +19,8 @@
 
 import {Maybe} from 'true-myth';
 
-import {AppInitStatisticsValue} from '../telemetry/app_init/AppInitStatisticsValue';
-import {AppInitTimingsStep} from '../telemetry/app_init/AppInitTimingsStep';
+import {AppInitStatisticsValue} from '../telemetry/appInit/appInitStatisticsValue';
+import {AppInitTimingsStep} from '../telemetry/appInit/appInitTimingsStep';
 
 import {createApplicationStartupReport} from './createApplicationStartupReport';
 

@@ -60,7 +60,7 @@ import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {BrowserPermissionStatus} from '../permission/BrowserPermissionStatus';
 import {UserMapper} from '../user/userMapper';
 import {UserState} from '../user/userState';
-import '../../localization/Localizer';
+import '../../localization/localizer';
 import {CALL_MESSAGE_TYPE} from '../../message/callMessageType';
 import {MentionEntity} from '../../message/mentionEntity';
 import {QuoteEntity} from '../../message/quoteEntity';

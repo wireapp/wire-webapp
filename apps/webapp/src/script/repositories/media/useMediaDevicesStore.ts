@@ -22,7 +22,7 @@ import {useStore} from 'zustand';
 import {immer} from 'zustand/middleware/immer';
 import {createStore} from 'zustand/vanilla';
 
-import type {ElectronDesktopCapturerSource} from './MediaDevicesHandler';
+import type {ElectronDesktopCapturerSource} from './desktopCapturerSource';
 
 export const defaultAudioInputId = 'default';
 export const defaultAudioOutputId = 'default';

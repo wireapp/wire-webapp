@@ -33,8 +33,11 @@ import {
 
 import {useApplicationContext} from '../../../page/rootProvider';
 import {ChevronIcon} from '../../../uiKit/dataDisplay/icon/chevronIcon';
+import {getLogger} from '../../../util/logger';
 import {MeetingNotificationCard} from '../meetingNotificationCard/meetingNotificationCard';
 import {useMeetingNotificationStore} from '../meetingNotificationStore/meetingNotificationStore';
+
+const logger = getLogger('MeetingNotificationHost');
 
 type MeetingNotificationHostProps = {
   isStandalone: boolean;
@@ -51,6 +54,10 @@ export const MeetingNotificationHost: FunctionComponent<MeetingNotificationHostP
     return state.isExpanded;
   });
   const hostRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    logger.debug('meeting notification host count changed', {isStandalone, notificationCount: notifications.length});
+  }, [isStandalone, notifications.length]);
 
   useEffect(() => {
     if (notifications.length === 0) {

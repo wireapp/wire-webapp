@@ -76,7 +76,10 @@ test.describe('Folders', () => {
     'I want to move a 1:1 conversation to a new custom folder',
     {tag: ['@TC-545', '@regression']},
     async ({createPage}) => {
-      const userAPageManager = await PageManager.from(createPage(withLogin(userA)));
+      const [userAPageManager] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA))),
+        createPage(withLogin(userB)),
+      ]);
       await connectWithUser(userAPageManager, userB);
       const userAPages = userAPageManager.webapp.pages;
 
@@ -98,7 +101,10 @@ test.describe('Folders', () => {
     'I want to move a group conversation to a new custom folder',
     {tag: ['@TC-546', '@regression']},
     async ({createPage}) => {
-      const userAPageManager = await PageManager.from(createPage(withLogin(userA)));
+      const [userAPageManager] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA))),
+        createPage(withLogin(userB)),
+      ]);
       await connectWithUser(userAPageManager, userB);
       const userAPages = userAPageManager.webapp.pages;
 
@@ -123,7 +129,10 @@ test.describe('Folders', () => {
     'I want to move a 1:1 conversation to an existing custom folder',
     {tag: ['@TC-547', '@regression']},
     async ({createPage}) => {
-      const userAPageManager = await PageManager.from(createPage(withLogin(userA)));
+      const [userAPageManager] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA))),
+        createPage(withLogin(userB)),
+      ]);
       await connectWithUser(userAPageManager, userB);
       const {pages: userAPages, components: userAComponents} = userAPageManager.webapp;
 
@@ -151,7 +160,10 @@ test.describe('Folders', () => {
     'I want to move a group conversation to an existing custom folder',
     {tag: ['@TC-548', '@regression']},
     async ({createPage}) => {
-      const userAPageManager = await PageManager.from(createPage(withLogin(userA)));
+      const [userAPageManager] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA))),
+        createPage(withLogin(userB)),
+      ]);
       await connectWithUser(userAPageManager, userB);
       const {pages: userAPages, components: userAComponents} = userAPageManager.webapp;
 
@@ -183,7 +195,10 @@ test.describe('Folders', () => {
     'I want to see custom folder removed when last conversation is removed',
     {tag: ['@TC-553', '@regression']},
     async ({createPage}) => {
-      const userAPageManager = await PageManager.from(createPage(withLogin(userA)));
+      const [userAPageManager] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA))),
+        createPage(withLogin(userB)),
+      ]);
       await connectWithUser(userAPageManager, userB);
       const {pages: userAPages, components: userAComponents} = userAPageManager.webapp;
 
@@ -216,7 +231,10 @@ test.describe('Folders', () => {
     'I should not be able to create a custom folder without a name',
     {tag: ['@TC-560', '@regression']},
     async ({createPage}) => {
-      const userAPageManager = await PageManager.from(createPage(withLogin(userA)));
+      const [userAPageManager] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA))),
+        createPage(withLogin(userB)),
+      ]);
       await connectWithUser(userAPageManager, userB);
       const {pages: userAPages, modals: userAModals} = userAPageManager.webapp;
 
@@ -236,7 +254,10 @@ test.describe('Folders', () => {
     'I should not see any traces of a deleted custom folder',
     {tag: ['@TC-568', '@regression']},
     async ({createPage}) => {
-      const userAPageManager = await PageManager.from(createPage(withLogin(userA)));
+      const [userAPageManager] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA))),
+        createPage(withLogin(userB)),
+      ]);
       await connectWithUser(userAPageManager, userB);
       const userAPages = userAPageManager.webapp.pages;
 

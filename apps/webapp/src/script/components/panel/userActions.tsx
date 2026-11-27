@@ -37,6 +37,7 @@ import {ConnectionStatus} from '../../apiClient/connection/connectionStatus';
 import {CONVERSATION_TYPE} from '../../apiClient/conversation/conversation';
 import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
 import {ClientMLSError, ClientMLSErrorLabel} from '../../core/messagingProtocols/mls';
+import {pendingOnboardingStatusFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
 import {SidebarTabs, useSidebarStore} from '../../page/leftSidebar/panels/conversations/useSidebarStore';
 import {useApplicationContext} from '../../page/rootProvider';
 import {ACCESS_STATE} from '../../repositories/conversation/AccessState';
@@ -47,7 +48,7 @@ import type {User} from '../../repositories/entity/User';
 import {TeamState} from '../../repositories/team/TeamState';
 import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {matchQualifiedIds} from '../../util/qualifiedId';
-import type {ActionsViewModel} from '../../view_model/ActionsViewModel';
+import type {ActionsViewModel} from '../../viewModel/actionsViewModel';
 import {WebAppEvents} from '../../webAppEvents';
 import * as Icon from '../icon';
 import {PrimaryModal} from '../Modals/PrimaryModal';
@@ -129,7 +130,7 @@ const UserActions: FunctionComponent<UserActionsProps> = ({
   teamState = container.resolve(TeamState),
   conversationState = container.resolve(ConversationState),
 }: UserActionsProps) => {
-  const {translate} = useApplicationContext();
+  const {translate, isFeatureToggleEnabled} = useApplicationContext();
   const {
     isAvailable,
     isBlocked,
@@ -154,6 +155,8 @@ const UserActions: FunctionComponent<UserActionsProps> = ({
     'isPendingOnboarding',
   ]);
   const pendingOnboardingInfoId = useId();
+  const isPendingOnboardingShown =
+    isPendingOnboarding && isFeatureToggleEnabled(pendingOnboardingStatusFeatureToggleName);
   const isTeamMember = teamState.isInTeam(user);
 
   const {setCurrentTab: setCurrentSidebarTab} = useSidebarStore();
@@ -254,7 +257,7 @@ const UserActions: FunctionComponent<UserActionsProps> = ({
           Icon: Icon.MessageIcon,
           identifier: ActionIdentifier[Actions.START_CONVERSATION],
           label: translate('groupParticipantActionStartConversation'),
-          ...(isPendingOnboarding && {
+          ...(isPendingOnboardingShown && {
             disabled: true,
             descriptionId: pendingOnboardingInfoId,
           }),

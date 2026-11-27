@@ -31,7 +31,7 @@ import {TestFactory} from '../../../../../test/helper/TestFactory';
 
 import {Notifications} from './notifications';
 
-import {ViewModelRepositories} from '../../../view_model/MainViewModel';
+import {ViewModelRepositories} from '../../../viewModel/mainViewModel';
 import {translateForTest} from '../../../util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
 

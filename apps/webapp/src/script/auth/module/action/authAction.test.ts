@@ -26,6 +26,7 @@ import {BackendError} from '../../../apiClient/http/backendError';
 import {BackendErrorLabel, SyntheticErrorLabel} from '../../../apiClient/http/backendErrorLabel';
 import {RecursivePartial} from '../../../commons/util/TypeUtil';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {arrayLast} from 'ts-extras';
 
 import type {APIClient} from '../../../apiClient/apiClient';
 import type {TypeUtil} from '../../../commons/util';
@@ -35,6 +36,12 @@ import {AuthActionCreator} from './creator/';
 import {mockStoreFactory} from '../../util/test/mockStoreFactory';
 
 import {ActionRoot, actionRoot} from './';
+import {LabeledError} from './labeledError';
+
+import {
+  createCoreCryptoDatabaseOpenError,
+  isCoreCryptoDatabaseOpenError,
+} from '../../../core/messagingProtocols/proteus/proteusService/cryptoClient/coreCryptoWrapper/coreCryptoDatabaseOpenError';
 
 describe('AuthAction', () => {
   it.each([Maybe.just({id: 'existing-client'} as MetaClient), Maybe.nothing<MetaClient>()])(
@@ -307,6 +314,97 @@ describe('AuthAction', () => {
       message: backendError.message,
     });
     expect(store.getActions()).toEqual([AuthActionCreator.startLogin(), AuthActionCreator.failedLogin(backendError)]);
+  });
+
+  it('labels CoreCrypto database open errors and allows a later login retry', async () => {
+    const loginData = {clientType: ClientType.PERMANENT, email: 'test@example.com', password: 'password'};
+    const databaseOpenCause = new Error('Opaque database open failure');
+    const databaseOpenError = createCoreCryptoDatabaseOpenError(databaseOpenCause);
+    let hasServerAccessToken = false;
+    let clientInitializationAttempts = 0;
+    const logout = jest.fn(async () => {
+      hasServerAccessToken = false;
+    });
+    const login = jest.fn(async () => {
+      hasServerAccessToken = true;
+    });
+    const doInitializeClient = jest.fn(() => {
+      return async () => {
+        expect(hasServerAccessToken).toBe(true);
+        clientInitializationAttempts += 1;
+        if (clientInitializationAttempts === 1) {
+          throw databaseOpenError;
+        }
+      };
+    });
+    const store = mockStoreFactory({
+      actions: {
+        authAction: {doSilentLogout: actionRoot.authAction.doSilentLogout},
+        clientAction: {doInitializeClient},
+        localStorageAction: {setLocalStorage: jest.fn().mockReturnValue(asyncNoop)},
+        selfAction: {fetchSelf: jest.fn().mockReturnValue(asyncNoop)},
+      },
+      core: {login, logout},
+    })({});
+
+    const firstLoginError = await store.dispatch(actionRoot.authAction.doLogin(loginData)).catch((error: unknown) => {
+      return error;
+    });
+
+    expect(firstLoginError).toBeInstanceOf(LabeledError);
+    expect(firstLoginError).toMatchObject({
+      cause: databaseOpenError,
+      label: LabeledError.GENERAL_ERRORS.CORE_CRYPTO_DATABASE_OPEN,
+    });
+    if (!(firstLoginError instanceof LabeledError)) {
+      throw new Error('Expected a labeled CoreCrypto database open error');
+    }
+    const firstErrorCause = firstLoginError.cause;
+    expect(firstErrorCause).toBe(databaseOpenError);
+    expect(Object.prototype.propertyIsEnumerable.call(firstLoginError, 'cause')).toBe(false);
+    if (isCoreCryptoDatabaseOpenError(firstErrorCause)) {
+      expect(firstErrorCause.cause).toBe(databaseOpenCause);
+      expect(Object.prototype.propertyIsEnumerable.call(firstErrorCause, 'cause')).toBe(false);
+    }
+    const firstFailedLoginAction = store.getActions().find(action => {
+      return action.type === 'LOGIN_FAILED';
+    });
+    expect(firstFailedLoginAction?.error).toBe(firstLoginError);
+
+    await store.dispatch(actionRoot.authAction.doLogin(loginData));
+
+    expect(logout).toHaveBeenCalledTimes(2);
+    expect(login).toHaveBeenCalledTimes(2);
+    expect(doInitializeClient).toHaveBeenCalledTimes(2);
+    expect(arrayLast(store.getActions())).toEqual(AuthActionCreator.successfulLogin());
+  });
+
+  it('labels a CoreCrypto database open error after SSO and stops the login loading state', async () => {
+    const databaseOpenError = createCoreCryptoDatabaseOpenError(new Error('Opaque database open failure'));
+    const doInitializeClient = jest.fn().mockReturnValue(async () => {
+      throw databaseOpenError;
+    });
+    const store = mockStoreFactory({
+      actions: {
+        clientAction: {doInitializeClient},
+        localStorageAction: {setLocalStorage: jest.fn().mockReturnValue(asyncNoop)},
+        selfAction: {fetchSelf: jest.fn().mockReturnValue(asyncNoop)},
+      },
+      core: {init: jest.fn().mockResolvedValue(undefined)},
+    })({});
+
+    const loginError = await store
+      .dispatch(actionRoot.authAction.doFinalizeSSOLogin({clientType: ClientType.PERMANENT}))
+      .catch((error: unknown) => {
+        return error;
+      });
+
+    expect(loginError).toBeInstanceOf(LabeledError);
+    expect(loginError).toMatchObject({label: LabeledError.GENERAL_ERRORS.CORE_CRYPTO_DATABASE_OPEN});
+    expect(store.getActions()).toEqual([
+      AuthActionCreator.startLogin(),
+      AuthActionCreator.failedLogin(loginError as Error),
+    ]);
   });
 
   it('handles failed logout', async () => {

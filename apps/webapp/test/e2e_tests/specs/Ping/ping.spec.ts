@@ -94,7 +94,7 @@ test.describe('Ping', () => {
         usersForBigGroup.push(newMember);
       }
 
-      const userAPage = await createPage(withLogin(userA));
+      const [userAPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
       await connectWithUser(userAPage, userB);
       const {pages: userAPages, modals: userAModals} = PageManager.from(userAPage).webapp;
 

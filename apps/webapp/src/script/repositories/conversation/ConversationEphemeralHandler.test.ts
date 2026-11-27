@@ -18,6 +18,8 @@
  */
 
 import {ContentMessage} from '../entity/message/contentMessage';
+import {Text} from '../entity/message/text';
+import {User} from '../entity/User';
 import type {EventService} from '../event/EventService';
 import {translateForTest} from '../../util/test/translateForTest';
 
@@ -46,6 +48,29 @@ describe('ConversationEphemeralHandler', () => {
       expect(onMessageTimeout).toHaveBeenCalledTimes(isRetained ? 0 : 1);
     } finally {
       ephemeralHandler.timedMessages.removeAll();
+      ephemeralHandler.dispose();
+    }
+  });
+
+  it('keeps own messages that expired before validation as obfuscated placeholders', async () => {
+    const selfUser = new User('self-user', 'example.com', translateForTest);
+    selfUser.isMe = true;
+    const message = new ContentMessage('timed-message', translateForTest);
+    message.user(selfUser);
+    message.assets([new Text('text-asset', 'Test Message')]);
+    message.ephemeral_expires('0');
+    const onMessageTimeout = jest.fn();
+    const ephemeralHandler = new ConversationEphemeralHandler({} as EventService, {onMessageTimeout});
+
+    try {
+      const validatedMessages = await ephemeralHandler.validateMessages([message]);
+
+      expect(validatedMessages).toEqual([message]);
+      expect(message.ephemeral_expires()).toBe(true);
+      expect((message.getFirstAsset() as Text).text).not.toBe('Test Message');
+      expect(ephemeralHandler.timedMessages()).toEqual([]);
+      expect(onMessageTimeout).toHaveBeenCalledTimes(1);
+    } finally {
       ephemeralHandler.dispose();
     }
   });

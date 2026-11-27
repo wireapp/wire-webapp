@@ -57,7 +57,7 @@ import {ShieldIcon} from '../../../uiKit/dataDisplay/icon/shieldIcon';
 import {UpdateIcon} from '../../../uiKit/dataDisplay/icon/updateIcon';
 import {isEscapeKey} from '../../../util/keyboardUtil';
 import type {Translate} from '../../../util/localizerUtil';
-import {Duration} from '../Duration';
+import {Duration} from '../duration';
 
 /** How long the "Only people in this call…" sentence stays before the line settles. */
 export const CALL_SECURITY_INTRO_DURATION_IN_MILLISECONDS = 3000;

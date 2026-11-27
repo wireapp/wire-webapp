@@ -38,7 +38,7 @@ import {
   createRootProviderWrapperForTest,
 } from '../../../page/testSupport/rootContextTestSupport';
 import {translateForTest} from '../../../util/test/translateForTest';
-import type {MainViewModel} from '../../../view_model/MainViewModel';
+import type {MainViewModel} from '../../../viewModel/mainViewModel';
 
 type RenderCreateConversationModalOptions = {
   readonly createGroupConversation: ConversationRepository['createGroupConversation'];
