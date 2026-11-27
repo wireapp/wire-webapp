@@ -2673,17 +2673,16 @@ export class MessageRepository {
         !this.isUnconfirmed(pending) &&
         !originalMessage.hasMultipartAsset()
       ) {
-        const replaced = await this.editPendingMessage(
-          conversation,
-          textMessage,
-          originalMessage,
-          mentions,
-          pending.payload,
-        );
-        if (!replaced) {
+        const {payload} = pending;
+        await this.enqueueAgainIfAttemptEnded(
+          () => {
+            return this.editPendingMessage(conversation, textMessage, originalMessage, mentions, payload);
+          },
           // An attempt started meanwhile and went through, so the message was sent.
-          await this.enqueueEditAfterMessage(conversation, textMessage, originalMessage, mentions);
-        }
+          () => {
+            return this.enqueueEditAfterMessage(conversation, textMessage, originalMessage, mentions);
+          },
+        );
       } else {
         await this.enqueueEditAfterMessage(conversation, textMessage, originalMessage, mentions);
         // The message was held while its text could still be replaced. Now it goes, and the edit goes behind it.
@@ -2697,33 +2696,26 @@ export class MessageRepository {
     }
   }
 
-  /**
-   * A version of the message: with the new text it keeps its id, its place and its lack of an edited mark.
-   * Resolves to `false` when the message went out before the version could take its place.
-   */
+  /** A version of the message: with the new text it keeps its id, its place and its lack of an edited mark. */
   private async editPendingMessage(
     conversation: Conversation,
     textMessage: string,
     originalMessage: ContentMessage,
     mentions: MentionEntity[],
     payload: OutboxTextPayload,
-  ): Promise<boolean> {
+  ): Promise<EnqueueOutcome<unknown>> {
     const enqueueResult = await this.outboxKinds.message.enqueue({
       payload: {...payload, text: textMessage, mentions: this.toStoredMentions(mentions)},
       correlationKey: originalMessage.id,
       laneKey: laneOfMessages(payload.conversationId),
     });
-    const isAccepted = this.isAccepted(enqueueResult);
-    if (enqueueResult.outcome === 'operation-succeeded') {
-      return false;
-    }
-    if (isAccepted) {
+    if (this.isAccepted(enqueueResult)) {
       await this.updateMessageTextLocally(conversation, originalMessage, textMessage, mentions);
-    } else {
+    } else if (enqueueResult.outcome !== 'operation-succeeded') {
       // The message is still held for the edit that the outbox refused.
       await this.activeOutbox.release(originalMessage.id);
     }
-    return true;
+    return enqueueResult;
   }
 
   private async enqueueEditAfterMessage(
@@ -2731,7 +2723,7 @@ export class MessageRepository {
     textMessage: string,
     originalMessage: ContentMessage,
     mentions: MentionEntity[],
-  ): Promise<void> {
+  ): Promise<EnqueueOutcome<unknown>> {
     const attachments = originalMessage
       .getMultipartAssets()
       .map(multipart => {
@@ -2749,6 +2741,7 @@ export class MessageRepository {
       attachments: isNonEmptyArray(attachments) ? attachments : undefined,
     });
     this.isAccepted(outcome);
+    return outcome;
   }
 
   /** Nothing is sent, and the message gets no edited mark. */
@@ -3184,24 +3177,43 @@ export class MessageRepository {
     const targetMessageId = payload.type === 'edit' ? payload.originalMessageId : payload.targetMessageId;
     const followsTarget =
       this.findPendingMessage(targetMessageId) !== undefined || this.findPendingMessage(correlationKey) !== undefined;
-    if (payload.type !== 'hide' && followsTarget) {
-      const messageResult = await this.outboxKinds.message.enqueue({
+    const enqueueChangeRequest = (): Promise<EnqueueOutcome<unknown>> => {
+      return this.outboxKinds.messageChange.enqueue({
         payload,
         correlationKey,
-        laneKey: laneOfMessages(payload.conversationId),
+        laneKey: laneOfChanges(payload.conversationId),
       });
-      // When the earlier version went out meanwhile, this is a change to a message that was sent.
-      if (messageResult.outcome !== 'operation-succeeded') {
-        return messageResult;
-      }
+    };
+    // A running attempt of the change sent an older payload.
+    const enqueueInLaneOfChanges = (): Promise<EnqueueOutcome<unknown>> => {
+      return this.enqueueAgainIfAttemptEnded(enqueueChangeRequest, enqueueChangeRequest);
+    };
+    if (payload.type === 'hide' || !followsTarget) {
+      return enqueueInLaneOfChanges();
     }
-    const request = {payload, correlationKey, laneKey: laneOfChanges(payload.conversationId)};
-    const changeResult = await this.outboxKinds.messageChange.enqueue(request);
-    // An enqueue with the key of a running attempt answers how that attempt ended, and that attempt sent an older
-    // payload. So the new payload is enqueued again. The kernel should queue the new payload itself.
-    return changeResult.outcome === 'operation-succeeded'
-      ? this.outboxKinds.messageChange.enqueue(request)
-      : changeResult;
+    return this.enqueueAgainIfAttemptEnded(
+      () => {
+        return this.outboxKinds.message.enqueue({
+          payload,
+          correlationKey,
+          laneKey: laneOfMessages(payload.conversationId),
+        });
+      },
+      // The earlier version went out meanwhile, so this is a change to a message that was sent.
+      enqueueInLaneOfChanges,
+    );
+  }
+
+  /**
+   * An enqueue with the key of a running attempt answers how that attempt ended and doesn't queue the payload, so
+   * `enqueueAgain` queues it instead. The kernel should queue the payload itself.
+   */
+  private async enqueueAgainIfAttemptEnded(
+    enqueue: () => Promise<EnqueueOutcome<unknown>>,
+    enqueueAgain: () => Promise<EnqueueOutcome<unknown>>,
+  ): Promise<EnqueueOutcome<unknown>> {
+    const enqueueResult = await enqueue();
+    return enqueueResult.outcome === 'operation-succeeded' ? enqueueAgain() : enqueueResult;
   }
 
   /** `undefined` once the message went through, or when it never was in the outbox */
