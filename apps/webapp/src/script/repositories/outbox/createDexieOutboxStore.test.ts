@@ -32,13 +32,17 @@ import {createDexieOutboxStore} from './createDexieOutboxStore';
 
 function snapshotOf(id: string, seq: number, overrides: Partial<OperationSnapshot> = {}): OperationSnapshot {
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     id,
     seq,
     trigger: 'operation-queued',
     at: 1000 + seq,
     kind: 'message',
     payload: {text: `payload ${seq}`},
+    correlation: {state: 'uncorrelated'},
+    lane: {state: 'no-lane'},
+    expiry: {state: 'never-expires'},
+    limits: {attemptTimeout: {state: 'never-times-out'}},
     queuedSeq: 1,
     queuedAt: 1000,
     state: 'queued',
@@ -67,7 +71,11 @@ describe('createDexieOutboxStore', () => {
   }
 
   it('loads nothing from an empty table', async () => {
-    expect(await createStore().loadLatest()).toEqual({type: 'snapshots-loaded', operations: [], quarantinedCount: 0});
+    expect(await createStore().loadLatest()).toEqual({
+      outcome: 'snapshots-loaded',
+      operations: [],
+      quarantinedCount: 0,
+    });
   });
 
   it('appends snapshots and loads the newest one of every operation', async () => {
@@ -76,18 +84,18 @@ describe('createDexieOutboxStore', () => {
     const second = snapshotOf('a', 2, {state: 'in-progress', trigger: 'attempt-started'});
     const other = snapshotOf('b', 1);
 
-    expect(await store.append(first)).toEqual({type: 'snapshot-appended'});
-    expect(await store.append(other)).toEqual({type: 'snapshot-appended'});
-    expect(await store.append(second)).toEqual({type: 'snapshot-appended'});
+    expect(await store.append(first)).toEqual({outcome: 'snapshot-appended'});
+    expect(await store.append(other)).toEqual({outcome: 'snapshot-appended'});
+    expect(await store.append(second)).toEqual({outcome: 'snapshot-appended'});
 
-    const outcome = await store.loadLatest();
+    const loadResult = await store.loadLatest();
 
-    if (outcome.type !== 'snapshots-loaded') {
-      throw new Error(`Unexpected outcome ${outcome.type}`);
+    if (loadResult.outcome !== 'snapshots-loaded') {
+      throw new Error(`Unexpected outcome ${loadResult.outcome}`);
     }
-    expect(outcome.quarantinedCount).toBe(0);
-    expect(outcome.operations).toHaveLength(2);
-    expect(outcome.operations).toEqual(
+    expect(loadResult.quarantinedCount).toBe(0);
+    expect(loadResult.operations).toHaveLength(2);
+    expect(loadResult.operations).toEqual(
       expect.arrayContaining([expect.objectContaining(second), expect.objectContaining(other)]),
     );
   });
@@ -104,15 +112,15 @@ describe('createDexieOutboxStore', () => {
     const store = createStore();
     await store.append(snapshotOf('a', 1));
 
-    const outcome = await store.loadLatest();
-    if (outcome.type !== 'snapshots-loaded') {
-      throw new Error(`Unexpected outcome ${outcome.type}`);
+    const loadResult = await store.loadLatest();
+    if (loadResult.outcome !== 'snapshots-loaded') {
+      throw new Error(`Unexpected outcome ${loadResult.outcome}`);
     }
-    const [loaded] = outcome.operations;
+    const [loaded] = loadResult.operations;
     expect(loaded).not.toHaveProperty('primary_key');
 
     const next: OperationSnapshot = {...loaded, seq: 2, trigger: 'attempt-started', state: 'in-progress'};
-    expect(await store.append(next)).toEqual({type: 'snapshot-appended'});
+    expect(await store.append(next)).toEqual({outcome: 'snapshot-appended'});
   });
 
   it('removes every snapshot of the given operations only', async () => {
@@ -121,11 +129,11 @@ describe('createDexieOutboxStore', () => {
     await store.append(snapshotOf('a', 2));
     await store.append(snapshotOf('b', 1));
 
-    expect(await store.remove(['a'])).toEqual({type: 'snapshots-removed'});
+    expect(await store.remove(['a'])).toEqual({outcome: 'snapshots-removed'});
 
-    const outcome = await store.loadLatest();
-    expect(outcome).toEqual({
-      type: 'snapshots-loaded',
+    const loadResult = await store.loadLatest();
+    expect(loadResult).toEqual({
+      outcome: 'snapshots-loaded',
       operations: [expect.objectContaining({id: 'b'})],
       quarantinedCount: 0,
     });
@@ -138,10 +146,10 @@ describe('createDexieOutboxStore', () => {
     await store.append(snapshotOf('broken', 2, {state: undefined as unknown as OperationSnapshot['state']}));
     await database.outbox.add({id: 'no-kind', seq: 1, state: 'queued'} as unknown as OperationSnapshot);
 
-    const outcome = await store.loadLatest();
+    const loadResult = await store.loadLatest();
 
-    expect(outcome).toEqual({
-      type: 'snapshots-loaded',
+    expect(loadResult).toEqual({
+      outcome: 'snapshots-loaded',
       operations: [expect.objectContaining({id: 'good'})],
       quarantinedCount: 2,
     });
@@ -151,9 +159,9 @@ describe('createDexieOutboxStore', () => {
   it('quarantines a row without an id', async () => {
     await database.outbox.add({seq: 1, state: 'queued', kind: 'message'} as unknown as OperationSnapshot);
 
-    const outcome = await createStore().loadLatest();
+    const loadResult = await createStore().loadLatest();
 
-    expect(outcome).toEqual({type: 'snapshots-loaded', operations: [], quarantinedCount: 1});
+    expect(loadResult).toEqual({outcome: 'snapshots-loaded', operations: [], quarantinedCount: 1});
     expect(await database.outbox.count()).toBe(0);
   });
 
@@ -180,15 +188,15 @@ describe('createDexieOutboxStore', () => {
     it('answers storage-full to a quota error on append', async () => {
       const store = createStoreOverFailingTable(errorNamed('QuotaExceededError'));
 
-      expect(await store.append(snapshotOf('a', 1))).toEqual({type: 'storage-full'});
+      expect(await store.append(snapshotOf('a', 1))).toEqual({outcome: 'storage-full'});
     });
 
     it('answers storage-failed with the error name to any other error, without rejecting', async () => {
       const store = createStoreOverFailingTable(errorNamed('DataError'));
 
-      expect(await store.append(snapshotOf('a', 1))).toEqual({type: 'storage-failed', errorName: 'DataError'});
-      expect(await store.loadLatest()).toEqual({type: 'storage-failed', errorName: 'DataError'});
-      expect(await store.remove(['a'])).toEqual({type: 'storage-failed', errorName: 'DataError'});
+      expect(await store.append(snapshotOf('a', 1))).toEqual({outcome: 'storage-failed', errorName: 'DataError'});
+      expect(await store.loadLatest()).toEqual({outcome: 'storage-failed', errorName: 'DataError'});
+      expect(await store.remove(['a'])).toEqual({outcome: 'storage-failed', errorName: 'DataError'});
     });
 
     it('answers storage-failed when the table is not available', async () => {
@@ -196,7 +204,7 @@ describe('createDexieOutboxStore', () => {
         throw new Error('The database is not open');
       });
 
-      expect(await store.loadLatest()).toEqual({type: 'storage-failed', errorName: 'Error'});
+      expect(await store.loadLatest()).toEqual({outcome: 'storage-failed', errorName: 'Error'});
     });
   });
 });

@@ -39,7 +39,7 @@ describe('createApplicationOutbox', () => {
 
     expect(outbox.isStarted()).toBe(false);
 
-    expect(await outbox.start()).toEqual({type: 'outbox-started'});
+    expect(await outbox.start()).toEqual({outcome: 'outbox-started'});
 
     expect(table.toArray).toHaveBeenCalled();
     expect(outbox.isStarted()).toBe(true);
@@ -58,7 +58,7 @@ describe('createApplicationOutbox', () => {
   it('answers storage-failed and stays unstarted while the database is not open', async () => {
     const outbox = createApplicationOutbox({storageService: {db: undefined}, serverTimeHandler});
 
-    expect(await outbox.start()).toEqual({type: 'storage-failed', errorName: 'Error'});
+    expect(await outbox.start()).toEqual({outcome: 'storage-failed', errorName: 'Error'});
     expect(outbox.isStarted()).toBe(false);
   });
 });
