@@ -824,6 +824,7 @@
   "conversationCreatedYou": "You started a conversation with {users}",
   "conversationCreatedYouMore": "You started a conversation with {users}, and [showmore]{count} more[/showmore]",
   "conversationDeleteTimestamp": "Deleted: {date}",
+  "conversationDeleteTimestampBy": "Deleted by {name}: {date}",
   "conversationDetails1to1ReceiptsFirst": "If both sides turn on read receipts, you can see when messages are read.",
   "conversationDetails1to1ReceiptsHeadDisabled": "You have disabled read receipts",
   "conversationDetails1to1ReceiptsHeadEnabled": "You have enabled read receipts",

@@ -17,18 +17,26 @@
  *
  */
 
+import ko from 'knockout';
+
 import {Message} from './message';
 
 import {SuperType} from '../../../message/superType';
 import type {Translate} from '../../../util/localizerUtil';
+import type {User} from '../User';
 
 export class DeleteMessage extends Message {
   public deleted_timestamp: null | number;
+  /** Only the sender can delete a message for everyone, so the deleter is the sender. */
+  public readonly deletedBy: ko.PureComputed<User>;
 
   constructor(translate: Translate) {
     super(undefined, undefined, translate);
 
     this.super_type = SuperType.DELETE;
     this.deleted_timestamp = null;
+    this.deletedBy = ko.pureComputed(() => {
+      return this.user();
+    });
   }
 }
