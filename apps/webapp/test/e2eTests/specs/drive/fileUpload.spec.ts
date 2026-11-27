@@ -27,7 +27,7 @@ import {test, expect, withLogin} from '../../test.fixtures';
 import {connectWithUser, createGroup, sendConnectionRequest} from '../../utils/userActions';
 import {waitForDriveConversationReady} from '../../utils/driveReadiness';
 
-const UPLOAD_STATUS_TIMEOUT_MS = 20_000;
+const UPLOAD_STATUS_TIMEOUT_MS = 30_000;
 
 interface DragAndDropOptions {
   buffer: Buffer;

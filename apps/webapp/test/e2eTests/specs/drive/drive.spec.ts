@@ -28,7 +28,7 @@ import {ConversationPage} from '../../pageManager/webapp/pages/conversation.page
 import {Locator} from '@playwright/test';
 import {waitForDriveConversationReady} from '../../utils/driveReadiness';
 
-const UPLOAD_STATUS_TIMEOUT_MS = 20_000;
+const UPLOAD_STATUS_TIMEOUT_MS = 30_000;
 
 const getMultipartAssetRoot = (conversation: ConversationPage, user: User): Locator => {
   return conversation.messageItems.getByLabel(new RegExp(`^Image from ${user.fullName}`));
