@@ -141,7 +141,7 @@
     "@emotion/jest": "11.14.2",
     "@enormora/objectory": "0.0.25",
     "@faker-js/faker": "10.6.0",
-    "@formatjs/cli": "6.22.0",
+    "@formatjs/cli": "6.23.0",
     "@ls-lint/ls-lint": "2.3.2",
     "@playwright/test": "1.65.1",
     "@roamhq/wrtc": "0.10.0",
