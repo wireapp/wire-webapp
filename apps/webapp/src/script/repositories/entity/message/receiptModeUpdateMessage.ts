@@ -24,13 +24,13 @@ import {SystemMessageType} from '../../../message/systemMessageType';
 import {type Translate} from '../../../util/localizerUtil';
 
 export class ReceiptModeUpdateMessage extends SystemMessage {
-  constructor(isReceiptEnabled: boolean, translate: Translate) {
+  constructor(isReceiptEnabled: boolean, isSelfUser: boolean, translate: Translate) {
     super(translate);
 
     this.type = CONVERSATION_EVENT.RECEIPT_MODE_UPDATE;
     this.system_message_type = SystemMessageType.CONVERSATION_RECEIPT_MODE_UPDATE;
 
-    this.caption = getCaption(isReceiptEnabled, this.user().isMe, this.translate);
+    this.caption = getCaption(isReceiptEnabled, isSelfUser, this.translate);
   }
 }
 
