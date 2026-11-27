@@ -87,11 +87,9 @@ export class ContentMessage extends Message {
    * @returns `true` if the message mentions the user, `false` otherwise.
    */
   isUserMentioned(userId: QualifiedId): boolean {
-    return this.hasAssetText()
-      ? this.assets().some(assetEntity => {
-          return assetEntity.isText() && assetEntity.isUserMentioned(userId);
-        })
-      : false;
+    return this.assets().some(assetEntity => {
+      return (assetEntity.isText() || assetEntity.isMultipart()) && assetEntity.isUserMentioned(userId);
+    });
   }
 
   /**
