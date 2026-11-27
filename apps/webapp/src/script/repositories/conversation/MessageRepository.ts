@@ -217,12 +217,12 @@ export class MessageRepository {
     private readonly assetRepository: AssetRepository,
     private readonly audioRepository: AudioRepository,
     private readonly translate: Translate,
+    private readonly outbox: Outbox | undefined,
     private readonly userState = container.resolve(UserState),
     private readonly clientState = container.resolve(ClientState),
     private readonly conversationState = container.resolve(ConversationState),
     private readonly teamState = container.resolve(TeamState),
     private readonly core = container.resolve(Core),
-    private readonly outbox?: Outbox,
   ) {
     this.logger = getLogger('MessageRepository');
 

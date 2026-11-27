@@ -137,6 +137,7 @@ async function buildMessageRepository(
     assetRepository: {} as AssetRepository,
     audioRepository: new AudioRepository(),
     translate,
+    outbox: undefined,
     userState,
     clientState,
     conversationState,

@@ -68,12 +68,12 @@ function buildMessageRepository(outbox?: Outbox): MessageRepository {
     {} as AssetRepository,
     new AudioRepository(),
     translateForTest,
+    outbox,
     userState,
     clientState,
     conversationState,
     new TeamState(),
     createCoreTestFixture({service: {conversation: {send: jest.fn(), messageTimer: new MessageTimer()}}}),
-    outbox,
   );
 }
 

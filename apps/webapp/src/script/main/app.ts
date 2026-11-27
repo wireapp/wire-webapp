@@ -361,11 +361,6 @@ export class App {
       repositories.asset,
       repositories.audio,
       this.translate,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
       this.outbox,
     );
 

@@ -356,6 +356,7 @@ export class TestFactory {
       this.assetRepository,
       new AudioRepository(),
       translate,
+      undefined,
       userRepository['userState'],
       clientState,
     );
