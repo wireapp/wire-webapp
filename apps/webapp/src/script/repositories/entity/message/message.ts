@@ -471,7 +471,7 @@ export class Message {
    * (pending, or failed and waiting for a retry at the bottom of the log) sits where the user sees what happens to it.
    * @param isOffline the app knows it is offline, with the outbox on
    */
-  isChangeRefusedOffline(isOffline: boolean): boolean {
+  isChangeRefused(isOffline: boolean): boolean {
     return isOffline && this.sendingState() === 'sent';
   }
 

@@ -24,12 +24,13 @@ import {isNull} from '@sindresorhus/is';
 import {EmojiChar} from './emojiChar';
 import {reactionImgSize} from './emojiChar.styles';
 
+import {ariaDisabledStyle} from '../../../../../../uiKit/inputs/ariaDisabled.styles';
 import {isSpaceOrEnterKey} from '../../../../../../util/keyboardUtil';
 import type {Translate} from '../../../../../../util/localizerUtil';
 import {EmojiPicker} from '../../../../../emojiPicker/emojiPicker';
 import {MessageActionsId} from '../messageActions';
 import {useMessageActionsState} from '../messageActions.state';
-import {messageActionsMenuButton, getActionsMenuCSS, getIconCSS, disabledActionCSS} from '../messageActions.styles';
+import {messageActionsMenuButton, getActionsMenuCSS, getIconCSS} from '../messageActions.styles';
 
 const thumbsUpEmoji = '👍';
 const likeEmoji = '❤️';
@@ -46,7 +47,7 @@ export interface MessageReactionsProps {
   wrapperRef: RefObject<HTMLDivElement | null>;
   handleReactionClick: (emoji: string) => void;
   /** The buttons stay focusable and in place but do nothing, and say why */
-  isDisabled?: boolean;
+  isChangeRefused?: boolean;
 }
 
 const MessageReactions: FC<MessageReactionsProps> = ({
@@ -59,7 +60,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
   resetActionMenuStates,
   wrapperRef,
   handleReactionClick,
-  isDisabled = false,
+  isChangeRefused = false,
 }) => {
   const isThumbUpAction = currentMsgActionName === MessageActionsId.THUMBSUP;
   const isLikeAction = currentMsgActionName === MessageActionsId.HEART;
@@ -125,7 +126,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
 
   const handleMsgActionClick = (event: React.MouseEvent<HTMLButtonElement>): void => {
     event.stopPropagation();
-    if (isDisabled) {
+    if (isChangeRefused) {
       return;
     }
     const actionType = event.currentTarget.dataset.uieName;
@@ -146,7 +147,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
 
   const handleMsgActionKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>): void => {
     event.stopPropagation();
-    if (isDisabled) {
+    if (isChangeRefused) {
       handleKeyDown(event);
       return;
     }
@@ -166,7 +167,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
 
   const emojiSize = 15;
   const getActionProps = (actionLabel: string): {'aria-label': string; 'aria-disabled'?: true; title?: string} => {
-    if (!isDisabled) {
+    if (!isChangeRefused) {
       return {'aria-label': actionLabel};
     }
     const disabledLabel = translate('featureNotAvailableOffline', {feature: actionLabel});
@@ -179,7 +180,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
           ...messageActionsMenuButton(),
           ...getIconCSS,
           ...getActionsMenuCSS(isThumbUpAction),
-          ...(isDisabled && disabledActionCSS),
+          ...ariaDisabledStyle,
         }}
         data-uie-name={MessageActionsId.THUMBSUP}
         aria-pressed={isThumbUpAction}
@@ -196,7 +197,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
           ...messageActionsMenuButton(),
           ...getIconCSS,
           ...getActionsMenuCSS(isLikeAction),
-          ...(isDisabled && disabledActionCSS),
+          ...ariaDisabledStyle,
         }}
         data-uie-name={MessageActionsId.HEART}
         aria-pressed={isLikeAction}
@@ -213,7 +214,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
           ...messageActionsMenuButton(),
           ...getIconCSS,
           ...getActionsMenuCSS(currentMsgActionName === MessageActionsId.EMOJI),
-          ...(isDisabled && disabledActionCSS),
+          ...ariaDisabledStyle,
         }}
         data-uie-name={MessageActionsId.EMOJI}
         type="button"

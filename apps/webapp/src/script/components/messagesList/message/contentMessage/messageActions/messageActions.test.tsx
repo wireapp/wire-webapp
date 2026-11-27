@@ -86,10 +86,10 @@ describe('MessageActions', () => {
     expect(getByText('option1')).toBeDefined();
   });
 
-  it('keeps the reactions in place but disabled, and the reply enabled, when they are disabled', () => {
+  it('keeps the reactions in place but disabled, and the reply enabled, when a change is refused', () => {
     const handleReactionClick = jest.fn();
     const {getByTestId} = render(
-      <MessageActionsMenu {...defaultProps} handleReactionClick={handleReactionClick} areReactionsDisabled />,
+      <MessageActionsMenu {...defaultProps} handleReactionClick={handleReactionClick} isChangeRefused />,
       {wrapper: rootProviderWrapper},
     );
     const thumbsUpButton = getByTestId('reactwith-thumbsup-messag');

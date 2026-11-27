@@ -25,7 +25,6 @@ import {task} from 'true-myth';
 
 import {EmojiChar} from './emojiChar';
 import {
-  disabledMessageReactionButton,
   getReactionsButtonCSS,
   messageReactionButton,
   messageReactionButtonTooltip,
@@ -39,6 +38,7 @@ import {
 import type {QualifiedId} from '../../../../../../apiClient/user/qualifiedId';
 import type {User} from '../../../../../../repositories/entity/User';
 import {Tooltip} from '../../../../../../uiKit/dataDisplay/tooltip/tooltip';
+import {ariaDisabledStyle} from '../../../../../../uiKit/inputs/ariaDisabled.styles';
 import {getEmojiTitleFromEmojiUnicode} from '../../../../../../util/emojiUtil';
 import {isTabKey} from '../../../../../../util/keyboardUtil';
 import type {Translate} from '../../../../../../util/localizerUtil';
@@ -62,8 +62,8 @@ interface EmojiPillProps {
   reactingUsers: User[];
   reactorIds: QualifiedId[];
   loadUsersByIdsFromDb: (userIds: QualifiedId[]) => Promise<User[]>;
-  /** Toggling the reaction is refused: the pill stays focusable and shows the details, but does nothing on click */
-  isDisabled?: boolean;
+  /** Toggling the reaction is refused: the pill stays focusable, shows the details and says why */
+  isChangeRefused?: boolean;
 }
 
 const MAX_USER_NAMES_TO_SHOW = 2;
@@ -84,7 +84,7 @@ export const EmojiPill = ({
   reactingUsers,
   reactorIds,
   loadUsersByIdsFromDb,
-  isDisabled = false,
+  isChangeRefused = false,
 }: EmojiPillProps): false | JSX.Element => {
   const [storedReactingUsers, setStoredReactingUsers] = useState<User[]>([]);
   const isLoadingStoredUsers = useRef(false);
@@ -182,7 +182,7 @@ export const EmojiPill = ({
       ? translate('accessibility.messageReactionDetailsPlural', {emojiCount: emojiCount.toString(), emojiName})
       : translate('accessibility.messageReactionDetailsSingular', {emojiCount: emojiCount.toString(), emojiName});
 
-  const disabledLabel = translate('featureNotAvailableOffline', {feature: detailsLabel});
+  const refusedLabel = translate('featureNotAvailableOffline', {feature: detailsLabel});
 
   const content = replaceReactComponents(caption, [
     {
@@ -222,7 +222,7 @@ export const EmojiPill = ({
                 ? translate('conversationLikesCaptionReactedPlural', {emojiName})
                 : translate('conversationLikesCaptionReactedSingular', {emojiName})}
             </p>
-            {isDisabled && <p css={messageReactionButtonTooltipText}>{disabledLabel}</p>}
+            {isChangeRefused && <p css={messageReactionButtonTooltipText}>{refusedLabel}</p>}
           </div>
         }
       >
@@ -230,10 +230,10 @@ export const EmojiPill = ({
           css={{
             ...messageReactionButton,
             ...getReactionsButtonCSS(isActive, isRemovedFromConversation),
-            ...(isDisabled && disabledMessageReactionButton),
+            ...ariaDisabledStyle,
           }}
-          aria-label={isDisabled ? disabledLabel : detailsLabel}
-          aria-disabled={isDisabled || undefined}
+          aria-label={isChangeRefused ? refusedLabel : detailsLabel}
+          aria-disabled={isChangeRefused || undefined}
           title={emojiName}
           aria-pressed={isActive}
           type="button"
@@ -247,9 +247,7 @@ export const EmojiPill = ({
             void loadMissingReactingUsers();
           }}
           onClick={() => {
-            if (!isDisabled) {
-              handleReactionClick(emoji);
-            }
+            handleReactionClick(emoji);
           }}
           onKeyDown={event => {
             // is last reaction then on tab key press it should hide the reaction menu

@@ -326,16 +326,26 @@ describe.each([THEME_ID.LIGHT, THEME_ID.DARK])('content message with the outbox 
       expect(container.querySelector('[data-uie-name="do-reply-message"]')).not.toHaveAttribute('aria-disabled');
     });
 
-    it('does nothing when a disabled reaction button or pill is clicked', () => {
+    it('does nothing when a disabled reaction button is clicked', () => {
       useNoInternetState.setState({hasNoInternet: true});
       message.status(StatusType.SENT);
 
       const {container} = render(<ContentMessageComponent {...params} />, {wrapper: createWrapper(true)});
       fireEvent.click(thumbsUp(container) as Element);
       fireEvent.click(container.querySelector('[data-uie-name="reactwith-emoji-message"]') as Element);
-      fireEvent.click(pill(container) as Element);
 
       expect(params.onClickReaction).not.toHaveBeenCalled();
+    });
+
+    it('leaves refusing the click on a disabled pill to the message', () => {
+      useNoInternetState.setState({hasNoInternet: true});
+      message.status(StatusType.SENT);
+
+      const {container} = render(<ContentMessageComponent {...params} />, {wrapper: createWrapper(true)});
+      fireEvent.click(pill(container) as Element);
+
+      expect(pill(container)).toHaveAttribute('aria-disabled', 'true');
+      expect(params.onClickReaction).toHaveBeenCalledTimes(1);
     });
 
     it('keeps the reactions of a pending message enabled', () => {

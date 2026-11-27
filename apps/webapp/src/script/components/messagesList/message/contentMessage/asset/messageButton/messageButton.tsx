@@ -23,6 +23,7 @@ import {isNonEmptyString} from '@sindresorhus/is';
 
 import type {CompositeMessage} from '../../../../../../repositories/entity/message/compositeMessage';
 import {COLOR} from '../../../../../../uiKit/identity/colors/colors';
+import {ariaDisabledStyle} from '../../../../../../uiKit/inputs/ariaDisabled.styles';
 import {Button, ButtonVariant} from '../../../../../../uiKit/inputs/button/button';
 import {useKoSubscribableChildren} from '../../../../../../util/componentUtil';
 import {noop} from '../../../../../../util/util';
@@ -32,7 +33,10 @@ interface MessageButtonProps {
   label: string;
   message: CompositeMessage;
   onClick?: () => void;
-  /** Given while offline: the button stays focusable but does nothing, and takes this as its accessible name */
+  /**
+   * Given while offline: the button stays focusable but does nothing, and takes this as its accessible name. A prop,
+   * because importing the app context here would close an import cycle.
+   */
   getOfflineLabel?: (label: string) => string;
 }
 
@@ -72,12 +76,12 @@ export const MessageButton: FunctionComponent<MessageButtonProps> = ({
         showLoading={isWaiting}
         isActive={isSelected}
         loadingColor={COLOR.GRAY}
+        css={ariaDisabledStyle}
         style={{
           maxWidth: '400px',
           width: '100%',
           marginTop: '8px',
           marginBottom: 0,
-          ...(isOffline && {cursor: 'not-allowed', opacity: 0.4}),
         }}
       >
         {label}

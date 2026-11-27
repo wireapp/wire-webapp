@@ -382,7 +382,7 @@ function InputBarContent({
                   onArrowUp={() => {
                     if (messageContent.text.length === 0) {
                       const lastEditableMessage = conversation.getLastEditableMessage();
-                      if (lastEditableMessage !== undefined && !lastEditableMessage.isChangeRefusedOffline(isOffline)) {
+                      if (lastEditableMessage !== undefined && !lastEditableMessage.isChangeRefused(isOffline)) {
                         editMessage(lastEditableMessage);
                       }
                     }

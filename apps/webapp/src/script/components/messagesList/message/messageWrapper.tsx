@@ -162,11 +162,10 @@ export const MessageWrapper: FunctionComponent<MessageParams> = ({
 
     const hasDetails = !conversation.is1to1() && !message.isEphemeral() && !conversation.isSelfUserRemoved();
 
-    const isChangeRefused = message.isChangeRefusedOffline(isOffline);
-    const refusedOfflineEntry = (label: string): Partial<ContextMenuEntry> => {
-      return isChangeRefused
-        ? {isDisabled: true, title: translate('featureNotAvailableOffline', {feature: label.replace(/…$/, '')})}
-        : {};
+    const isChangeRefused = message.isChangeRefused(isOffline);
+    /** `feature` is the label without the ellipsis of an entry that asks before it acts */
+    const refusedChangeEntry = (feature: string): Partial<ContextMenuEntry> => {
+      return isChangeRefused ? {isDisabled: true, title: translate('featureNotAvailableOffline', {feature})} : {};
     };
 
     if (message.isDownloadable() && !isFileShareRestricted) {
@@ -184,7 +183,7 @@ export const MessageWrapper: FunctionComponent<MessageParams> = ({
           return amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.EDIT, message);
         },
         label: translate('conversationContextMenuEdit'),
-        ...refusedOfflineEntry(translate('conversationContextMenuEdit')),
+        ...refusedChangeEntry(translate('conversationContextMenuEdit')),
       });
     }
 
@@ -218,13 +217,14 @@ export const MessageWrapper: FunctionComponent<MessageParams> = ({
     }
 
     if (message.isDeletable()) {
-      const deleteLabel = translate(isPendingDelete ? 'outboxDeletePending' : 'conversationContextMenuDelete');
       entries.push({
         click: () => {
           return messageActions.deleteMessage(conversation, message);
         },
-        label: deleteLabel,
-        ...refusedOfflineEntry(deleteLabel),
+        label: translate(isPendingDelete ? 'outboxDeletePending' : 'conversationContextMenuDelete'),
+        ...refusedChangeEntry(
+          translate(isPendingDelete ? 'outboxDeletePendingAction' : 'conversationContextMenuDeleteForMe'),
+        ),
       });
     }
 
@@ -234,7 +234,7 @@ export const MessageWrapper: FunctionComponent<MessageParams> = ({
           return messageActions.deleteMessageEveryone(conversation, message);
         },
         label: translate('conversationContextMenuDeleteEveryone'),
-        ...refusedOfflineEntry(translate('conversationContextMenuDeleteEveryone')),
+        ...refusedChangeEntry(translate('conversationContextMenuDeleteForEveryone')),
       });
     }
 
@@ -242,7 +242,7 @@ export const MessageWrapper: FunctionComponent<MessageParams> = ({
   });
 
   const handleReactionClick = (reaction: ReactionType): void => {
-    if (!message.isContent() || message.isChangeRefusedOffline(isOffline)) {
+    if (!message.isContent() || message.isChangeRefused(isOffline)) {
       return;
     }
     fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {

@@ -139,7 +139,7 @@ export const ContentMessageComponent: FunctionComponent<ContentMessageProps> = (
     return state.hasNoInternet;
   });
   const isOffline = isOutboxEnabled && hasNoInternet;
-  const isChangeDisabled = message.isChangeRefusedOffline(isOffline);
+  const isChangeRefused = message.isChangeRefused(isOffline);
   const getOfflineButtonLabel = (feature: string): string => {
     return translate('featureNotAvailableOffline', {feature});
   };
@@ -354,7 +354,7 @@ export const ContentMessageComponent: FunctionComponent<ContentMessageProps> = (
                 reactionsTotalCount={reactions.length}
                 isRemovedFromConversation={conversation.isSelfUserRemoved()}
                 isPendingInOutbox={isPendingInOutbox}
-                areReactionsDisabled={isChangeDisabled}
+                isChangeRefused={isChangeRefused}
               />
             )}
           </div>
@@ -410,7 +410,7 @@ export const ContentMessageComponent: FunctionComponent<ContentMessageProps> = (
             return setActionMenuVisibility(false);
           }}
           isRemovedFromConversation={conversation.isSelfUserRemoved()}
-          isDisabled={isChangeDisabled}
+          isChangeRefused={isChangeRefused}
           users={conversation.allUserEntities()}
           loadUsersByIdsFromDb={loadUsersByIdsFromDb}
         />

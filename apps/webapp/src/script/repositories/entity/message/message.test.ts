@@ -60,7 +60,7 @@ describe('Message', () => {
     });
   });
 
-  describe('isChangeRefusedOffline', () => {
+  describe('isChangeRefused', () => {
     it.each([
       [StatusType.SENT, true, true],
       [StatusType.DELIVERED, true, true],
@@ -74,7 +74,7 @@ describe('Message', () => {
       const message = new ContentMessage(undefined, translateForTest);
       message.status(status);
 
-      expect(message.isChangeRefusedOffline(isOffline)).toBe(expected);
+      expect(message.isChangeRefused(isOffline)).toBe(expected);
     });
   });
 

@@ -18,11 +18,13 @@
  */
 
 import {render} from '@testing-library/react';
+import {noop} from 'noop-esm';
 import type {ComponentProps} from 'react';
 
 import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
 import {pendingOfflineMessagesFeatureToggleName} from '../../../featureToggles/startupFeatureToggleNames';
 import {
+  createFireAndForgetInvokerForTest,
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from '../../../page/testSupport/rootContextTestSupport';
@@ -30,6 +32,7 @@ import {StatusType} from '../../../message/statusType';
 import {Conversation} from '../../../repositories/entity/Conversation';
 import {ContentMessage} from '../../../repositories/entity/message/contentMessage';
 import {Text} from '../../../repositories/entity/message/text';
+import type {Translate} from '../../../util/localizerUtil';
 import {useNoInternetState} from '../../../view_model/WarningsContainer/noInternetState';
 import {translateForTest} from '../../../util/test/translateForTest';
 import {createUuid} from '../../../util/uuid';
@@ -40,11 +43,19 @@ import {MessageWrapper} from './messageWrapper';
 import type {ContextMenuEntry} from '../../../ui/contextMenu';
 
 let latestEntries: ContextMenuEntry[] = [];
+let latestOnClickReaction: (reaction: string) => void = noop;
 
 jest.mock('./contentMessage', () => {
   return {
-    ContentMessageComponent: ({contextMenu}: {contextMenu: {entries: () => ContextMenuEntry[]}}) => {
+    ContentMessageComponent: ({
+      contextMenu,
+      onClickReaction,
+    }: {
+      contextMenu: {entries: () => ContextMenuEntry[]};
+      onClickReaction: (reaction: string) => void;
+    }) => {
       latestEntries = contextMenu.entries();
+      latestOnClickReaction = onClickReaction;
       return null;
     },
   };
@@ -52,7 +63,12 @@ jest.mock('./contentMessage', () => {
 
 type Setup = {
   messageActions: {deleteMessage: jest.Mock; deleteMessageEveryone: jest.Mock};
+  fireAndForgetInvoker: ReturnType<typeof createFireAndForgetInvokerForTest>;
 };
+
+const translateWithFeature = ((translationKey: string, substitutions?: {feature?: string}) => {
+  return substitutions?.feature === undefined ? translationKey : `${translationKey}:${substitutions.feature}`;
+}) as Translate;
 
 const renderMenu = (isNeverAttempted: boolean, status = StatusType.SENT, isOutboxEnabled = true): Setup => {
   const conversation = new Conversation(
@@ -81,10 +97,12 @@ const renderMenu = (isNeverAttempted: boolean, status = StatusType.SENT, isOutbo
     selfId: {id: createUuid(), domain: 'test.wire.link'},
   } as unknown as ComponentProps<typeof MessageWrapper>;
 
+  const fireAndForgetInvoker = createFireAndForgetInvokerForTest();
   render(<MessageWrapper {...props} />, {
     wrapper: createRootProviderWrapperForTest(
       createRootContextValueForTest({
-        translate: translateForTest,
+        translate: translateWithFeature,
+        fireAndForgetInvoker,
         isFeatureToggleEnabled: featureName => {
           return isOutboxEnabled && featureName === pendingOfflineMessagesFeatureToggleName;
         },
@@ -92,7 +110,7 @@ const renderMenu = (isNeverAttempted: boolean, status = StatusType.SENT, isOutbo
     ),
   });
 
-  return {messageActions};
+  return {messageActions, fireAndForgetInvoker};
 };
 
 const labels = (): (string | undefined)[] => {
@@ -163,11 +181,33 @@ describe('MessageWrapper delete menu', () => {
           return [label, isDisabled, title];
         }),
       ).toEqual([
-        ['conversationContextMenuEdit', true, 'featureNotAvailableOffline'],
-        ['conversationContextMenuDelete', true, 'featureNotAvailableOffline'],
-        ['conversationContextMenuDeleteEveryone', true, 'featureNotAvailableOffline'],
+        ['conversationContextMenuEdit', true, 'featureNotAvailableOffline:conversationContextMenuEdit'],
+        ['conversationContextMenuDelete', true, 'featureNotAvailableOffline:conversationContextMenuDeleteForMe'],
+        [
+          'conversationContextMenuDeleteEveryone',
+          true,
+          'featureNotAvailableOffline:conversationContextMenuDeleteForEveryone',
+        ],
       ]);
       expect(messageActions.deleteMessage).not.toHaveBeenCalled();
+    });
+
+    it('refuses a reaction to a sent message', () => {
+      useNoInternetState.setState({hasNoInternet: true});
+
+      const {fireAndForgetInvoker} = renderMenu(false);
+      latestOnClickReaction('👍');
+
+      expect(fireAndForgetInvoker.fireAndForget).not.toHaveBeenCalled();
+    });
+
+    it('reacts to a pending message', () => {
+      useNoInternetState.setState({hasNoInternet: true});
+
+      const {fireAndForgetInvoker} = renderMenu(true, StatusType.SENDING);
+      latestOnClickReaction('👍');
+
+      expect(fireAndForgetInvoker.fireAndForget).toHaveBeenCalledTimes(1);
     });
 
     it('keeps edit and delete of a pending message enabled', () => {

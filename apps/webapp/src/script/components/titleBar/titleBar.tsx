@@ -39,6 +39,7 @@ import {Conversation} from '../../repositories/entity/Conversation';
 import {User} from '../../repositories/entity/User';
 import {TeamState} from '../../repositories/team/TeamState';
 import {CallIcon} from '../../uiKit/dataDisplay/icon/callIcon';
+import {ariaDisabledStyle} from '../../uiKit/inputs/ariaDisabled.styles';
 import {IconButton, IconButtonVariant} from '../../uiKit/inputs/iconButton/iconButton';
 import {useMatchMedia} from '../../uiKit/layout/matchMedia/matchMedia';
 import {TabIndex} from '../../uiKit/utils/enums';
@@ -409,7 +410,7 @@ export const TitleBar: FunctionComponent<TitleBarProps> = ({
                     title={callLabel}
                     aria-label={callLabel}
                     aria-disabled={isOffline || undefined}
-                    css={{marginBottom: 0, ...(isOffline && {cursor: 'not-allowed', opacity: 0.4})}}
+                    css={{marginBottom: 0, ...ariaDisabledStyle}}
                     onClick={onClickStartAudio}
                     data-uie-name="do-call"
                     disabled={isCallButtonDisabled}
