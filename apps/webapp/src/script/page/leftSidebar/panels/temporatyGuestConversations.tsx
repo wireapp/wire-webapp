@@ -28,6 +28,7 @@ import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {CallingViewModel} from '../../../view_model/CallingViewModel';
 import {ListViewModel} from '../../../view_model/ListViewModel';
 import {useApplicationContext} from '../../rootProvider';
+import {ContentState, useAppState} from '../../useAppState';
 
 type TemporaryGuestConversations = {
   callingViewModel: CallingViewModel;
@@ -47,6 +48,9 @@ const TemporaryGuestConversations: FunctionComponent<TemporaryGuestConversations
   ]);
 
   const {activeCalls} = useKoSubscribableChildren(callingViewModel, ['activeCalls']);
+  const isMeetingsView = useAppState(state => {
+    return state.contentState === ContentState.MEETINGS;
+  });
   const isAccountCreationEnabled = Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION;
   const openPreferences = (): void => {
     void listViewModel.openPreferencesAccount();
@@ -77,6 +81,9 @@ const TemporaryGuestConversations: FunctionComponent<TemporaryGuestConversations
     <div id="temporary-guest" className={`temporary-guest`}>
       {activeCalls.map(call => {
         const {conversation} = call;
+        if (isMeetingsView && conversation.isMeeting()) {
+          return null;
+        }
         return (
           <CallingCell
             key={conversation.id}

@@ -195,7 +195,7 @@ export const ConversationTabs: FunctionComponent<ConversationTabsProps> = ({
   const totalUnreadConversations = unreadConversations.length;
   const {teamRole, isTemporaryGuest} = useKoSubscribableChildren(selfUser, ['teamRole', 'isTemporaryGuest']);
   const {isCellsEnabled: isCellsEnabledForTeam} = useKoSubscribableChildren(teamState, ['isCellsEnabled']);
-  const {isMeetingsEnabled} = useMeetingsFeatureFlag();
+  const {canViewMeetings} = useMeetingsFeatureFlag();
   const isDebugEnabled = Config.getConfig().FEATURE.ENABLE_DEBUG;
 
   const totalUnreadFavoriteConversations = favoriteConversations.filter(favoriteConversation => {
@@ -413,7 +413,7 @@ export const ConversationTabs: FunctionComponent<ConversationTabsProps> = ({
           </>
         )}
 
-        {isMeetingsEnabled && (
+        {canViewMeetings && (
           <>
             <div className="conversations-sidebar-divider" />
 

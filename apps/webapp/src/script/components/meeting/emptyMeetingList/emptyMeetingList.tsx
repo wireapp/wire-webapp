@@ -34,10 +34,12 @@ import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';
 import {useMeetingActions} from '../useMeetingActions';
 
 export interface EmptyMeetingListProps {
+  showActions?: boolean;
   useMeetingActionsHook?: typeof useMeetingActions;
 }
 
 export const EmptyMeetingList: FunctionComponent<EmptyMeetingListProps> = ({
+  showActions = true,
   useMeetingActionsHook = useMeetingActions,
 }: EmptyMeetingListProps) => {
   const {translate} = useApplicationContext();
@@ -45,16 +47,22 @@ export const EmptyMeetingList: FunctionComponent<EmptyMeetingListProps> = ({
 
   return (
     <div css={emptyListStyles} data-uie-name="empty-meetings-list">
-      <p css={emptyListHeadingStyles}>{translate('meetings.noMeetingsText')}</p>
-      <p css={emptyListBodyStyles}>{translate('meetings.startMeetingHelp')}</p>
-      <div css={emptyListActionButtonContainerStyles}>
-        <Button variant={ButtonVariant.TERTIARY} onClick={handleMeetNow}>
-          <CallIcon css={emptyListActionButtonsStyles} /> {translate('meetings.action.meetNow')}
-        </Button>
-        <Button variant={ButtonVariant.TERTIARY} onClick={handleScheduleMeeting} data-uie-name="schedule-meeting">
-          <CalendarIcon css={emptyListActionButtonsStyles} /> {translate('meetings.action.scheduleMeeting')}
-        </Button>
-      </div>
+      <p css={emptyListHeadingStyles}>
+        {translate(showActions ? 'meetings.noMeetingsText' : 'meetings.noMeetingsToday')}
+      </p>
+      <p css={emptyListBodyStyles}>
+        {translate(showActions ? 'meetings.startMeetingHelp' : 'meetings.invitedMeetingsHelp')}
+      </p>
+      {showActions && (
+        <div css={emptyListActionButtonContainerStyles}>
+          <Button variant={ButtonVariant.TERTIARY} onClick={handleMeetNow}>
+            <CallIcon css={emptyListActionButtonsStyles} /> {translate('meetings.action.meetNow')}
+          </Button>
+          <Button variant={ButtonVariant.TERTIARY} onClick={handleScheduleMeeting} data-uie-name="schedule-meeting">
+            <CalendarIcon css={emptyListActionButtonsStyles} /> {translate('meetings.action.scheduleMeeting')}
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

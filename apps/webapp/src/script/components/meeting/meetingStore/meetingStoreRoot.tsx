@@ -64,7 +64,7 @@ type MeetingStoreRootProps = {
  */
 export const MeetingStoreRoot: FunctionComponent<MeetingStoreRootProps> = ({children}: MeetingStoreRootProps) => {
   const {mainViewModel, clock, translate} = useApplicationContext();
-  const {isMeetingsEnabled} = useMeetingsFeatureFlag();
+  const {canViewMeetings} = useMeetingsFeatureFlag();
   const meetingPrepSession = useMeetingPrepModal(state => {
     return state.session;
   });
@@ -109,7 +109,7 @@ export const MeetingStoreRoot: FunctionComponent<MeetingStoreRootProps> = ({chil
   }, [meetingsRepository, conversationRepository, callingRepository, clock, deviceTimeZone]);
 
   useEffect(() => {
-    if (!isMeetingsEnabled) {
+    if (!canViewMeetings) {
       return undefined;
     }
 
@@ -236,7 +236,7 @@ export const MeetingStoreRoot: FunctionComponent<MeetingStoreRootProps> = ({chil
       reminderScheduler.stop();
       reminderOsNotifier.stop();
     };
-  }, [isMeetingsEnabled, store, clock, mainViewModel, translate]);
+  }, [canViewMeetings, store, clock, mainViewModel, translate]);
 
   return (
     <MeetingStoreProvider store={store}>

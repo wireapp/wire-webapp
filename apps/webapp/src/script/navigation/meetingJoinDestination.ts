@@ -53,6 +53,10 @@ const pendingMeetingPrepSchema = z.object({
     qualifiedConversationId: qualifiedIdSchema,
   }),
 });
+export const parsePendingMeetingPrep = (data: unknown): MeetingPrepSession | undefined => {
+  const result = pendingMeetingPrepSchema.safeParse(data);
+  return result.success ? result.data.meetingPrep : undefined;
+};
 export function loginJoinDestination(result: JoinLinkResult): {
   conversation: string;
   domain: string;
@@ -66,10 +70,10 @@ export function loginJoinDestination(result: JoinLinkResult): {
 }
 
 export function openLoginMeetingPrep(data: unknown, open: (session: MeetingPrepSession) => void): boolean {
-  const destination = pendingMeetingPrepSchema.safeParse(data);
-  if (!destination.success) {
+  const session = parsePendingMeetingPrep(data);
+  if (isNullOrUndefined(session)) {
     return false;
   }
-  open(destination.data.meetingPrep);
+  open(session);
   return true;
 }

@@ -22,7 +22,7 @@ import {ClientType} from '../../../apiClient/client';
 
 import {joinLinkAction} from './joinLinkAction';
 import {conversationAction} from './conversationAction';
-import {authAction} from './authAction';
+import {authAction, MeetingAdmissionError} from './authAction';
 import {ConversationActionCreator} from './creator';
 
 import {mockStoreFactory} from '../../util/test/mockStoreFactory';
@@ -71,20 +71,13 @@ describe('Join link actions', () => {
     window.history.replaceState({}, '', '/');
   });
 
-  it('checks the public meeting endpoint and retains no metadata in auth state', async () => {
+  it('checks the public meeting endpoint without changing conversation state', async () => {
     const {store, sendJSON} = createStore();
-    await store.dispatch(joinLinkAction.doCheckJoinLink(link.key, link.code));
+    await store.dispatch(joinLinkAction.doCheckMeetingLink(link));
     expect(sendJSON).toHaveBeenCalledWith(
       expect.objectContaining({method: 'get', url: '/meeting/example.com/key/code/code-check'}),
     );
-    const state = store.getActions().reduce(conversationReducer, {
-      ...initialConversationState,
-      conversationInfo: {id: 'group-id', name: 'Previous group', has_password: true},
-    });
-    expect(state.fetching).toBe(false);
-    expect(state.error).toBeNull();
-    expect(state.conversationInfo).toBeNull();
-    expect(state.hasPassword).toBe(false);
+    expect(store.getActions()).toEqual([]);
     expect(JSON.stringify(store.getActions())).not.toContain('Private title');
   });
 
@@ -110,14 +103,9 @@ describe('Join link actions', () => {
           data: {...metadata, qualified_conversation: {id: 'conversation-id', domain: 'example.com'}},
         }),
     );
-    await store.dispatch(joinLinkAction.doCheckJoinLink(link.key, link.code));
-    expect(store.getActions()).toEqual([
-      ConversationActionCreator.startConversationCodeCheck('meeting'),
-      ConversationActionCreator.joinLinkPasswordRequired(),
-    ]);
-    await store.dispatch(joinLinkAction.doCheckJoinLink(link.key, link.code));
-    expect(sendJSON).toHaveBeenLastCalledWith(expect.objectContaining({method: 'get'}));
-    expect(sendJSON.mock.lastCall?.[0]).not.toHaveProperty('params');
+    await expect(store.dispatch(joinLinkAction.doCheckMeetingLink(link))).rejects.toBe(error);
+    await store.dispatch(joinLinkAction.doCheckMeetingLink(link, 'secret'));
+    expect(sendJSON).toHaveBeenLastCalledWith(expect.objectContaining({method: 'get', params: {password: 'secret'}}));
     await store.dispatch(joinLinkAction.doJoinMeetingLink(link, 'secret'));
     expect(sendJSON).toHaveBeenLastCalledWith(expect.objectContaining({method: 'post', params: {password: 'secret'}}));
   });
@@ -156,7 +144,7 @@ describe('Join link actions', () => {
 
   it('rejects unsupported API versions without sending a request', async () => {
     const {store, sendJSON} = createStore(undefined, 18);
-    await expect(store.dispatch(joinLinkAction.doCheckJoinLink(link.key, link.code))).rejects.toMatchObject({
+    await expect(store.dispatch(joinLinkAction.doCheckMeetingLink(link))).rejects.toMatchObject({
       label: 'meeting-api-unsupported',
     });
     expect(sendJSON).not.toHaveBeenCalled();
@@ -171,8 +159,8 @@ describe('Join link actions', () => {
         data: {...metadata, qualified_conversation: {id: 'conversation-id', domain: 'example.com'}},
       }),
     );
-    await store.dispatch(joinLinkAction.doCheckJoinLink('key', 'code'));
-    await store.dispatch(joinLinkAction.doJoinByLink('key', 'code'));
+    await store.dispatch(joinLinkAction.doCheckMeetingLink(link));
+    await store.dispatch(joinLinkAction.doJoinMeetingLink(link));
     expect(check).not.toHaveBeenCalled();
     expect(info).not.toHaveBeenCalled();
     expect(join).not.toHaveBeenCalled();
@@ -265,11 +253,83 @@ describe('Join link actions', () => {
           joinLinkAction,
         ),
       ),
-    ).rejects.toBe(error);
+    ).rejects.toEqual(new MeetingAdmissionError(error));
     expect(sendJSON).toHaveBeenCalledWith(
       expect.objectContaining({method: 'post', params: {password: 'wrong-password'}}),
     );
     expect(initialize).not.toHaveBeenCalled();
     expect(new URLSearchParams(window.location.search).get('meeting_key')).toBe('key');
+  });
+
+  it('resumes meeting admission after password login without authenticating again', async () => {
+    const wrongPassword = new BackendError('Wrong password', BackendErrorLabel.INVALID_MEETING_PASSWORD, 403);
+    const sendJSON = jest
+      .fn()
+      .mockRejectedValueOnce(wrongPassword)
+      .mockResolvedValue({
+        data: {...metadata, qualified_conversation: {id: 'conversation-id', domain: 'example.com'}},
+      });
+    const login = jest.fn().mockResolvedValue(undefined);
+    const initializeClient = jest.fn().mockReturnValue(async () => {
+      return undefined;
+    });
+    const store = mockStoreFactory({
+      apiClient: {backendFeatures: {version: 19}, transport: {http: {sendJSON}}},
+      core: {login},
+      actions: {
+        authAction: {
+          doSilentLogout: () => {
+            return async () => {
+              return undefined;
+            };
+          },
+        },
+        selfAction: {
+          fetchSelf: () => {
+            return async () => {
+              return undefined;
+            };
+          },
+        },
+        clientAction: {doInitializeClient: initializeClient},
+        localStorageAction: {
+          setLocalStorage: () => {
+            return async () => {
+              return undefined;
+            };
+          },
+        },
+      },
+    })(initialRootState);
+
+    let admissionError: unknown;
+    try {
+      await store.dispatch(
+        authAction.doLoginAndJoin(
+          {email: 'member@example.com', password: 'login-password', clientType: ClientType.PERMANENT},
+          link.key,
+          link.code,
+          undefined,
+          undefined,
+          undefined,
+          joinLinkAction,
+          link,
+        ),
+      );
+    } catch (error: unknown) {
+      admissionError = error;
+    }
+
+    expect(admissionError).toBeInstanceOf(MeetingAdmissionError);
+    if (!(admissionError instanceof MeetingAdmissionError) || !admissionError.resume) {
+      throw admissionError;
+    }
+    await admissionError.resume('new-password');
+    expect(login).toHaveBeenCalledTimes(1);
+    expect(initializeClient).toHaveBeenCalledTimes(1);
+    expect(sendJSON).toHaveBeenCalledTimes(2);
+    expect(sendJSON).toHaveBeenLastCalledWith(
+      expect.objectContaining({method: 'post', params: {password: 'new-password'}}),
+    );
   });
 });

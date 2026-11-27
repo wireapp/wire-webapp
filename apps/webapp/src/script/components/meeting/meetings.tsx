@@ -32,6 +32,7 @@ import {ScheduleMeetingModal} from './scheduleMeetingModal';
 
 import {useApplicationContext} from '../../page/rootProvider';
 import {UserState} from '../../repositories/user/userState';
+import {useMeetingsFeatureFlag} from '../../util/useMeetingsFeatureFlag';
 
 export const Meetings: FunctionComponent = () => {
   const {fireAndForgetInvoker} = useApplicationContext();
@@ -49,6 +50,8 @@ export const Meetings: FunctionComponent = () => {
     return state.loadMeetings;
   });
   const selfUser = container.resolve(UserState).self();
+  const {canManageMeetings: teamCanManageMeetings} = useMeetingsFeatureFlag();
+  const canManageMeetings = teamCanManageMeetings && !selfUser.isTemporaryGuest();
 
   const refreshMeetings = useCallback(() => {
     return fireAndForgetInvoker.fireAndForget(loadMeetings);
@@ -60,7 +63,7 @@ export const Meetings: FunctionComponent = () => {
 
   return (
     <div css={meetingsContentWrapperStyles}>
-      <MeetingHeader />
+      <MeetingHeader showActions={canManageMeetings} />
       <div css={contentStyles} ref={scrollContainerRef}>
         <MeetingList
           meetingSeries={meetingSeries}
@@ -69,11 +72,12 @@ export const Meetings: FunctionComponent = () => {
           onRefresh={refreshMeetings}
           scrollElementRef={scrollContainerRef}
           selfUser={selfUser}
+          canManageMeetings={canManageMeetings}
         />
       </div>
       <MeetingCallingView />
-      <ScheduleMeetingModal />
-      <MeetNowModal />
+      {canManageMeetings && <ScheduleMeetingModal />}
+      {canManageMeetings && <MeetNowModal />}
     </div>
   );
 };

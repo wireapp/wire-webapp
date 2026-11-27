@@ -17,6 +17,8 @@
  *
  */
 
+import {isNullOrUndefined} from '@sindresorhus/is';
+
 import {BackendErrorLabel} from '../../apiClient/http';
 import {QUERY_KEY} from '../route';
 
@@ -36,7 +38,7 @@ export function getJoinLink(search = window.location.search): JoinLink {
   const domain = params.get(QUERY_KEY.MEETING_DOMAIN);
   const key = params.get(QUERY_KEY.MEETING_KEY);
   const code = params.get(QUERY_KEY.MEETING_CODE);
-  if (domain !== null || key !== null || code !== null) {
+  if (!isNullOrUndefined(domain) || !isNullOrUndefined(key) || !isNullOrUndefined(code)) {
     return {
       kind: JOIN_LINK_KIND.MEETING,
       domain: domain ?? '',
@@ -55,7 +57,8 @@ export function isJoinLinkPasswordError(error: unknown): boolean {
   return (
     error instanceof Object &&
     'label' in error &&
-    (error.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD || error.label === 'invalid-meeting-password')
+    (error.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD ||
+      error.label === BackendErrorLabel.INVALID_MEETING_PASSWORD)
   );
 }
 

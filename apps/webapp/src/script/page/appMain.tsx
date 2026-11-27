@@ -21,7 +21,7 @@ import {type FunctionComponent, useEffect, useLayoutEffect, useMemo} from 'react
 
 import type {Clock} from '@enormora/clock/clock';
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
-import {isNonEmptyString, isNullOrUndefined, isTruthy} from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined, isTruthy, isUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {ErrorBoundary} from 'react-error-boundary';
@@ -70,7 +70,7 @@ import {
   initialiseMigrationOfProteusConversations,
   joinUnestablishedMixedConversations,
 } from '../mls/MLSMigration/migrationInitialiser';
-import {openLoginMeetingPrep} from '../navigation/meetingJoinDestination';
+import {parsePendingMeetingPrep} from '../navigation/meetingJoinDestination';
 import {CallingViewMode, CallState, DesktopScreenShareMenu} from '../repositories/calling/CallState';
 import {ConversationState} from '../repositories/conversation/ConversationState';
 import {User} from '../repositories/entity/User';
@@ -85,7 +85,7 @@ import {THEME_ID} from '../uiKit/identity/theme/theme';
 import {useMatchMedia} from '../uiKit/layout/matchMedia/matchMedia';
 import {StyledApp} from '../uiKit/layout/styledApp/styledApp';
 import {QUERY} from '../uiKit/utils/mediaQueries';
-import {canUseMeetings} from '../util/canUseMeetings';
+import {canViewMeetings} from '../util/canUseMeetings';
 import {canUseTroubleshooter} from '../util/canUseTroubleshooter';
 import {useKoSubscribableChildren} from '../util/componentUtil';
 import {isDetachedCallingFeatureEnabled} from '../util/isDetachedCallingFeatureEnabled';
@@ -196,6 +196,37 @@ export const AppMain: FunctionComponent<AppMainProps> = (properties: AppMainProp
   const isMobileCentralColumnView = currentView == ViewType.MOBILE_CENTRAL_COLUMN;
 
   const initializeApp = async (): Promise<void> => {
+    const redirect = localStorage.getItem(App.LOCAL_STORAGE_LOGIN_REDIRECT_KEY);
+    if (isNonEmptyString(redirect)) {
+      localStorage.removeItem(App.LOCAL_STORAGE_LOGIN_REDIRECT_KEY);
+      window.location.replace(redirect);
+      return;
+    }
+    const conversationRedirect = localStorage.getItem(App.LOCAL_STORAGE_LOGIN_CONVERSATION_KEY);
+    let destination: unknown;
+    try {
+      destination = isNonEmptyString(conversationRedirect) ? JSON.parse(conversationRedirect)?.data : undefined;
+    } catch {
+      destination = undefined;
+    }
+    const pendingMeetingPrep = parsePendingMeetingPrep(destination);
+    const hasPendingMeetingJoin = !isUndefined(pendingMeetingPrep) && canViewMeetings(core.backendFeatures.version);
+    const conversationDestination =
+      typeof destination === 'object' &&
+      destination !== null &&
+      'conversation' in destination &&
+      typeof destination.conversation === 'string' &&
+      isNonEmptyString(destination.conversation)
+        ? {
+            conversation: destination.conversation,
+            domain: 'domain' in destination && typeof destination.domain === 'string' ? destination.domain : '',
+          }
+        : undefined;
+
+    if (isNonEmptyString(conversationRedirect)) {
+      localStorage.removeItem(App.LOCAL_STORAGE_LOGIN_CONVERSATION_KEY);
+    }
+
     const showMostRecentConversation = (): void => {
       const isShowingConversation = useAppState.getState().isShowingConversation();
       if (!isShowingConversation) {
@@ -283,6 +314,17 @@ export const AppMain: FunctionComponent<AppMainProps> = (properties: AppMainProp
       });
     };
 
+    if (hasPendingMeetingJoin) {
+      window.history.replaceState(window.history.state, '', '#/meetings');
+    } else if (!isUndefined(conversationDestination)) {
+      const {conversation, domain} = conversationDestination;
+      window.history.replaceState(
+        window.history.state,
+        '',
+        `#/conversation/${conversation}${isTruthy(domain) ? `/${domain}` : ''}`,
+      );
+    }
+
     configureRouterClock(clock);
     configureRoutes({
       '/': showMostRecentConversation,
@@ -313,47 +355,15 @@ export const AppMain: FunctionComponent<AppMainProps> = (properties: AppMainProp
         return mainView.list.openPreferencesOptions();
       },
       '/meetings': () => {
-        return canUseMeetings({
-          isTeamMeetingsFeatureEnabled: teamState.isMeetingsEnabled(),
-          apiVersion: core.backendFeatures.version,
-        })
-          ? mainView.list.openMeetingsList()
-          : navigate('/');
+        return canViewMeetings(core.backendFeatures.version) ? mainView.list.openMeetingsList() : navigate('/');
       },
       '/user/:userId/:domain': showUserProfile,
       '/user/:domain/:userId': showUserProfile,
       '/user/:userId': showUserProfile,
     });
 
-    const redirect = localStorage.getItem(App.LOCAL_STORAGE_LOGIN_REDIRECT_KEY);
-
-    if (isNonEmptyString(redirect)) {
-      localStorage.removeItem(App.LOCAL_STORAGE_LOGIN_REDIRECT_KEY);
-      window.location.replace(redirect);
-    }
-
-    const conversationRedirect = localStorage.getItem(App.LOCAL_STORAGE_LOGIN_CONVERSATION_KEY);
-
-    if (isNonEmptyString(conversationRedirect)) {
-      const destination = JSON.parse(conversationRedirect)?.data;
-      localStorage.removeItem(App.LOCAL_STORAGE_LOGIN_CONVERSATION_KEY);
-      const openedMeetingPrep = openLoginMeetingPrep(destination, useMeetingPrepModal.getState().open);
-      if (openedMeetingPrep) {
-        const session = useMeetingPrepModal.getState().session;
-        if (session.isJust) {
-          navigate(
-            canUseMeetings({
-              isTeamMeetingsFeatureEnabled: teamState.isMeetingsEnabled(),
-              apiVersion: core.backendFeatures.version,
-            })
-              ? '/meetings'
-              : generateConversationUrl(session.value.qualifiedConversationId),
-          );
-        }
-      } else {
-        const {conversation, domain} = destination;
-        window.location.replace(`#/conversation/${conversation}${isTruthy(domain) ? `/${domain}` : ''}`);
-      }
+    if (hasPendingMeetingJoin && !isUndefined(pendingMeetingPrep)) {
+      useMeetingPrepModal.getState().open(pendingMeetingPrep);
     }
 
     repositories.properties.checkTelemetrySharingPermission();

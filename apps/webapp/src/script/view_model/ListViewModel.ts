@@ -325,7 +325,11 @@ export class ListViewModel {
     }
 
     setHistoryParam('/meetings');
-    this.switchListAndSetTab(ListState.MEETINGS, SidebarTabs.MEETINGS);
+    if (this.selfUser().isTemporaryGuest()) {
+      this.switchList(ListState.TEMPORARY_GUEST, false);
+    } else {
+      this.switchListAndSetTab(ListState.MEETINGS, SidebarTabs.MEETINGS);
+    }
     this.contentViewModel.switchContent(ContentState.MEETINGS);
   };
 
@@ -381,8 +385,11 @@ export class ListViewModel {
     }
   };
 
-  readonly showTemporaryGuest = (): void => {
-    this.switchList(ListState.TEMPORARY_GUEST);
+  readonly showTemporaryGuest = (showConversation = true): void => {
+    this.switchList(ListState.TEMPORARY_GUEST, showConversation);
+    if (!showConversation) {
+      return;
+    }
     const conversationEntity = this.conversationState.getMostRecentConversation();
     amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
   };

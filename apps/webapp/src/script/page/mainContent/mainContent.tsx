@@ -100,7 +100,7 @@ const MainContent: FunctionComponent<MainContentProps> = ({
   const userState = container.resolve(UserState);
   const teamState = container.resolve(TeamState);
   const {showRequestModal} = useLegalHoldModalState();
-  const {isMeetingsEnabled} = useMeetingsFeatureFlag();
+  const {canViewMeetings} = useMeetingsFeatureFlag();
 
   const {isActivatedAccount} = useKoSubscribableChildren(selfUser, ['isActivatedAccount']);
 
@@ -338,7 +338,7 @@ const MainContent: FunctionComponent<MainContentProps> = ({
               />
             )}
 
-            {contentState === ContentState.MEETINGS && isMeetingsEnabled && <Meetings />}
+            {contentState === ContentState.MEETINGS && canViewMeetings && <Meetings />}
           </>
         </Animated>
       </SwitchTransition>

@@ -19,7 +19,7 @@
 
 import React, {useCallback, useEffect, useMemo, useRef, useState, type FunctionComponent} from 'react';
 
-import {isNonEmptyArray, isNonEmptyString, isUndefined} from '@sindresorhus/is';
+import {isNonEmptyArray, isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import {StatusCodes} from 'http-status-codes';
 import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
@@ -63,6 +63,7 @@ import {LoginForm} from '../../component/loginForm';
 import {EXTERNAL_ROUTE} from '../../externalRoute';
 import {useRouteA11y} from '../../hooks/useRouteA11Y';
 import {actionRoot} from '../../module/action';
+import {MeetingAdmissionError} from '../../module/action/authAction';
 import {joinLinkAction} from '../../module/action/joinLinkAction';
 import {LabeledError} from '../../module/action/labeledError';
 import {ValidationError} from '../../module/action/validationError';
@@ -74,9 +75,11 @@ import {QUERY_KEY, ROUTE} from '../../route';
 import {parseError, parseValidationErrors} from '../../util/errorUtil';
 import {getEnterpriseLoginV2FF} from '../../util/helpers';
 import {getJoinLink, isJoinLinkPasswordError} from '../../util/joinLink';
+import type {MeetingLink} from '../../util/joinLink';
 import {getOAuthQueryString, withOAuthQuery} from '../../util/oauthUtil';
 import {getPrefixedSSOCode} from '../../util/urlUtil';
 import {EntropyContainer} from '../entropyContainer';
+import {useVerifiedMeetingLink} from '../meetingLinkGate';
 import {Page} from '../page';
 import {styles} from '../verifyEmailCode.styles';
 
@@ -110,6 +113,7 @@ const LoginComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> 
   account,
 }: Props & ConnectedProps & DispatchProps) => {
   const {translate} = useApplicationContext();
+  const verifiedMeetingLink = useVerifiedMeetingLink();
   const millisecondsPerSecond = 1000;
   const secondsPerMinute = 60;
   const twoFactorExpiryMinutes = 10;
@@ -183,12 +187,15 @@ const LoginComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> 
 
   useEffect(() => {
     // Redirect to prefilled SSO login if default SSO code is set on backend unless we're following the guest link flow
-    if (isNonEmptyString(defaultSSOCode) && embedded !== true) {
+    if (isNonEmptyString(defaultSSOCode) && embedded !== true && isUndefined(verifiedMeetingLink)) {
       navigate(withOAuthQuery(`${ROUTE.SSO}/${getPrefixedSSOCode(defaultSSOCode)}`), {replace: true});
     }
-  }, [defaultSSOCode, embedded, navigate]);
+  }, [defaultSSOCode, embedded, navigate, verifiedMeetingLink]);
 
   useEffect(() => {
+    if (!isUndefined(verifiedMeetingLink)) {
+      return;
+    }
     const {code: queryConversationCode, key: queryConversationKey} = getJoinLink();
 
     const keyAndCodeExistent = isNonEmptyString(queryConversationKey) && isNonEmptyString(queryConversationCode);
@@ -199,7 +206,7 @@ const LoginComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> 
         logger.warn('Invalid conversation code', {error});
       });
     }
-  }, [doCheckConversationCode]);
+  }, [doCheckConversationCode, verifiedMeetingLink]);
 
   const immediateLogin = useCallback(async () => {
     try {
@@ -236,10 +243,10 @@ const LoginComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> 
     const isImmediateLogin = UrlUtil.hasURLParameter(QUERY_KEY.IMMEDIATE_LOGIN);
     const is2FAEntropy = UrlUtil.hasURLParameter(QUERY_KEY.TWO_FACTOR) && isEntropyRequired;
 
-    if ((isImmediateLogin && !is2FAEntropy) || isOauth) {
+    if (isUndefined(verifiedMeetingLink) && ((isImmediateLogin && !is2FAEntropy) || isOauth)) {
       void immediateLogin();
     }
-  }, [immediateLogin, isEntropyRequired, isOauth]);
+  }, [immediateLogin, isEntropyRequired, isOauth, verifiedMeetingLink]);
 
   const handleSubmit = async (
     formLoginData: Partial<LoginData>,
@@ -248,11 +255,30 @@ const LoginComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> 
   ): Promise<void> => {
     setValidationErrors(validationErrors);
 
-    if (!isLinkPasswordModalOpen && (conversationHasPassword || isJoinLinkPasswordError(conversationError))) {
+    if (
+      isUndefined(verifiedMeetingLink) &&
+      !isLinkPasswordModalOpen &&
+      (conversationHasPassword || isJoinLinkPasswordError(conversationError))
+    ) {
       setConversationSubmitData(formLoginData);
       setIsLinkPasswordModalOpen(true);
       return;
     }
+
+    const finishLogin = (): void => {
+      if (isOauth) {
+        const queryString = getOAuthQueryString(window.location);
+        verifiedMeetingLink?.clear();
+        navigate(`${ROUTE.AUTHORIZE}/${queryString}`);
+        return;
+      }
+      if (shouldDisplayWarning) {
+        setIsAccountAlreadyExistsModalOpen(true);
+        return;
+      }
+      verifiedMeetingLink?.clear();
+      navigate(ROUTE.HISTORY_INFO);
+    };
 
     try {
       const login: LoginData = {...formLoginData, clientType: loginData.clientType};
@@ -261,7 +287,10 @@ const LoginComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> 
       }
 
       const hasKeyAndCode = isNonEmptyString(conversationKey) && isNonEmptyString(conversationCode);
-      if (hasKeyAndCode) {
+      if (!isUndefined(verifiedMeetingLink)) {
+        const {link, password} = verifiedMeetingLink;
+        await doLoginAndJoin(login, link.key, link.code, undefined, getEntropy, password, link);
+      } else if (hasKeyAndCode) {
         try {
           await doLoginAndJoin(login, conversationKey, conversationCode, undefined, getEntropy, conversationPassword);
         } catch (error: unknown) {
@@ -277,19 +306,27 @@ const LoginComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> 
         await doLogin(login, getEntropy);
       }
 
-      if (isOauth) {
-        const queryString = getOAuthQueryString(window.location);
-
-        return navigate(`${ROUTE.AUTHORIZE}/${queryString}`);
-      }
-
-      if (shouldDisplayWarning) {
-        setIsAccountAlreadyExistsModalOpen(true);
+      finishLogin();
+    } catch (error: unknown) {
+      if (!isUndefined(verifiedMeetingLink) && error instanceof MeetingAdmissionError) {
+        const resume = error.resume;
+        if (isUndefined(resume)) {
+          throw error;
+        }
+        const retryAdmission = async (password?: string): Promise<void> => {
+          try {
+            await resume(password);
+            finishLogin();
+          } catch (retryError: unknown) {
+            verifiedMeetingLink.onJoinError(
+              retryError instanceof MeetingAdmissionError ? retryError.cause : retryError,
+              retryAdmission,
+            );
+          }
+        };
+        verifiedMeetingLink.onJoinError(error.cause, retryAdmission);
         return;
       }
-
-      return navigate(ROUTE.HISTORY_INFO);
-    } catch (error: unknown) {
       if (isBackendError(error)) {
         switch (error.label) {
           case BackendErrorLabel.INVALID_CONVERSATION_PASSWORD: {
@@ -302,7 +339,7 @@ const LoginComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> 
             if (isNonEmptyString(formLoginData.verificationCode)) {
               await doSetLocalStorage(QUERY_KEY.CONVERSATION_CODE, formLoginData.verificationCode);
             }
-            if (entropy.current !== undefined) {
+            if (!isUndefined(entropy.current)) {
               await pushEntropyData(entropy.current);
             }
             navigate(withOAuthQuery(ROUTE.CLIENTS));
@@ -318,7 +355,7 @@ const LoginComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> 
             } else if (isNonEmptyString(login.handle)) {
               twoFactorTarget = login.handle;
             }
-            if (twoFactorTarget !== undefined) {
+            if (!isUndefined(twoFactorTarget)) {
               await doSendTwoFactorCode(twoFactorTarget);
               setTwoFactorLoginData(login);
               setRouteAction('verify');
@@ -382,7 +419,7 @@ const LoginComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> 
   };
 
   const submitJoinCodeWithPassword = async (password: string): Promise<void> => {
-    if (conversationSubmitData === null) {
+    if (isNullOrUndefined(conversationSubmitData)) {
       setIsLinkPasswordModalOpen(false);
       return;
     }
@@ -391,6 +428,9 @@ const LoginComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> 
 
   const hideAccountAlreadyExistsModal = (): void => {
     setIsAccountAlreadyExistsModalOpen(false);
+    if (!isUndefined(verifiedMeetingLink)) {
+      verifiedMeetingLink.clear();
+    }
     return navigate(ROUTE.HISTORY_INFO);
   };
 
@@ -535,7 +575,7 @@ const LoginComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> 
                         <LoginForm isFetching={isFetching || conversationInfoFetching} onSubmit={handleSubmit} />
                         {validationErrors.length > 0
                           ? parseValidationErrors(validationErrors)
-                          : authError !== null && authError !== undefined && <Exception errors={[authError]} />}
+                          : !isNullOrUndefined(authError) && <Exception errors={[authError]} />}
 
                         {!Runtime.isDesktopApp() && (
                           <Checkbox
@@ -578,7 +618,7 @@ const LoginComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> 
                         {translate(isDomainDiscoveryEnabled ? 'index.enterprise' : 'index.ssoLogin')}
                       </Button>
                     )}
-                    {isEnterpriseLoginV2Enabled && accountCreationEnabled && (
+                    {isUndefined(verifiedMeetingLink) && isEnterpriseLoginV2Enabled && accountCreationEnabled && (
                       <>
                         <div css={separator}>
                           <span>{translate('index.or')}</span>
@@ -660,6 +700,7 @@ type MapDispatchToPropsResult = {
     uri?: string | undefined,
     getEntropy?: (() => Promise<Uint8Array>) | undefined,
     password?: string | undefined,
+    meetingLink?: MeetingLink,
   ) => Promise<void>;
   doSendTwoFactorCode: (email: string) => Promise<void>;
   doSetLocalStorage: (key: string, value: any) => Promise<void>;
@@ -681,9 +722,18 @@ const mapDispatchToProps = (dispatch: ThunkDispatch): MapDispatchToPropsResult =
     doLogin: (...args: Parameters<typeof actionRoot.authAction.doLogin>) => {
       return dispatch(actionRoot.authAction.doLogin(...args));
     },
-    doLoginAndJoin: (loginData, key, code, uri, getEntropy, password) => {
+    doLoginAndJoin: (loginData, key, code, uri, getEntropy, password, meetingLink) => {
       return dispatch(
-        actionRoot.authAction.doLoginAndJoin(loginData, key, code, uri, getEntropy, password, joinLinkAction),
+        actionRoot.authAction.doLoginAndJoin(
+          loginData,
+          key,
+          code,
+          uri,
+          getEntropy,
+          password,
+          joinLinkAction,
+          meetingLink,
+        ),
       );
     },
     doSendTwoFactorCode: (...args: Parameters<typeof actionRoot.authAction.doSendTwoFactorLoginCode>) => {

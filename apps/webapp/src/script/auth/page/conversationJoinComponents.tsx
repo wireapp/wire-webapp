@@ -41,6 +41,9 @@ interface IsLoggedInColumnProps {
   selfName: string;
   handleSubmit: () => void;
   handleLogout: () => void;
+  isMeeting?: boolean;
+  disabled?: boolean;
+  logoutError?: Error | null;
 }
 
 interface GuestLoginColumnProps {
@@ -89,8 +92,12 @@ const IsLoggedInColumn: FunctionComponent<IsLoggedInColumnProps> = ({
   handleLogout,
   handleSubmit,
   selfName,
+  isMeeting = false,
+  disabled = false,
+  logoutError,
 }: IsLoggedInColumnProps) => {
   const {translate} = useApplicationContext();
+  const joinLabel = translate(isMeeting ? 'meetingJoin.joinHeadline' : 'conversationJoin.join');
   return (
     <Container centerText verticalCenter style={{width: '100%', display: 'flex'}}>
       <Columns style={{justifyContent: 'center'}}>
@@ -114,18 +121,21 @@ const IsLoggedInColumn: FunctionComponent<IsLoggedInColumnProps> = ({
                 block
                 type="submit"
                 formNoValidate
+                disabled={disabled}
                 onClick={() => {
                   return handleSubmit();
                 }}
-                aria-label={translate('conversationJoin.join')}
+                aria-label={joinLabel}
                 data-uie-name="do-join-as-member"
               >
-                {translate('conversationJoin.join')}
+                {joinLabel}
               </Button>
+              {!isNullOrUndefined(logoutError) && <p role="alert">{logoutError.message}</p>}
               <Link
                 variant={LinkVariant.PRIMARY}
                 block
                 onClick={handleLogout}
+                aria-disabled={disabled}
                 textTransform={'none'}
                 style={{fontSize: '1rem'}}
                 data-uie-name="go-logout"

@@ -19,7 +19,7 @@
 
 import React, {type FunctionComponent, useCallback, useEffect, useRef, useState} from 'react';
 
-import {isError, isNonEmptyString, isUndefined} from '@sindresorhus/is';
+import {isError, isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import {FormattedMessage} from 'react-intl';
 import {connect, useDispatch} from 'react-redux';
 import {Navigate, useNavigate} from 'react-router';
@@ -48,6 +48,7 @@ import {InputBlock} from '../../../uiKit/inputs/inputBlock/inputBlock';
 import {isBackendError} from '../../../util/typePredicateUtil';
 import {JoinGuestLinkPasswordModal} from '../../component/joinGuestLinkPasswordModal';
 import {actionRoot as ROOT_ACTIONS} from '../../module/action';
+import {MeetingAdmissionError} from '../../module/action/authAction';
 import {joinLinkAction} from '../../module/action/joinLinkAction';
 import {ValidationError} from '../../module/action/validationError';
 import {RootState, ThunkDispatch} from '../../module/reducer';
@@ -61,6 +62,7 @@ import {getJoinLink, isJoinLinkPasswordError, JOIN_LINK_KIND, type MeetingLink} 
 import {logoutReasonStrings} from '../../util/logoutUtil';
 import {withOAuthQuery} from '../../util/oauthUtil';
 import {getSearchParams, removeURLParameterFromCurrentUrl, SSO_CODE_PREFIX} from '../../util/urlUtil';
+import {useVerifiedMeetingLink} from '../meetingLinkGate';
 
 interface SingleSignOnFormProps {
   doLogin: (code: string) => Promise<void>;
@@ -138,6 +140,7 @@ const SingleSignOnFormComponent: FunctionComponent<SingleSignOnFormProps & Conne
   loginData,
 }: SingleSignOnFormProps & ConnectedProps & DispatchProps) => {
   const {fireAndForgetInvoker, translate} = useApplicationContext();
+  const verifiedMeetingLink = useVerifiedMeetingLink();
   const codeOrMailInput = useRef<HTMLInputElement>(null);
   const [codeOrMail, setCodeOrMail] = useState(account.email ?? '');
   const [disableInput, setDisableInput] = useState(false);
@@ -168,15 +171,22 @@ const SingleSignOnFormComponent: FunctionComponent<SingleSignOnFormProps & Conne
       const strippedCode = stripPrefix(code);
       await validateSSOCode(strippedCode);
       await doLogin(strippedCode);
-      const link = getJoinLink();
+      const link = verifiedMeetingLink?.link ?? getJoinLink();
       await doFinalizeSSOLogin(
-        link.kind === JOIN_LINK_KIND.MEETING ? {clientType, meetingLink: link, password} : {clientType},
+        link.kind === JOIN_LINK_KIND.MEETING
+          ? {
+              clientType,
+              meetingLink: link,
+              password: isUndefined(verifiedMeetingLink) ? password : verifiedMeetingLink.password,
+            }
+          : {clientType},
       );
       const hasKeyAndCode = isNonEmptyString(conversationKey) && isNonEmptyString(conversationCode);
       if (link.kind === JOIN_LINK_KIND.CONVERSATION && hasKeyAndCode) {
         await doJoinConversationByCode(conversationKey, conversationCode, undefined, password);
       }
 
+      verifiedMeetingLink?.clear();
       const authorizationRoute = withOAuthQuery(ROUTE.AUTHORIZE);
       navigate(authorizationRoute === ROUTE.AUTHORIZE ? ROUTE.HISTORY_INFO : authorizationRoute);
     },
@@ -190,12 +200,15 @@ const SingleSignOnFormComponent: FunctionComponent<SingleSignOnFormProps & Conne
       doLogin,
       navigate,
       validateSSOCode,
+      verifiedMeetingLink,
     ],
   );
 
   useEffect(() => {
-    setIsLinkPasswordModalOpen(requiresPasswordModal(false, conversationHasPassword, conversationError));
-  }, [conversationError, conversationHasPassword]);
+    setIsLinkPasswordModalOpen(
+      isUndefined(verifiedMeetingLink) && requiresPasswordModal(false, conversationHasPassword, conversationError),
+    );
+  }, [conversationError, conversationHasPassword, verifiedMeetingLink]);
 
   useEffect(() => {
     const queryAutoLogin = UrlUtil.hasURLParameter(QUERY_KEY.SSO_AUTO_LOGIN);
@@ -221,6 +234,9 @@ const SingleSignOnFormComponent: FunctionComponent<SingleSignOnFormProps & Conne
   }, []);
 
   useEffect(() => {
+    if (!isUndefined(verifiedMeetingLink)) {
+      return;
+    }
     const {code: queryConversationCode, key: queryConversationKey} = getJoinLink();
 
     const keyAndCodeExistent = isNonEmptyString(queryConversationKey) && isNonEmptyString(queryConversationCode);
@@ -233,7 +249,7 @@ const SingleSignOnFormComponent: FunctionComponent<SingleSignOnFormProps & Conne
         setIsValidLink(false);
       });
     }
-  }, [doCheckConversationCode]);
+  }, [doCheckConversationCode, verifiedMeetingLink]);
 
   useEffect(() => {
     if (isNonEmptyString(initialCode) && initialCode !== codeOrMail) {
@@ -266,7 +282,7 @@ const SingleSignOnFormComponent: FunctionComponent<SingleSignOnFormProps & Conne
       }
       void resetAuthError();
 
-      if (isFetching || codeOrMailInput.current === null) {
+      if (isFetching || isNullOrUndefined(codeOrMailInput.current)) {
         return;
       }
 
@@ -276,7 +292,10 @@ const SingleSignOnFormComponent: FunctionComponent<SingleSignOnFormProps & Conne
         setShouldAutoLogin,
       });
 
-      if (requiresPasswordModal(isLinkPasswordModalOpen, conversationHasPassword, conversationError)) {
+      if (
+        isUndefined(verifiedMeetingLink) &&
+        requiresPasswordModal(isLinkPasswordModalOpen, conversationHasPassword, conversationError)
+      ) {
         setIsLinkPasswordModalOpen(true);
         return;
       }
@@ -320,6 +339,23 @@ const SingleSignOnFormComponent: FunctionComponent<SingleSignOnFormProps & Conne
         }
       } catch (error: unknown) {
         setIsLoading(false);
+        if (!isUndefined(verifiedMeetingLink) && error instanceof MeetingAdmissionError) {
+          const retryAdmission = async (nextPassword?: string): Promise<void> => {
+            try {
+              await doFinalizeSSOLogin({clientType, meetingLink: verifiedMeetingLink.link, password: nextPassword});
+              verifiedMeetingLink.clear();
+              const authorizationRoute = withOAuthQuery(ROUTE.AUTHORIZE);
+              navigate(authorizationRoute === ROUTE.AUTHORIZE ? ROUTE.HISTORY_INFO : authorizationRoute);
+            } catch (retryError: unknown) {
+              verifiedMeetingLink.onJoinError(
+                retryError instanceof MeetingAdmissionError ? retryError.cause : retryError,
+                retryAdmission,
+              );
+            }
+          };
+          verifiedMeetingLink.onJoinError(error.cause, retryAdmission);
+          return;
+        }
         if (isJoinLinkPasswordError(error)) {
           setIsLinkPasswordModalOpen(true);
           return;
@@ -336,6 +372,7 @@ const SingleSignOnFormComponent: FunctionComponent<SingleSignOnFormProps & Conne
       conversationError,
       conversationHasPassword,
       dispatch,
+      doFinalizeSSOLogin,
       doGetDomainInfo,
       doNavigate,
       isEnterpriseLoginV2Enabled,
@@ -346,6 +383,7 @@ const SingleSignOnFormComponent: FunctionComponent<SingleSignOnFormProps & Conne
       pushAccountRegistrationData,
       resetAuthError,
       shouldAutoLogin,
+      verifiedMeetingLink,
     ],
   );
 
@@ -358,10 +396,19 @@ const SingleSignOnFormComponent: FunctionComponent<SingleSignOnFormProps & Conne
       initialCode,
       codeOrMail,
     });
-    if (isReadyToSubmit) {
+    if (isReadyToSubmit && !isLinkPasswordModalOpen && isValidLink) {
       void handleSubmit();
     }
-  }, [codeOrMail, conversationInfoFetching, handleSubmit, initialCode, isFetching, shouldAutoLogin]);
+  }, [
+    codeOrMail,
+    conversationInfoFetching,
+    handleSubmit,
+    initialCode,
+    isFetching,
+    isLinkPasswordModalOpen,
+    isValidLink,
+    shouldAutoLogin,
+  ]);
 
   const stripPrefix = (prefixedCode: string): string => {
     return prefixedCode.trim().toLowerCase().replace(SSO_CODE_PREFIX, '');
@@ -386,13 +433,13 @@ const SingleSignOnFormComponent: FunctionComponent<SingleSignOnFormProps & Conne
   };
 
   const renderStatusMessage = (): RenderStatusMessageResult => {
-    if (validationError !== null && validationError !== undefined) {
+    if (!isNullOrUndefined(validationError)) {
       return parseValidationErrors([validationError]);
     }
-    if (authError !== null && authError !== undefined) {
+    if (!isNullOrUndefined(authError)) {
       return parseError(authError);
     }
-    if (ssoError !== null) {
+    if (!isNullOrUndefined(ssoError)) {
       return parseError(ssoError);
     }
     if (isNonEmptyString(logoutReason)) {
@@ -416,7 +463,7 @@ const SingleSignOnFormComponent: FunctionComponent<SingleSignOnFormProps & Conne
 
   return (
     <>
-      {isLinkPasswordModalOpen && (
+      {isUndefined(verifiedMeetingLink) && isLinkPasswordModalOpen && (
         <JoinGuestLinkPasswordModal
           onClose={() => {
             return setIsLinkPasswordModalOpen(false);
@@ -511,7 +558,8 @@ const mapStateToProps = (state: RootState): MapStateToPropsResult => {
     conversationError: ConversationSelector.getError(state),
     conversationInfo: ConversationSelector.conversationInfo(state),
     conversationHasPassword: ConversationSelector.hasPassword(state),
-    conversationInfoFetching: ConversationSelector.conversationInfoFetching(state),
+    conversationInfoFetching:
+      ConversationSelector.conversationInfoFetching(state) || ConversationSelector.isFetching(state),
     loginData: AuthSelector.getLoginData(state),
   };
 };

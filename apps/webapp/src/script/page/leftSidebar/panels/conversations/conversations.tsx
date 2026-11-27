@@ -131,6 +131,9 @@ export const Conversations: FunctionComponent<ConversationsProps> = ({
   const {translate} = useApplicationContext();
   const [conversationListRef, setConversationListRef] = useState<HTMLElement | null>(null);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
+  const temporaryGuestOpenedPreferencesFromMeetings = useRef(
+    useAppState.getState().previousContentState === ContentState.MEETINGS,
+  );
   const focusConversationRef = useRef<FocusConversation>(() => {
     return false;
   });
@@ -156,7 +159,7 @@ export const Conversations: FunctionComponent<ConversationsProps> = ({
   const [conversationsFilter, setConversationsFilter] = useState<string>('');
   const [searchResetToken, setSearchResetToken] = useState(0);
   const {classifiedDomains, isTeam} = useKoSubscribableChildren(teamState, ['classifiedDomains', 'isTeam']);
-  const {isMeetingsEnabled} = useMeetingsFeatureFlag();
+  const {canViewMeetings} = useMeetingsFeatureFlag();
   const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
   const {notifications} = useKoSubscribableChildren(preferenceNotificationRepository, ['notifications']);
 
@@ -501,6 +504,14 @@ export const Conversations: FunctionComponent<ConversationsProps> = ({
     [setCurrentView, switchList, switchContent],
   );
 
+  const closeTemporaryGuestPreferences = useCallback(() => {
+    if (temporaryGuestOpenedPreferencesFromMeetings.current) {
+      listViewModel.openMeetingsList();
+      return;
+    }
+    onExitPreferences();
+  }, [listViewModel, onExitPreferences]);
+
   const changeTab = useCallback(
     (nextTab: SidebarTabs, folderId?: string) => {
       if (!isNonEmptyString(folderId)) {
@@ -512,7 +523,7 @@ export const Conversations: FunctionComponent<ConversationsProps> = ({
         void conversationRepository.updateArchivedConversations();
       }
 
-      if (nextTab === SidebarTabs.MEETINGS && !isMeetingsEnabled) {
+      if (nextTab === SidebarTabs.MEETINGS && !canViewMeetings) {
         return;
       }
 
@@ -545,7 +556,7 @@ export const Conversations: FunctionComponent<ConversationsProps> = ({
       onExitPreferences,
       switchList,
       switchContent,
-      isMeetingsEnabled,
+      canViewMeetings,
       clearConversationFilter,
       setCurrentTab,
       listViewModel,
@@ -571,13 +582,13 @@ export const Conversations: FunctionComponent<ConversationsProps> = ({
   }, [isAdvancedFiltersEnabled, resetDisabledFeatureTabs]);
 
   useEffect(() => {
-    if (!isMeetingsEnabled && currentTab === SidebarTabs.MEETINGS) {
+    if (!canViewMeetings && currentTab === SidebarTabs.MEETINGS) {
       setCurrentTab(SidebarTabs.RECENT);
       switchList(ListState.CONVERSATIONS);
       switchContent(ContentState.CONVERSATION);
       setHistoryParam('/');
     }
-  }, [currentTab, isMeetingsEnabled, setCurrentTab, switchContent, switchList]);
+  }, [currentTab, canViewMeetings, setCurrentTab, switchContent, switchList]);
 
   const onClickPreferences = useCallback(
     (itemId: ContentState) => {
@@ -608,7 +619,7 @@ export const Conversations: FunctionComponent<ConversationsProps> = ({
         teamRepository={teamRepository}
         preferenceNotificationRepository={preferenceNotificationRepository}
         {...(isTemporaryGuest && {
-          onClose: onExitPreferences,
+          onClose: closeTemporaryGuestPreferences,
         })}
       />
     );

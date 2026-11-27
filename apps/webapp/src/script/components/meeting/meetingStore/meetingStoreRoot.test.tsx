@@ -131,6 +131,7 @@ type RenderParameters = {
   readonly apiVersion?: number;
   readonly clock?: ReturnType<typeof createDeterministicClock>;
   readonly initialAvailability?: Availability.Type;
+  readonly isTemporaryGuest?: boolean;
   readonly showMeetingNotificationHost?: boolean;
 };
 
@@ -267,12 +268,14 @@ const renderMeetingStoreRoot = ({
   apiVersion = Config.getConfig().MIN_MEETINGS_SUPPORTED_API_VERSION,
   clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
   initialAvailability = Availability.Type.AVAILABLE,
+  isTemporaryGuest = false,
   showMeetingNotificationHost = false,
 }: RenderParameters = {}): RenderMeetingStoreRootResult => {
   setMeetingsTeamFeature(isMeetingsFeatureEnabled ? FEATURE_STATUS.ENABLED : FEATURE_STATUS.DISABLED);
   setNegotiatedApiVersion(apiVersion);
   const selfUser = new User(selfUserId.id, selfUserId.domain, translateForTest);
   selfUser.availability(initialAvailability);
+  selfUser.isTemporaryGuest(isTemporaryGuest);
   container.resolve(UserState).self(selfUser);
   container.registerInstance(MediaStreamHandler, {} as MediaStreamHandler);
 
@@ -809,14 +812,32 @@ describe('MeetingStoreRoot', () => {
     expect(getMeeting).not.toHaveBeenCalled();
   });
 
-  it('does not load meeting data when the meetings feature is disabled', async () => {
+  it('loads accessible meetings when the team feature is disabled', async () => {
     const {getMeetingsList} = renderMeetingStoreRoot({isMeetingsFeatureEnabled: false});
 
     await waitFor(() => {
-      expect(getRenderedMeetingTitles()).toBe('');
+      expect(getRenderedMeetingTitles()).toBe('Weekly sync');
     });
 
-    expect(getMeetingsList).not.toHaveBeenCalled();
+    expect(getMeetingsList).toHaveBeenCalledTimes(1);
+  });
+
+  it('loads every meeting returned by the list endpoint for a temporary guest', async () => {
+    const getMeetingsList = jest
+      .fn()
+      .mockReturnValue(
+        task.resolve([
+          createApiMeeting('First guest meeting'),
+          createApiMeeting('Second guest meeting', {...meetingId, id: 'second-meeting-id'}),
+        ]),
+      );
+
+    renderMeetingStoreRoot({getMeetingsList, isMeetingsFeatureEnabled: false, isTemporaryGuest: true});
+
+    await waitFor(() => {
+      expect(getRenderedMeetingTitles()).toContain('First guest meeting');
+      expect(getRenderedMeetingTitles()).toContain('Second guest meeting');
+    });
   });
 
   it('mounts one Prep modal for an active session even when Meetings is disabled, then removes it on close', () => {

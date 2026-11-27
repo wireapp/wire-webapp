@@ -19,7 +19,6 @@
 
 import type {ConversationJoinData} from '../../../apiClient/conversation/data/conversationJoinData';
 import type {BackendError} from '../../../apiClient/http/backendError';
-import {JOIN_LINK_KIND} from '../../util/joinLink';
 import {AppActions, CONVERSATION_ACTION} from '../action/creator/';
 
 export interface ConversationState {
@@ -53,7 +52,6 @@ export function conversationReducer(
         error: null,
         fetching: true,
         hasPassword: false,
-        ...(action.kind === JOIN_LINK_KIND.MEETING ? {conversationInfo: null} : {}),
       };
     case CONVERSATION_ACTION.CONVERSATION_CODE_JOIN_START: {
       return {
@@ -72,8 +70,6 @@ export function conversationReducer(
     }
     case CONVERSATION_ACTION.CONVERSATION_CODE_CHECK_SUCCESS:
       return {...state, fetching: false};
-    case CONVERSATION_ACTION.JOIN_LINK_PASSWORD_REQUIRED:
-      return {...state, fetching: false, hasPassword: true};
     case CONVERSATION_ACTION.CONVERSATION_CODE_JOIN_SUCCESS:
     case CONVERSATION_ACTION.MEETING_CODE_JOIN_SUCCESS: {
       return {

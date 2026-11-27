@@ -37,6 +37,8 @@ import {CustomEnvironmentRedirect} from './customEnvironmentRedirect';
 import {HistoryInfo} from './historyInfo';
 import {Login} from './login/login';
 import {SingleSignOn} from './login/singleSignOn';
+import {MeetingJoin} from './meetingJoin';
+import {MeetingLinkGate, MeetingLinkSession} from './meetingLinkGate';
 import {OAuthPermissions} from './oAuthPermissions';
 import {SetAccountType} from './setAccountType';
 import {SetEmail} from './setEmail';
@@ -244,7 +246,7 @@ const RootComponent: FunctionComponent<RootProps & ConnectedProps & DispatchProp
                 <Route path={ROUTE.CLIENTS} element={<ProtectedClientManager />} />
                 <Route path={ROUTE.CONVERSATION_JOIN_INVALID} element={<ConversationJoinInvalid />} />
                 <Route path={ROUTE.CONVERSATION_JOIN} element={<ConversationJoin />} />
-                <Route path={ROUTE.MEETING_JOIN} element={<ConversationJoin />} />
+                <Route path={ROUTE.MEETING_JOIN} element={<MeetingJoin />} />
                 <Route path={ROUTE.MEETING_JOIN_INVALID} element={<ConversationJoinInvalid />} />
                 <Route path={ROUTE.HISTORY_INFO} element={<ProtectedHistoryInfo />} />
                 <Route path={`${ROUTE.AUTHORIZE}`} element={<ProtectedOAuthPermissions />} />
@@ -254,7 +256,9 @@ const RootComponent: FunctionComponent<RootProps & ConnectedProps & DispatchProp
                   path={`${ROUTE.LOGIN}/*`}
                   element={
                     <Title title={`${translate('authLoginTitle')} . ${brandName}`}>
-                      <Login />
+                      <MeetingLinkGate>
+                        <Login />
+                      </MeetingLinkGate>
                     </Title>
                   }
                 />
@@ -288,7 +292,9 @@ const RootComponent: FunctionComponent<RootProps & ConnectedProps & DispatchProp
                     path=""
                     element={
                       <Title title={`${translate('authLoginTitle')} . ${brandName}`}>
-                        <SingleSignOn />
+                        <MeetingLinkGate>
+                          <SingleSignOn />
+                        </MeetingLinkGate>
                       </Title>
                     }
                   />
@@ -296,7 +302,9 @@ const RootComponent: FunctionComponent<RootProps & ConnectedProps & DispatchProp
                     path=":code"
                     element={
                       <Title title={`${translate('authSSOLoginTitle')} . ${brandName}`}>
-                        <SingleSignOn />
+                        <MeetingLinkGate>
+                          <SingleSignOn />
+                        </MeetingLinkGate>
                       </Title>
                     }
                   />
@@ -343,6 +351,14 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>): MapDispatchToPropsRe
   );
 };
 
-const Root = connect(mapStateToProps, mapDispatchToProps)(RootComponent);
+const ConnectedRoot = connect(mapStateToProps, mapDispatchToProps)(RootComponent);
+
+const Root: FunctionComponent<RootProps> = props => {
+  return (
+    <MeetingLinkSession>
+      <ConnectedRoot {...props} />
+    </MeetingLinkSession>
+  );
+};
 
 export {Root};

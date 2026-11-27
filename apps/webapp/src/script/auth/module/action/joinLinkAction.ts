@@ -17,7 +17,7 @@
  *
  */
 
-import {isNullOrUndefined} from '@sindresorhus/is';
+import {isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import {StatusCodes} from 'http-status-codes';
 
 import {ConversationActionCreator} from './creator';
@@ -30,7 +30,7 @@ import {
   loginJoinDestination,
 } from '../../../navigation/meetingJoinDestination';
 import {toError} from '../../../util/toError';
-import {getJoinLink, isJoinLinkPasswordError, JOIN_LINK_KIND, type MeetingLink} from '../../util/joinLink';
+import {type MeetingLink} from '../../util/joinLink';
 import type {ThunkAction} from '../reducer';
 
 const disableRetries = {'axios-retry': {retries: 0}};
@@ -55,30 +55,20 @@ export class JoinLinkAction {
   };
 
   doCheckJoinLink = (key: string, code: string, uri?: string): ThunkAction => {
-    const link = getJoinLink();
-    if (link.kind === JOIN_LINK_KIND.CONVERSATION) {
-      return async (dispatch, getState, {actions: {conversationAction}}) => {
-        await dispatch(conversationAction.doCheckConversationCode(key, code, uri));
-        await dispatch(conversationAction.doGetConversationInfoByCode(key, code));
-      };
-    }
+    return async (dispatch, getState, {actions: {conversationAction}}) => {
+      await dispatch(conversationAction.doCheckConversationCode(key, code, uri));
+      await dispatch(conversationAction.doGetConversationInfoByCode(key, code));
+    };
+  };
+
+  doCheckMeetingLink = (link: MeetingLink, password?: string): ThunkAction => {
     return async (dispatch, getState, {apiClient}) => {
-      dispatch(ConversationActionCreator.startConversationCodeCheck(JOIN_LINK_KIND.MEETING));
-      try {
-        await apiClient.transport.http.sendJSON({
-          method: 'get',
-          url: `${meetingLinkUrl(link, apiClient.backendFeatures.version)}/code-check`,
-          ...disableRetries,
-        });
-      } catch (error: unknown) {
-        if (!isJoinLinkPasswordError(error)) {
-          dispatch(ConversationActionCreator.failedConversationCodeCheck(toError(error)));
-          throw error;
-        }
-        dispatch(ConversationActionCreator.joinLinkPasswordRequired());
-        return;
-      }
-      dispatch(ConversationActionCreator.successfulConversationCodeCheck());
+      await apiClient.transport.http.sendJSON({
+        method: 'get',
+        url: `${meetingLinkUrl(link, apiClient.backendFeatures.version)}/code-check`,
+        ...(isUndefined(password) ? {} : {params: {password}}),
+        ...disableRetries,
+      });
     };
   };
 
@@ -88,10 +78,6 @@ export class JoinLinkAction {
     uri?: string,
     password?: string,
   ): ThunkAction<Promise<JoinLinkResult | undefined>> => {
-    const link = getJoinLink();
-    if (link.kind === JOIN_LINK_KIND.MEETING) {
-      return this.doJoinMeetingLink(link, password);
-    }
     return async (dispatch, getState, {actions: {conversationAction}}) => {
       const event = await dispatch(conversationAction.doJoinConversationByCode(key, code, uri, password));
       if (isNullOrUndefined(event)) {
@@ -111,7 +97,7 @@ export class JoinLinkAction {
         const response = await apiClient.transport.http.sendJSON<unknown>({
           method: 'post',
           url: `${meetingLinkUrl(link, apiClient.backendFeatures.version)}/join`,
-          params: password === undefined ? undefined : {password},
+          params: isUndefined(password) ? undefined : {password},
           ...disableRetries,
         });
         const destination = joinedMeetingDestinationSchema.parse(response.data);

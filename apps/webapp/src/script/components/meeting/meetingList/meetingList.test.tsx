@@ -131,8 +131,8 @@ const createMeetingStoreForTest = (): StoreApi<MeetingStoreState> => {
 };
 
 const renderMeetingList = (
-  props: Omit<MeetingListProps, 'useMeetingListVirtualizer' | 'selfUser' | 'onRefresh'> &
-    Partial<Pick<MeetingListProps, 'selfUser' | 'onRefresh'>>,
+  props: Omit<MeetingListProps, 'useMeetingListVirtualizer' | 'selfUser' | 'onRefresh' | 'canManageMeetings'> &
+    Partial<Pick<MeetingListProps, 'selfUser' | 'onRefresh' | 'canManageMeetings'>>,
   clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
   useMeetingListVirtualizer = createUseMeetingListVirtualizerForTest(),
 ): RenderResult => {
@@ -149,6 +149,7 @@ const renderMeetingList = (
     withThemeAndRootContext(
       <MeetingStoreProvider store={meetingStore}>
         <MeetingList
+          canManageMeetings={props.canManageMeetings ?? true}
           {...props}
           onRefresh={props.onRefresh ?? jest.fn()}
           selfUser={props.selfUser}
@@ -161,6 +162,14 @@ const renderMeetingList = (
 };
 
 describe('MeetingList', () => {
+  it('shows the invitation empty state without meeting creation controls', () => {
+    renderMeetingList({meetingSeries: [], isLoading: false, hasLoadError: false, canManageMeetings: false});
+
+    expect(screen.getByText('meetings.noMeetingsToday')).toBeInTheDocument();
+    expect(screen.getByText('meetings.invitedMeetingsHelp')).toBeInTheDocument();
+    expect(screen.queryByTestId('schedule-meeting')).toBeNull();
+  });
+
   it('shows a loading state before the first meetings response is received', () => {
     renderMeetingList({meetingSeries: [], isLoading: true, hasLoadError: false});
 

@@ -41,6 +41,7 @@ import {canEditMeeting, canRotateMeetingLink} from '../../../../utils/canEditMee
 type GetMeetingActionEntriesParams = {
   meetingInstance: MeetingInstance;
   selfUser: User;
+  canManageMeetings: boolean;
   nowMilliseconds: number;
   translate: Translate;
   onJoin: () => void;
@@ -56,6 +57,7 @@ type GetMeetingActionEntriesParams = {
 export const getMeetingActionEntries = ({
   meetingInstance,
   selfUser,
+  canManageMeetings,
   nowMilliseconds,
   translate,
   onJoin,
@@ -75,6 +77,10 @@ export const getMeetingActionEntries = ({
     isDisabled: isJoinDisabled,
     click: onJoin,
   };
+
+  if (!canManageMeetings && selfUser.isTemporaryGuest()) {
+    return [joinEntry];
+  }
 
   const editEntry: ContextMenuEntry = {
     icon: () => {
@@ -118,14 +124,16 @@ export const getMeetingActionEntries = ({
     click: onDeleteForAll,
   };
 
-  const showDeleteForAll = canDeleteMeetingForAll(meetingInstance, selfUser);
-  const showDeleteForMe = canDeleteMeetingForMe(meetingInstance, selfUser);
+  const showDeleteForAll = canManageMeetings && canDeleteMeetingForAll(meetingInstance, selfUser);
+  const showDeleteForMe = canManageMeetings && canDeleteMeetingForMe(meetingInstance, selfUser);
 
   return [
     joinEntry,
-    ...(canEditMeeting(meetingInstance, selfUser, nowMilliseconds) ? [editEntry] : []),
-    ...(isNullOrUndefined(meetingLink) ? [] : [copyMeetingLinkEntry]),
-    ...(canRotateMeetingLink(meetingInstance, selfUser, nowMilliseconds) ? [rotateMeetingLinkEntry] : []),
+    ...(canManageMeetings && canEditMeeting(meetingInstance, selfUser, nowMilliseconds) ? [editEntry] : []),
+    ...(canManageMeetings && !isNullOrUndefined(meetingLink) ? [copyMeetingLinkEntry] : []),
+    ...(canManageMeetings && canRotateMeetingLink(meetingInstance, selfUser, nowMilliseconds)
+      ? [rotateMeetingLinkEntry]
+      : []),
     ...(showDeleteForAll ? [deleteForAllEntry] : []),
     ...(showDeleteForMe ? [deleteForMeEntry] : []),
   ];

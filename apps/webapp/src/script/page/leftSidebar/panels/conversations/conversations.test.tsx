@@ -94,6 +94,11 @@ describe('Conversations', () => {
 
   afterEach(() => {
     testFactory.dispose();
+    useAppState.setState({
+      listState: ListState.CONVERSATIONS,
+      contentState: ContentState.CONVERSATION,
+      previousContentState: null,
+    });
   });
 
   let conversationRepository: ConversationRepository;
@@ -575,6 +580,51 @@ describe('Conversations', () => {
     });
 
     expect(defaultParams.listViewModel.openPreferences).toHaveBeenCalledWith(ContentState.PREFERENCES_ACCOUNT);
+  });
+
+  it('returns a temporary guest to Meetings when closing settings opened from Meetings', () => {
+    const selfUser = new User('guest-id', 'example.com', translateForTest);
+    selfUser.isTemporaryGuest(true);
+    const openMeetingsList = jest.fn();
+    const listViewModel = {
+      ...defaultParams.listViewModel,
+      openMeetingsList,
+      switchList: jest.fn(),
+    } as unknown as ConversationsProps['listViewModel'];
+    useAppState.setState({
+      listState: ListState.PREFERENCES,
+      contentState: ContentState.PREFERENCES_ACCOUNT,
+      previousContentState: ContentState.MEETINGS,
+    });
+    useSidebarStore.setState({currentTab: SidebarTabs.PREFERENCES});
+
+    const {getByTestId} = render(
+      withTheme(
+        <Conversations
+          {...defaultParams}
+          selfUser={selfUser}
+          listViewModel={listViewModel}
+          preferenceNotificationRepository={
+            {
+              notifications: observable([]),
+              getNotifications: () => {
+                return [];
+              },
+            } as unknown as ConversationsProps['preferenceNotificationRepository']
+          }
+          searchRepository={searchRepository}
+          conversationRepository={conversationRepository}
+        />,
+      ),
+    );
+
+    useAppState.setState({previousContentState: ContentState.PREFERENCES_AV});
+    act(() => {
+      getByTestId('do-close-preferences').click();
+    });
+
+    expect(openMeetingsList).toHaveBeenCalledTimes(1);
+    expect(listViewModel.switchList).not.toHaveBeenCalledWith(ListState.CONVERSATIONS, true);
   });
 
   it.each([SidebarTabs.RECENT, SidebarTabs.CELLS, SidebarTabs.CONNECT])(

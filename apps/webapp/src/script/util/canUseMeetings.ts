@@ -19,11 +19,13 @@
 
 import {Config} from '../Config';
 
+export const canViewMeetings = (apiVersion: number): boolean => {
+  return apiVersion >= Config.getConfig().MIN_MEETINGS_SUPPORTED_API_VERSION;
+};
+
 export const canUseMeetings = (input: {
   readonly isTeamMeetingsFeatureEnabled: boolean;
   readonly apiVersion: number;
 }): boolean => {
-  return (
-    input.isTeamMeetingsFeatureEnabled && input.apiVersion >= Config.getConfig().MIN_MEETINGS_SUPPORTED_API_VERSION
-  );
+  return input.isTeamMeetingsFeatureEnabled && canViewMeetings(input.apiVersion);
 };

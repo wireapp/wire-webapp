@@ -19,13 +19,13 @@
 
 import {container} from 'tsyringe';
 
-import {canUseMeetings} from './canUseMeetings';
+import {canUseMeetings, canViewMeetings} from './canUseMeetings';
 import {useKoSubscribableChildren} from './componentUtil';
 
 import {TeamState} from '../repositories/team/TeamState';
 import {Core} from '../service/coreSingleton';
 
-type MeetingsFeatureFlagState = {isMeetingsEnabled: boolean};
+type MeetingsFeatureFlagState = {canManageMeetings: boolean; canViewMeetings: boolean};
 
 export const useMeetingsFeatureFlag = (): MeetingsFeatureFlagState => {
   const teamState = container.resolve(TeamState);
@@ -33,7 +33,8 @@ export const useMeetingsFeatureFlag = (): MeetingsFeatureFlagState => {
   const {isMeetingsEnabled: isTeamMeetingsFeatureEnabled} = useKoSubscribableChildren(teamState, ['isMeetingsEnabled']);
 
   return {
-    isMeetingsEnabled: canUseMeetings({
+    canViewMeetings: canViewMeetings(core.backendFeatures.version),
+    canManageMeetings: canUseMeetings({
       isTeamMeetingsFeatureEnabled,
       apiVersion: core.backendFeatures.version,
     }),

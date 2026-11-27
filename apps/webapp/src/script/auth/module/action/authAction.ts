@@ -47,6 +47,15 @@ import type {LoginDataState, RegistrationDataState} from '../reducer/authReducer
 
 type LoginLifecycleFunction = (dispatch: ThunkDispatch, getState: () => RootState, global: Api) => Promise<void>;
 
+export class MeetingAdmissionError extends Error {
+  constructor(
+    readonly cause: unknown,
+    readonly resume?: (password?: string) => Promise<void>,
+  ) {
+    super('Unable to join meeting', {cause});
+  }
+}
+
 export type JoinLinkActionOperations = {
   doJoinByLink: (
     key: string,
@@ -85,6 +94,7 @@ export class AuthAction {
     getEntropy?: () => Promise<Uint8Array>,
     password?: string,
     joinLinkOperations?: JoinLinkActionOperations,
+    meetingLink?: MeetingLink,
   ): ThunkAction => {
     if (joinLinkOperations === undefined) {
       throw new Error('Join link actions are required for login and join');
@@ -92,12 +102,27 @@ export class AuthAction {
     const onBeforeLogin: LoginLifecycleFunction = async (dispatch, getState, {actions: {authAction}}) => {
       return dispatch(authAction.doSilentLogout());
     };
+    let meetingPassword = password;
+    let admissionComplete = false;
     const onAfterLogin: LoginLifecycleFunction = async dispatch => {
-      const result = await dispatch(joinLinkOperations.doJoinByLink(key, code, uri, password));
+      if (admissionComplete) {
+        return;
+      }
+      let result: JoinLinkResult | undefined;
+      if (!isNullOrUndefined(meetingLink)) {
+        try {
+          result = await dispatch(joinLinkOperations.doJoinMeetingLink(meetingLink, meetingPassword));
+        } catch (error: unknown) {
+          throw new MeetingAdmissionError(error);
+        }
+      } else {
+        result = await dispatch(joinLinkOperations.doJoinByLink(key, code, uri, password));
+      }
       if (isNullOrUndefined(result)) {
         return;
       }
       await dispatch(joinLinkOperations.doStoreJoinDestination(result));
+      admissionComplete = true;
     };
 
     return async dispatch => {
@@ -106,6 +131,13 @@ export class AuthAction {
       } catch (error: unknown) {
         if (isBackendError(error) && error.label === BackendErrorLabel.TOO_MANY_CLIENTS) {
           clearMeetingJoinParameters();
+        }
+        if (error instanceof MeetingAdmissionError && !isNullOrUndefined(error.resume)) {
+          throw new MeetingAdmissionError(error.cause, async updatedPassword => {
+            meetingPassword = updatedPassword;
+            await error.resume?.();
+            clearMeetingJoinParameters();
+          });
         }
         throw error;
       }
@@ -138,16 +170,29 @@ export class AuthAction {
           }
           entropyData = existingClientResult.value.isNothing ? await getEntropy() : undefined;
         }
-        await onAfterLogin(dispatch, getState, global);
-        await dispatch(
-          clientAction.doInitializeClient(
-            loginData.clientType,
-            isString(loginData.password) ? loginData.password : undefined,
-            loginData.verificationCode,
-            entropyData,
-          ),
-        );
-        dispatch(AuthActionCreator.successfulLogin());
+        const completeLogin = async (): Promise<void> => {
+          await onAfterLogin(dispatch, getState, global);
+          await dispatch(
+            clientAction.doInitializeClient(
+              loginData.clientType,
+              isString(loginData.password) ? loginData.password : undefined,
+              loginData.verificationCode,
+              entropyData,
+            ),
+          );
+          dispatch(AuthActionCreator.successfulLogin());
+        };
+        try {
+          await completeLogin();
+        } catch (error: unknown) {
+          if (error instanceof MeetingAdmissionError) {
+            throw new MeetingAdmissionError(error.cause, async () => {
+              dispatch(AuthActionCreator.startLogin());
+              await completeLogin();
+            });
+          }
+          throw error;
+        }
       } catch (error: unknown) {
         if (isBackendError(error) && error.label === BackendErrorLabel.TOO_MANY_CLIENTS) {
           dispatch(AuthActionCreator.successfulLogin());
@@ -229,7 +274,12 @@ export class AuthAction {
           if (joinLinkOperations === undefined) {
             throw new Error('Join link actions are required for SSO meeting join');
           }
-          const result = await dispatch(joinLinkOperations.doJoinMeetingLink(meetingLink, password));
+          let result: JoinLinkResult;
+          try {
+            result = await dispatch(joinLinkOperations.doJoinMeetingLink(meetingLink, password));
+          } catch (error: unknown) {
+            throw new MeetingAdmissionError(error);
+          }
           await dispatch(joinLinkOperations.doStoreJoinDestination(result));
         }
         await dispatch(clientAction.doInitializeClient(clientType));

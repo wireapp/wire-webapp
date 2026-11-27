@@ -73,11 +73,12 @@ const noop = (): undefined => {
 };
 
 const getMeetingActionEntries = (
-  params: Omit<Parameters<typeof getMeetingActionEntriesImpl>[0], 'onRotateMeetingLink'> & {
+  params: Omit<Parameters<typeof getMeetingActionEntriesImpl>[0], 'onRotateMeetingLink' | 'canManageMeetings'> & {
     onRotateMeetingLink?: () => void;
+    canManageMeetings?: boolean;
   },
 ): ContextMenuEntry[] => {
-  return getMeetingActionEntriesImpl({onRotateMeetingLink: noop, ...params});
+  return getMeetingActionEntriesImpl({onRotateMeetingLink: noop, canManageMeetings: true, ...params});
 };
 
 const getEditEntryLabel = (entries: ReturnType<typeof getMeetingActionEntries>): ContextMenuEntry | undefined => {

@@ -28,12 +28,6 @@ import {NoCameraMessage} from '../../../../../components/noCameraMessage';
 import {Config} from '../../../../../Config';
 import {MediaStreamHandler} from '../../../../../repositories/media/MediaStreamHandler';
 import {MediaType} from '../../../../../repositories/media/MediaType';
-import {useMediaDevicesStore} from '../../../../../repositories/media/useMediaDevicesStore';
-import {
-  createReactTranslationMarker,
-  renderReactTranslation,
-} from '../../../../../util/localizerUtil/reactLocalizerUtil';
-import type {Translate} from '../../../../../util/localizerUtil/translationTypes';
 import {getLogger} from '../../../../../util/logger';
 import {useApplicationContext} from '../../../../rootProvider';
 import {PreferencesSection} from '../components/preferencesSection';

@@ -72,6 +72,10 @@ export enum BackendErrorLabel {
   MLS_INVALID_LEAF_NODE_INDEX = 'mls-invalid-leaf-node-index',
   MLS_MIGRATION_CRITERIA_NOT_SATISFIED = 'mls-migration-criteria-not-satisfied',
 
+  // Meeting errors
+  INVALID_MEETING_PASSWORD = 'invalid-meeting-password',
+  MEETING_NOT_FOUND = 'meeting-not-found',
+
   // Handle errors
   HANDLE_EXISTS = 'handle-exists',
   INVALID_HANDLE = 'invalid-handle',

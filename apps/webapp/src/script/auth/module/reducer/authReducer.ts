@@ -233,6 +233,9 @@ export function authReducer(state: AuthState = initialAuthState, action: AppActi
         isAuthenticated: false,
       };
     }
+    case AUTH_ACTION.LOGOUT_FAILED: {
+      return {...state, error: action.error};
+    }
     case AUTH_ACTION.AUTH_RESET_ERROR: {
       return {...state, error: null};
     }

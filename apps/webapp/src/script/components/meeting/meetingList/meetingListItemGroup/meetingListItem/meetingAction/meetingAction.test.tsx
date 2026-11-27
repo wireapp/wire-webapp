@@ -81,6 +81,7 @@ const renderAction = (
     <MeetingStoreProvider store={createMeetingStoreForTest()}>
       <ThemeProvider>
         <MeetingAction
+          canManageMeetings
           meetingInstance={meetingInstance}
           selfUser={user}
           joinMeeting={() => {

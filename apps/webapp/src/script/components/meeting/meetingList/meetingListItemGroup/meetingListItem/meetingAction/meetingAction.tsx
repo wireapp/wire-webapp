@@ -40,6 +40,7 @@ import {canEditMeeting, canRotateMeetingLink} from '../../../../utils/canEditMee
 interface MeetingActionProps {
   meetingInstance: MeetingInstance;
   selfUser: User | undefined;
+  canManageMeetings: boolean;
   joinMeeting: () => void;
   isJoinDisabled: boolean;
 }
@@ -47,6 +48,7 @@ interface MeetingActionProps {
 export const MeetingAction: FunctionComponent<MeetingActionProps> = ({
   meetingInstance,
   selfUser,
+  canManageMeetings,
   joinMeeting,
   isJoinDisabled,
 }: MeetingActionProps) => {
@@ -66,6 +68,7 @@ export const MeetingAction: FunctionComponent<MeetingActionProps> = ({
       entries: getMeetingActionEntries({
         meetingInstance,
         selfUser,
+        canManageMeetings,
         nowMilliseconds,
         translate,
         onJoin: joinMeeting,

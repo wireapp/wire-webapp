@@ -125,6 +125,7 @@ describe.each(['password', 'SSO'] as const)('Meeting link login with %s', mode =
           undefined,
           'secret',
           joinLinkAction,
+          link.kind === 'meeting' ? link : undefined,
         ),
       );
     };

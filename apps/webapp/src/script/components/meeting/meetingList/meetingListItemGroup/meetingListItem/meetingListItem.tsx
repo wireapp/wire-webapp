@@ -53,6 +53,7 @@ import {
 interface MeetingListItemProps {
   meetingInstance: MeetingInstance;
   selfUser: User | undefined;
+  canManageMeetings: boolean;
   nowMilliseconds?: number;
   isFirstInDay?: boolean;
   isLastInDay?: boolean;
@@ -61,6 +62,7 @@ interface MeetingListItemProps {
 const MeetingListItemComponent: FunctionComponent<MeetingListItemProps> = ({
   meetingInstance,
   selfUser,
+  canManageMeetings,
   nowMilliseconds: providedNowMilliseconds,
   isFirstInDay = false,
   isLastInDay = false,
@@ -140,6 +142,7 @@ const MeetingListItemComponent: FunctionComponent<MeetingListItemProps> = ({
         <MeetingAction
           meetingInstance={meetingInstance}
           selfUser={selfUser}
+          canManageMeetings={canManageMeetings}
           joinMeeting={openPrep}
           isJoinDisabled={isJoinDisabled}
         />
