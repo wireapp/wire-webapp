@@ -19,10 +19,7 @@
 
 import {create} from 'zustand';
 
-/**
- * Whether the no-internet warning is showing. The warnings state keeps it up to date; it is a store of its own so
- * that components can read it without importing the warnings state, which reaches the modals and most of the app.
- */
+/** Copied from useWarningsState, which owns it: reading that store directly adds a cycle through the modals */
 export const useNoInternetState = create<{hasNoInternet: boolean}>(() => {
   return {hasNoInternet: false};
 });

@@ -24,7 +24,7 @@ import {offlineNoticeIconStyles, offlineNoticeLabelStyles} from './offlineNotice
 import {NoInternetIcon} from '../../uiKit/dataDisplay/icon/noInternetIcon';
 
 interface OfflineNoticeProps {
-  /** The translated notice, passed in so that this component stays out of the import cycle of the app context */
+  /** Translated by the caller: reading the app context here would add a cycle through rootProvider to conversation */
   label: string;
 }
 

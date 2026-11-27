@@ -83,7 +83,7 @@ interface MessagesListParams {
   setMsgElementsFocusable: (isMsgElementsFocusable: boolean) => void;
   isRightSidebarOpen?: boolean;
   updateConversationLastRead: (conversation: Conversation) => void;
-  /** Passed in, like the notice, so that the list stays out of the import cycle of the app context */
+  /** Passed in: reading the app context here would add a cycle through rootProvider to conversation */
   isOutboxEnabled: boolean;
   /** Shown above the first message that waits to be sent, or at the end of the list; `null` while there is none */
   offlineNotice: ReactElement | null;

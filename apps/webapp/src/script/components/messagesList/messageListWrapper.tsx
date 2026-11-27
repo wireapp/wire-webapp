@@ -26,7 +26,7 @@ import {VirtualizedMessageListWrapper} from './virtualizedMessageListWrapper';
 import {Config} from '../../Config';
 
 type MessageListWrapperProps = MessagesListParams & {
-  /** Passed in, like the notice, so that the lists stay out of the import cycle of the app context */
+  /** Passed in: reading the app context here would add a cycle through rootProvider to conversation */
   isOutboxEnabled: boolean;
   /** Shown while offline; `null` while there is none */
   offlineNotice: ReactElement | null;

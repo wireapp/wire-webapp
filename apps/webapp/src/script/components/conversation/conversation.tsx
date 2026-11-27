@@ -67,7 +67,6 @@ import {
 } from '../../featureToggles/startupFeatureToggleNames';
 import {isMouseRightClickEvent, isAuxRightClickEvent} from '../../guards/Mouse';
 import {isServiceEntity} from '../../guards/Service';
-import {useOffline} from '../../hooks/useOffline';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {RightSidebarParams} from '../../page/appMain';
 import {PanelState} from '../../page/rightSidebar';
@@ -93,6 +92,7 @@ import {getLogger} from '../../util/logger';
 import {safeMailOpen, safeWindowOpen} from '../../util/sanitizationUtil';
 import {formatBytes} from '../../util/util';
 import {createUuid} from '../../util/uuid';
+import {useNoInternetState} from '../../view_model/WarningsContainer/noInternetState';
 import {WebAppEvents} from '../../webAppEvents';
 import {CallingCell} from '../calling/CallingCell';
 import {Giphy} from '../giphy';
@@ -145,7 +145,10 @@ function ConversationContent({
 
   const mainViewModel = useMainViewModel();
   const {fireAndForgetInvoker, translate, clock, isFeatureToggleEnabled} = useApplicationContext();
-  const isOffline = useOffline(isFeatureToggleEnabled(pendingOfflineMessagesFeatureToggleName));
+  const hasNoInternet = useNoInternetState(state => {
+    return state.hasNoInternet;
+  });
+  const isOffline = isFeatureToggleEnabled(pendingOfflineMessagesFeatureToggleName) && hasNoInternet;
   const offlineNotice = isOffline ? <OfflineNotice label={translate('outboxOfflineNotice')} /> : null;
   const {content: contentViewModel} = mainViewModel;
   const {conversationRepository, repositories} = contentViewModel;

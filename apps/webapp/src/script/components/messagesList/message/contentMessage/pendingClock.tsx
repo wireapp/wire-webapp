@@ -25,7 +25,7 @@ import {PendingIcon} from '../../../../uiKit/dataDisplay/icon/pendingIcon';
 import {Tooltip} from '../../../../uiKit/dataDisplay/tooltip/tooltip';
 
 interface PendingClockProps {
-  /** The translated label, passed in so that this component stays out of the import cycle of the app context */
+  /** Translated by the caller: reading the app context here would add a cycle through rootProvider to contentMessage */
   label: string;
 }
 
