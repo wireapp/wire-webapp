@@ -21,7 +21,7 @@ import type {FunctionComponent} from 'react';
 
 import type {Conversation} from '../../../../../repositories/entity/Conversation';
 import {getFileTypeFromExtension} from '../../../../../util/getFileTypeFromExtension/getFileTypeFromExtension';
-import {FileFullscreenModal} from '../../../../FileFullscreenModal/FileFullscreenModal';
+import {FileFullscreenModal} from '../../../../fileFullscreenModal/fileFullscreenModal';
 import {sortTagsAlphabetically} from '../../common/sortTagsAlphabetically/sortTagsAlphabetically';
 import {useCellsFilePreviewModal} from '../common/cellsFilePreviewModalContext/cellsFilePreviewModalContext';
 

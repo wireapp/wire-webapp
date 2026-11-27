@@ -22,9 +22,9 @@ import {useEffect, useMemo, useState, type FunctionComponent} from 'react';
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 
 import {DeviceDetails} from './components/deviceDetails';
-import {DeviceList} from './components/DeviceList';
-import {NoDevicesFound} from './components/NoDevicesFound';
-import {SelfFingerprint} from './components/SelfFingerprint';
+import {DeviceList} from './components/deviceList';
+import {NoDevicesFound} from './components/noDevicesFound';
+import {SelfFingerprint} from './components/selfFingerprint';
 import {FIND_MODE, UserDevicesState} from './userDevices.types';
 
 import {ClientClassification} from '../../apiClient/client/clientClassification';

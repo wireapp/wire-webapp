@@ -54,7 +54,7 @@ import {WebAppEvents} from '../../webAppEvents';
 import {ConversationVerificationBadges} from '../badge';
 import {useCallAlertState} from '../calling/useCallAlertState';
 import * as Icon from '../icon';
-import {LegalHoldDot} from '../LegalHoldDot';
+import {LegalHoldDot} from '../legalHoldDot';
 
 interface TitleBarProps {
   callActions: CallActions;

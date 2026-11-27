@@ -33,7 +33,7 @@ import {isPreviewableImage} from '../../../../../util/imageUtil';
 import type {Translate} from '../../../../../util/localizerUtil/translationTypes';
 import {getFileExtension, getName} from '../../../../../util/util';
 import {FileTypeIcon} from '../../../../conversation/common/fileTypeIcon/fileTypeIcon';
-import {FileFullscreenModal} from '../../../../FileFullscreenModal/FileFullscreenModal';
+import {FileFullscreenModal} from '../../../../fileFullscreenModal/fileFullscreenModal';
 
 interface MultipartAssetPreviewProps {
   cellAssets: ICellAsset[];

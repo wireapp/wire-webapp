@@ -35,7 +35,7 @@ import {
   getChatHistoryOptions,
   getChatHistorySharingUnitOptions,
 } from '../../../components/Modals/CreateConversation/utils';
-import {RadioGroup} from '../../../components/Radio';
+import {RadioGroup} from '../../../components/radio';
 import {User} from '../../../repositories/entity/User';
 import {TeamState} from '../../../repositories/team/TeamState';
 import {Input} from '../../../uiKit/inputs/input/input';

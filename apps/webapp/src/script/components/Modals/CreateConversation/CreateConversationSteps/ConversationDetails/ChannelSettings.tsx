@@ -30,7 +30,7 @@ import {TeamState} from '../../../../../repositories/team/TeamState';
 import {Option, Select} from '../../../../../uiKit/inputs/select/select';
 import {Muted} from '../../../../../uiKit/typography/text/text';
 import {useChannelsFeatureFlag} from '../../../../../util/useChannelsFeatureFlag';
-import {RadioGroup} from '../../../../Radio';
+import {RadioGroup} from '../../../../radio';
 import {useCreateConversationModal} from '../../hooks/useCreateConversationModal';
 import {ChatHistory, ConversationAccess} from '../../types';
 import {getConversationAccessOptions, getChatHistoryOptions, getConversationManagerOptions} from '../../utils';

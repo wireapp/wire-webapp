@@ -27,8 +27,8 @@ import {
 
 import {Config} from '../../../../Config';
 import {CopyToClipboardButton} from '../../../copyToClipboardButton';
-import {PasswordFields, type PasswordFieldsProps} from '../../../PasswordFields/PasswordFields';
-import {PasswordGeneratorButton} from '../../../PasswordGeneratorButton';
+import {PasswordFields, type PasswordFieldsProps} from '../../../passwordFields/passwordFields';
+import {PasswordGeneratorButton} from '../../../passwordGeneratorButton';
 
 interface MeetingLinkFormProps extends Omit<PasswordFieldsProps, 'translate'> {
   translate: PasswordFieldsProps['translate'];

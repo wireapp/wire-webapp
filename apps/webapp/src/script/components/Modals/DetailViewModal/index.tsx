@@ -43,7 +43,7 @@ import {renderElement} from '../../../util/renderElement';
 import {preventFocusOutside} from '../../../util/util';
 import {waitFor} from '../../../util/waitFor';
 import {WebAppEvents} from '../../../webAppEvents';
-import {ZoomableImage} from '../../ZoomableImage';
+import {ZoomableImage} from '../../zoomableImage';
 
 const detailModalScrollDelayInMilliseconds = 150;
 

@@ -29,7 +29,7 @@ import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {Declension, joinNames} from '../../../util/localizerUtil';
 import {capitalizeFirstChar} from '../../../util/stringUtil';
 import {WebAppEvents} from '../../../webAppEvents';
-import {VerificationIcon} from '../../VerificationIcon';
+import {VerificationIcon} from '../../verificationIcon';
 
 interface VerificationMessageProps {
   message: VerificationMessageEntity;

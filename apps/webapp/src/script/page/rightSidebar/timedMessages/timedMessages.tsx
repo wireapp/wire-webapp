@@ -22,7 +22,7 @@ import {FC, useEffect, useState} from 'react';
 import {isNan, isNullOrUndefined} from '@sindresorhus/is';
 
 import {FadingScrollbar} from '../../../components/fadingScrollbar';
-import {RadioGroup} from '../../../components/Radio';
+import {RadioGroup} from '../../../components/radio';
 import {EphemeralTimings} from '../../../ephemeral/ephemeralTimings';
 import {Conversation} from '../../../repositories/entity/Conversation';
 import {TeamState} from '../../../repositories/team/TeamState';

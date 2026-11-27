@@ -42,7 +42,7 @@ import {getLogger} from '../../util/logger';
 import {loadFileBuffer} from '../../util/util';
 import * as Icon from '../icon';
 import {PrimaryModal} from '../Modals/PrimaryModal';
-import {ProgressBar} from '../ProgressBar/ProgressBar';
+import {ProgressBar} from '../progressBar/progressBar';
 
 export enum HistoryImportState {
   DONE = 'HistoryImportState.STATE.DONE',

@@ -23,7 +23,7 @@ import {isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is
 import {useDebouncedCallback} from 'use-debounce';
 
 import * as Icon from '../../../../components/icon';
-import {ServiceList} from '../../../../components/ServiceList/ServiceList';
+import {ServiceList} from '../../../../components/serviceList/serviceList';
 import {getManageServicesUrl} from '../../../../externalRoute';
 import {IntegrationRepository} from '../../../../repositories/integration/IntegrationRepository';
 import {ServiceEntity} from '../../../../repositories/integration/ServiceEntity';

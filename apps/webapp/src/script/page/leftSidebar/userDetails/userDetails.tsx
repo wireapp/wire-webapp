@@ -25,7 +25,7 @@ import * as styles from './userDetails.styles';
 
 import {Avatar, AVATAR_SIZE} from '../../../components/avatar';
 import {UserVerificationBadges} from '../../../components/badge';
-import {LegalHoldDot} from '../../../components/LegalHoldDot';
+import {LegalHoldDot} from '../../../components/legalHoldDot';
 import {User} from '../../../repositories/entity/User';
 import {AvailabilityContextMenu} from '../../../ui/availabilityContextMenu';
 import {TabIndex} from '../../../uiKit/utils/enums';

@@ -47,7 +47,7 @@ import {
 import {FadingScrollbar} from '../../../components/fadingScrollbar';
 import * as Icon from '../../../components/icon';
 import {ParticipantItemContent} from '../../../components/participantItemContent';
-import {BaseToggle} from '../../../components/toggle/BaseToggle';
+import {BaseToggle} from '../../../components/toggle/baseToggle';
 import {driveOffboardingFeatureToggleName} from '../../../featureToggles/startupFeatureToggleNames';
 import type {Conversation} from '../../../repositories/entity/Conversation';
 import type {User} from '../../../repositories/entity/User';

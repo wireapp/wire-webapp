@@ -57,7 +57,7 @@ jest.mock('../../conversation/conversationCells/common/cellsTableLoader/cellsTab
   };
 });
 
-jest.mock('../../PasswordGeneratorButton', () => {
+jest.mock('../../passwordGeneratorButton', () => {
   return {
     PasswordGeneratorButton: ({onGeneratePassword}: {onGeneratePassword: (password: string) => void}) => {
       return (

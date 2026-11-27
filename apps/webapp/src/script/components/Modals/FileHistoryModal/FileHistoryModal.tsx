@@ -28,7 +28,7 @@ import {useFileVersions} from './hooks/useFileVersions';
 
 import {useApplicationContext} from '../../../page/rootProvider';
 import {handleEscDown} from '../../../util/keyboardUtil';
-import {FileLoader} from '../../FileFullscreenModal/FileLoader/FileLoader';
+import {FileLoader} from '../../fileFullscreenModal/fileLoader/fileLoader';
 import {ModalComponent} from '../ModalComponent';
 
 export const FileHistoryModal: FunctionComponent = () => {

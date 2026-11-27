@@ -30,7 +30,7 @@ import {
   getConversationAccessOptions,
   getConversationManagerOptions,
 } from '../../../components/Modals/CreateConversation/utils';
-import {RadioGroup} from '../../../components/Radio';
+import {RadioGroup} from '../../../components/radio';
 import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
 import {ConversationRoleRepository} from '../../../repositories/conversation/ConversationRoleRepository';
 import {Conversation} from '../../../repositories/entity/Conversation';

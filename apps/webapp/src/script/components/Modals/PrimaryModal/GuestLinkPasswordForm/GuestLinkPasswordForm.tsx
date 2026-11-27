@@ -22,8 +22,8 @@ import type {FormEvent, FunctionComponent} from 'react';
 import {Config} from '../../../../Config';
 import {Form} from '../../../../uiKit/inputs/form/form';
 import type {Translate} from '../../../../util/localizerUtil';
-import {PasswordFields} from '../../../PasswordFields/PasswordFields';
-import {PasswordGeneratorButton} from '../../../PasswordGeneratorButton';
+import {PasswordFields} from '../../../passwordFields/passwordFields';
+import {PasswordGeneratorButton} from '../../../passwordGeneratorButton';
 
 interface GuestLinkPasswordFormProps {
   readonly translate: Translate;

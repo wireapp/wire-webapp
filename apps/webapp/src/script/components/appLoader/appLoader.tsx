@@ -22,7 +22,7 @@ import {FC, ReactNode, useEffect, useRef, useState} from 'react';
 import {styles} from './appLoader.styles';
 
 import {User} from '../../repositories/entity/User';
-import {LoadingBar} from '../LoadingBar/LoadingBar';
+import {LoadingBar} from '../loadingBar/loadingBar';
 
 interface AppLoaderProps {
   init: (onProgress: (message?: string) => void) => Promise<User | undefined>;

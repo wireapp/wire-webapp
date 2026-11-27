@@ -33,7 +33,7 @@ import {Avatar, AVATAR_SIZE} from '../../../avatar';
 import {UserStatusBadges} from '../../../badge';
 import {ParticipantItemContent} from '../../../participantItemContent';
 import {listItem, listWrapper} from '../../../participantItemContent/participantItem.styles';
-import {useUserName} from '../../../UserName';
+import {useUserName} from '../../../userName';
 
 export interface UserListItemProps {
   groupId?: string;

@@ -39,7 +39,7 @@ import {ServiceEntity} from '../../repositories/integration/ServiceEntity';
 import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {UserBlockedBadge, UserVerificationBadges} from '../badge';
 import * as Icon from '../icon';
-import {UserInfo} from '../UserInfo';
+import {UserInfo} from '../userInfo';
 
 interface ParticipantItemContentProps {
   /** the conversation context in which we are displaying the user (will enable e2ei verification badges) */

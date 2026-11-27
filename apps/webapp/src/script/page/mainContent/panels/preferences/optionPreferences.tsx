@@ -25,7 +25,7 @@ import {PreferencesPage} from './components/preferencesPage';
 import {PreferencesSection} from './components/preferencesSection';
 
 import {Theme} from '../../../../components/appContainer/hooks/useTheme';
-import {RadioGroup} from '../../../../components/Radio';
+import {RadioGroup} from '../../../../components/radio';
 import {Config} from '../../../../Config';
 import {RootFontSize, useRootFontSize} from '../../../../hooks/useRootFontSize';
 import {User} from '../../../../repositories/entity/User';

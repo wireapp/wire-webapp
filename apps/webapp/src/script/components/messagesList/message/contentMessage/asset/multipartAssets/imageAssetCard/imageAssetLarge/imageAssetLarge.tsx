@@ -37,7 +37,7 @@ import {
 import {useApplicationContext} from '../../../../../../../../page/rootProvider';
 import {UnavailableFileIcon} from '../../../../../../../../uiKit/dataDisplay/icon/unavailableFileIcon';
 import {getBestPreviewSource} from '../../../../../../../../util/imageUtil';
-import {FileFullscreenModal} from '../../../../../../../FileFullscreenModal/FileFullscreenModal';
+import {FileFullscreenModal} from '../../../../../../../fileFullscreenModal/fileFullscreenModal';
 
 interface ImageAssetLargeProps {
   filePreviewUrl?: string;

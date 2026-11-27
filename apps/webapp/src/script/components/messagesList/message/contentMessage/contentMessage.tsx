@@ -48,7 +48,7 @@ import {ContextMenuEntry} from '../../../../ui/contextMenu';
 import {OutlineCheck} from '../../../../uiKit/dataDisplay/icon/outlineCheck';
 import {useKoSubscribableChildren} from '../../../../util/componentUtil';
 import {getMessageAriaLabel} from '../../../../util/conversationMessages';
-import {FileFullscreenModalSourceConversationProvider} from '../../../FileFullscreenModal/FileFullscreenModalSourceConversationContext';
+import {FileFullscreenModalSourceConversationProvider} from '../../../fileFullscreenModal/fileFullscreenModalSourceConversationContext';
 import {EphemeralTimer} from '../ephemeralTimer';
 import {MessageTime} from '../messageTime';
 import {ReadIndicator} from '../readIndicator';

@@ -48,7 +48,7 @@ import {useChannelsFeatureFlag} from '../../util/useChannelsFeatureFlag';
 import {noop, setContextMenuPosition} from '../../util/util';
 import {Avatar, AVATAR_SIZE, GroupAvatar, ChannelAvatar} from '../avatar';
 import {UserBlockedBadge} from '../badge';
-import {UserInfo} from '../UserInfo';
+import {UserInfo} from '../userInfo';
 
 interface ConversationListCellProps {
   conversation: Conversation;

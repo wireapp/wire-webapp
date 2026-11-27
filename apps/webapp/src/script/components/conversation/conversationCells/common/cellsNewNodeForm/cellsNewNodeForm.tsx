@@ -21,7 +21,7 @@ import {ChangeEvent, FormEvent, type FunctionComponent} from 'react';
 
 import {inputWrapperStyles} from './cellsNewNodeForm.styles';
 
-import {TextInput} from '../../../../TextInput';
+import {TextInput} from '../../../../textInput';
 import {useInputAutoFocus} from '../useInputAutoFocus/useInputAutoFocus';
 
 interface CellsNewNodeFormProps {

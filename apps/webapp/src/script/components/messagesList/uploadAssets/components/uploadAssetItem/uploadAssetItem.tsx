@@ -25,7 +25,7 @@ import {uploadingProgressText} from './uploadAssetItem.styles';
 
 import {useApplicationContext} from '../../../../../page/rootProvider';
 import {AssetRepository} from '../../../../../repositories/assets/assetRepository';
-import {ProgressBar} from '../../../../ProgressBar';
+import {ProgressBar} from '../../../../progressBar';
 
 interface Props {
   assetRepository: AssetRepository;

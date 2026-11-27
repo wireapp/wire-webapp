@@ -33,7 +33,7 @@ import {User} from '../../../../repositories/entity/User';
 import {TabIndex} from '../../../../uiKit/utils/enums';
 import {capitalizeFirstChar} from '../../../../util/stringUtil';
 import * as Icon from '../../../icon';
-import {UserInfo} from '../../../UserInfo';
+import {UserInfo} from '../../../userInfo';
 
 interface CallParticipantItemContentProps {
   user: User;

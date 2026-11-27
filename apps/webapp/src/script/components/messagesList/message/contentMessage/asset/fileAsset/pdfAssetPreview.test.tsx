@@ -27,7 +27,7 @@ import {PdfAssetPreview} from './pdfAssetPreview';
 import {PdfModalTestStub} from './pdfModalTestStub';
 import {ChatPdfModalToken, type ChatPdfModalComponent} from './chatPdfModal';
 
-import {FileFullscreenModal} from '../../../../../FileFullscreenModal/FileFullscreenModal';
+import {FileFullscreenModal} from '../../../../../fileFullscreenModal/fileFullscreenModal';
 
 import {AssetRemoteData} from '../../../../../../repositories/assets/assetRemoteData';
 import {translateForTest} from '../../../../../../util/test/translateForTest';

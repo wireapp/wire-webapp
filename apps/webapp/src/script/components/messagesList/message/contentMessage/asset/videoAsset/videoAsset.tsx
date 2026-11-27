@@ -36,7 +36,7 @@ import {useTimeout} from '../../../../../../uiKit/utils/useTimeout';
 import {useKoSubscribableChildren} from '../../../../../../util/componentUtil';
 import {formatSeconds} from '../../../../../../util/timeUtil';
 import {useEffectRef} from '../../../../../../util/useEffectRef';
-import {RestrictedVideo} from '../../../../../asset/RestrictedVideo';
+import {RestrictedVideo} from '../../../../../asset/restrictedVideo';
 import {MediaButton} from '../common/mediaButton/mediaButton';
 import {SeekBar} from '../common/seekBar/seekBar';
 import {AssetUrl, useAssetTransfer} from '../common/useAssetTransfer/useAssetTransfer';

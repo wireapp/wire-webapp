@@ -24234,8 +24234,8 @@
   {
     "type": "cycle",
     "from": "apps/webapp/src/script/components/avatar/stackedAvatars/participantAvatarTooltip.tsx",
-    "to": "apps/webapp/src/script/components/UserName/index.tsx",
-    "unresolvedTo": "../../UserName",
+    "to": "apps/webapp/src/script/components/userName/index.tsx",
+    "unresolvedTo": "../../userName",
     "dependencyTypes": [
       "local",
       "import"
@@ -24246,14 +24246,14 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/UserName/index.tsx",
+        "name": "apps/webapp/src/script/components/userName/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserName/UserName.tsx",
+        "name": "apps/webapp/src/script/components/userName/userName.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -26199,8 +26199,8 @@
   {
     "type": "cycle",
     "from": "apps/webapp/src/script/components/avatar/userAvatar/userAvatar.tsx",
-    "to": "apps/webapp/src/script/components/UserName/index.tsx",
-    "unresolvedTo": "../../UserName",
+    "to": "apps/webapp/src/script/components/userName/index.tsx",
+    "unresolvedTo": "../../userName",
     "dependencyTypes": [
       "local",
       "import"
@@ -26211,14 +26211,14 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/UserName/index.tsx",
+        "name": "apps/webapp/src/script/components/userName/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserName/UserName.tsx",
+        "name": "apps/webapp/src/script/components/userName/userName.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -41500,8 +41500,8 @@
   {
     "type": "cycle",
     "from": "apps/webapp/src/script/components/calling/callParticipantsListItem/callParticipantItemContent/callParticipantItemContent.tsx",
-    "to": "apps/webapp/src/script/components/UserInfo/index.tsx",
-    "unresolvedTo": "../../../UserInfo",
+    "to": "apps/webapp/src/script/components/userInfo/index.tsx",
+    "unresolvedTo": "../../../userInfo",
     "dependencyTypes": [
       "local",
       "import"
@@ -41512,14 +41512,14 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/UserInfo/index.tsx",
+        "name": "apps/webapp/src/script/components/userInfo/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserInfo/UserInfo.tsx",
+        "name": "apps/webapp/src/script/components/userInfo/userInfo.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -61001,8 +61001,8 @@
   {
     "type": "cycle",
     "from": "apps/webapp/src/script/components/cells/shareModal/cellsShareModalContent.tsx",
-    "to": "apps/webapp/src/script/components/PasswordGeneratorButton/index.tsx",
-    "unresolvedTo": "../../PasswordGeneratorButton",
+    "to": "apps/webapp/src/script/components/passwordGeneratorButton/index.tsx",
+    "unresolvedTo": "../../passwordGeneratorButton",
     "dependencyTypes": [
       "local",
       "import"
@@ -61013,14 +61013,14 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/PasswordGeneratorButton/index.tsx",
+        "name": "apps/webapp/src/script/components/passwordGeneratorButton/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/PasswordGeneratorButton/PasswordGeneratorButton.tsx",
+        "name": "apps/webapp/src/script/components/passwordGeneratorButton/passwordGeneratorButton.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -65659,8 +65659,8 @@
   {
     "type": "cycle",
     "from": "apps/webapp/src/script/components/cellsGlobalView/cellsTable/cellsFilePreviewModal/cellsFilePreviewModal.tsx",
-    "to": "apps/webapp/src/script/components/FileFullscreenModal/FileFullscreenModal.tsx",
-    "unresolvedTo": "../../../FileFullscreenModal/FileFullscreenModal",
+    "to": "apps/webapp/src/script/components/fileFullscreenModal/fileFullscreenModal.tsx",
+    "unresolvedTo": "../../../fileFullscreenModal/fileFullscreenModal",
     "dependencyTypes": [
       "local",
       "import"
@@ -65671,7 +65671,7 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/FileFullscreenModal/FileFullscreenModal.tsx",
+        "name": "apps/webapp/src/script/components/fileFullscreenModal/fileFullscreenModal.tsx",
         "dependencyTypes": [
           "local",
           "import"
@@ -80359,8 +80359,8 @@
   {
     "type": "cycle",
     "from": "apps/webapp/src/script/components/connectRequests/connectionRequests.tsx",
-    "to": "apps/webapp/src/script/components/UserName/index.tsx",
-    "unresolvedTo": "../UserName",
+    "to": "apps/webapp/src/script/components/userName/index.tsx",
+    "unresolvedTo": "../userName",
     "dependencyTypes": [
       "local",
       "import"
@@ -80371,14 +80371,14 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/UserName/index.tsx",
+        "name": "apps/webapp/src/script/components/userName/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserName/UserName.tsx",
+        "name": "apps/webapp/src/script/components/userName/userName.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -95416,14 +95416,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/TextInput/index.ts",
+        "name": "apps/webapp/src/script/components/textInput/index.ts",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/TextInput/TextInput.tsx",
+        "name": "apps/webapp/src/script/components/textInput/textInput.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -96272,14 +96272,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/TextInput/index.ts",
+        "name": "apps/webapp/src/script/components/textInput/index.ts",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/TextInput/TextInput.tsx",
+        "name": "apps/webapp/src/script/components/textInput/textInput.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -100143,14 +100143,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/TextInput/index.ts",
+        "name": "apps/webapp/src/script/components/textInput/index.ts",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/TextInput/TextInput.tsx",
+        "name": "apps/webapp/src/script/components/textInput/textInput.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -101678,8 +101678,8 @@
   {
     "type": "cycle",
     "from": "apps/webapp/src/script/components/conversation/conversationCells/cellsTable/cellsFilePreviewModal/cellsFilePreviewModal.tsx",
-    "to": "apps/webapp/src/script/components/FileFullscreenModal/FileFullscreenModal.tsx",
-    "unresolvedTo": "../../../../FileFullscreenModal/FileFullscreenModal",
+    "to": "apps/webapp/src/script/components/fileFullscreenModal/fileFullscreenModal.tsx",
+    "unresolvedTo": "../../../../fileFullscreenModal/fileFullscreenModal",
     "dependencyTypes": [
       "local",
       "import"
@@ -101690,7 +101690,7 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/FileFullscreenModal/FileFullscreenModal.tsx",
+        "name": "apps/webapp/src/script/components/fileFullscreenModal/fileFullscreenModal.tsx",
         "dependencyTypes": [
           "local",
           "import"
@@ -112867,14 +112867,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/TextInput/index.ts",
+        "name": "apps/webapp/src/script/components/textInput/index.ts",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/TextInput/TextInput.tsx",
+        "name": "apps/webapp/src/script/components/textInput/textInput.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -116218,14 +116218,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/TextInput/index.ts",
+        "name": "apps/webapp/src/script/components/textInput/index.ts",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/TextInput/TextInput.tsx",
+        "name": "apps/webapp/src/script/components/textInput/textInput.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -148842,8 +148842,8 @@
   {
     "type": "cycle",
     "from": "apps/webapp/src/script/components/conversationListCell/conversationListCell.tsx",
-    "to": "apps/webapp/src/script/components/UserInfo/index.tsx",
-    "unresolvedTo": "../UserInfo",
+    "to": "apps/webapp/src/script/components/userInfo/index.tsx",
+    "unresolvedTo": "../userInfo",
     "dependencyTypes": [
       "local",
       "import"
@@ -148854,14 +148854,14 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/UserInfo/index.tsx",
+        "name": "apps/webapp/src/script/components/userInfo/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserInfo/UserInfo.tsx",
+        "name": "apps/webapp/src/script/components/userInfo/userInfo.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -151663,7 +151663,7 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/FileFullscreenModal/FileEditor/FileEditor.tsx",
+    "from": "apps/webapp/src/script/components/fileFullscreenModal/fileEditor/fileEditor.tsx",
     "to": "apps/webapp/src/script/components/Modals/PrimaryModal/index.ts",
     "unresolvedTo": "../../Modals/PrimaryModal",
     "dependencyTypes": [
@@ -151968,14 +151968,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/FileFullscreenModal/FileFullscreenModal.tsx",
+        "name": "apps/webapp/src/script/components/fileFullscreenModal/fileFullscreenModal.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/FileFullscreenModal/FileEditor/FileEditor.tsx",
+        "name": "apps/webapp/src/script/components/fileFullscreenModal/fileEditor/fileEditor.tsx",
         "dependencyTypes": [
           "local",
           "import"
@@ -151985,7 +151985,7 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/FileFullscreenModal/FileEditor/FileEditor.tsx",
+    "from": "apps/webapp/src/script/components/fileFullscreenModal/fileEditor/fileEditor.tsx",
     "to": "apps/webapp/src/script/components/Modals/PrimaryModal/PrimaryModalState.tsx",
     "unresolvedTo": "../../Modals/PrimaryModal/PrimaryModalState",
     "dependencyTypes": [
@@ -152283,14 +152283,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/FileFullscreenModal/FileFullscreenModal.tsx",
+        "name": "apps/webapp/src/script/components/fileFullscreenModal/fileFullscreenModal.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/FileFullscreenModal/FileEditor/FileEditor.tsx",
+        "name": "apps/webapp/src/script/components/fileFullscreenModal/fileEditor/fileEditor.tsx",
         "dependencyTypes": [
           "local",
           "import"
@@ -152300,9 +152300,9 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/FileFullscreenModal/FileFullscreenModal.tsx",
-    "to": "apps/webapp/src/script/components/FileFullscreenModal/FileEditor/FileEditor.tsx",
-    "unresolvedTo": "./FileEditor/FileEditor",
+    "from": "apps/webapp/src/script/components/fileFullscreenModal/fileFullscreenModal.tsx",
+    "to": "apps/webapp/src/script/components/fileFullscreenModal/fileEditor/fileEditor.tsx",
+    "unresolvedTo": "./fileEditor/fileEditor",
     "dependencyTypes": [
       "local",
       "import"
@@ -152313,7 +152313,7 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/FileFullscreenModal/FileEditor/FileEditor.tsx",
+        "name": "apps/webapp/src/script/components/fileFullscreenModal/fileEditor/fileEditor.tsx",
         "dependencyTypes": [
           "local",
           "import"
@@ -152612,7 +152612,7 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/FileFullscreenModal/FileFullscreenModal.tsx",
+        "name": "apps/webapp/src/script/components/fileFullscreenModal/fileFullscreenModal.tsx",
         "dependencyTypes": [
           "local",
           "import"
@@ -152622,9 +152622,9 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/FileFullscreenModal/FileFullscreenModal.tsx",
-    "to": "apps/webapp/src/script/components/FileFullscreenModal/FileFullscreenModalSourceConversationContext.tsx",
-    "unresolvedTo": "./FileFullscreenModalSourceConversationContext",
+    "from": "apps/webapp/src/script/components/fileFullscreenModal/fileFullscreenModal.tsx",
+    "to": "apps/webapp/src/script/components/fileFullscreenModal/fileFullscreenModalSourceConversationContext.tsx",
+    "unresolvedTo": "./fileFullscreenModalSourceConversationContext",
     "dependencyTypes": [
       "local",
       "import"
@@ -152635,7 +152635,7 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/FileFullscreenModal/FileFullscreenModalSourceConversationContext.tsx",
+        "name": "apps/webapp/src/script/components/fileFullscreenModal/fileFullscreenModalSourceConversationContext.tsx",
         "dependencyTypes": [
           "local",
           "import"
@@ -152834,7 +152834,7 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/FileFullscreenModal/FileFullscreenModal.tsx",
+        "name": "apps/webapp/src/script/components/fileFullscreenModal/fileFullscreenModal.tsx",
         "dependencyTypes": [
           "local",
           "import"
@@ -152844,9 +152844,9 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/FileFullscreenModal/FileFullscreenModal.tsx",
-    "to": "apps/webapp/src/script/components/FileFullscreenModal/FileHeader/FileHeader.tsx",
-    "unresolvedTo": "./FileHeader/FileHeader",
+    "from": "apps/webapp/src/script/components/fileFullscreenModal/fileFullscreenModal.tsx",
+    "to": "apps/webapp/src/script/components/fileFullscreenModal/fileHeader/fileHeader.tsx",
+    "unresolvedTo": "./fileHeader/fileHeader",
     "dependencyTypes": [
       "local",
       "import"
@@ -152857,7 +152857,7 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/FileFullscreenModal/FileHeader/FileHeader.tsx",
+        "name": "apps/webapp/src/script/components/fileFullscreenModal/fileHeader/fileHeader.tsx",
         "dependencyTypes": [
           "local",
           "import"
@@ -153135,7 +153135,7 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/FileFullscreenModal/FileFullscreenModal.tsx",
+        "name": "apps/webapp/src/script/components/fileFullscreenModal/fileFullscreenModal.tsx",
         "dependencyTypes": [
           "local",
           "import"
@@ -153145,9 +153145,9 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/FileFullscreenModal/FileFullscreenModal.tsx",
-    "to": "apps/webapp/src/script/components/FileFullscreenModal/ImageFileView/ImageFileView.tsx",
-    "unresolvedTo": "./ImageFileView/ImageFileView",
+    "from": "apps/webapp/src/script/components/fileFullscreenModal/fileFullscreenModal.tsx",
+    "to": "apps/webapp/src/script/components/fileFullscreenModal/imageFileView/imageFileView.tsx",
+    "unresolvedTo": "./imageFileView/imageFileView",
     "dependencyTypes": [
       "local",
       "import"
@@ -153158,7 +153158,7 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/FileFullscreenModal/ImageFileView/ImageFileView.tsx",
+        "name": "apps/webapp/src/script/components/fileFullscreenModal/imageFileView/imageFileView.tsx",
         "dependencyTypes": [
           "local",
           "import"
@@ -153457,7 +153457,7 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/FileFullscreenModal/FileFullscreenModal.tsx",
+        "name": "apps/webapp/src/script/components/fileFullscreenModal/fileFullscreenModal.tsx",
         "dependencyTypes": [
           "local",
           "import"
@@ -153467,9 +153467,9 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/FileFullscreenModal/FileFullscreenModal.tsx",
-    "to": "apps/webapp/src/script/components/FileFullscreenModal/NoPreviewAvailable/NoPreviewAvailable.tsx",
-    "unresolvedTo": "./NoPreviewAvailable/NoPreviewAvailable",
+    "from": "apps/webapp/src/script/components/fileFullscreenModal/fileFullscreenModal.tsx",
+    "to": "apps/webapp/src/script/components/fileFullscreenModal/noPreviewAvailable/noPreviewAvailable.tsx",
+    "unresolvedTo": "./noPreviewAvailable/noPreviewAvailable",
     "dependencyTypes": [
       "local",
       "import"
@@ -153480,7 +153480,7 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/FileFullscreenModal/NoPreviewAvailable/NoPreviewAvailable.tsx",
+        "name": "apps/webapp/src/script/components/fileFullscreenModal/noPreviewAvailable/noPreviewAvailable.tsx",
         "dependencyTypes": [
           "local",
           "import"
@@ -153779,7 +153779,7 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/FileFullscreenModal/FileFullscreenModal.tsx",
+        "name": "apps/webapp/src/script/components/fileFullscreenModal/fileFullscreenModal.tsx",
         "dependencyTypes": [
           "local",
           "import"
@@ -153789,9 +153789,9 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/FileFullscreenModal/FileFullscreenModal.tsx",
-    "to": "apps/webapp/src/script/components/FileFullscreenModal/PdfViewer/PdfViewer.tsx",
-    "unresolvedTo": "./PdfViewer/PdfViewer",
+    "from": "apps/webapp/src/script/components/fileFullscreenModal/fileFullscreenModal.tsx",
+    "to": "apps/webapp/src/script/components/fileFullscreenModal/pdfViewer/pdfViewer.tsx",
+    "unresolvedTo": "./pdfViewer/pdfViewer",
     "dependencyTypes": [
       "local",
       "import"
@@ -153802,14 +153802,14 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/FileFullscreenModal/PdfViewer/PdfViewer.tsx",
+        "name": "apps/webapp/src/script/components/fileFullscreenModal/pdfViewer/pdfViewer.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/FileFullscreenModal/PdfViewer/PdfControls/PdfControls.tsx",
+        "name": "apps/webapp/src/script/components/fileFullscreenModal/pdfViewer/pdfControls/pdfControls.tsx",
         "dependencyTypes": [
           "local",
           "import"
@@ -154108,7 +154108,7 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/FileFullscreenModal/FileFullscreenModal.tsx",
+        "name": "apps/webapp/src/script/components/fileFullscreenModal/fileFullscreenModal.tsx",
         "dependencyTypes": [
           "local",
           "import"
@@ -154118,7 +154118,7 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/FileFullscreenModal/FileFullscreenModal.tsx",
+    "from": "apps/webapp/src/script/components/fileFullscreenModal/fileFullscreenModal.tsx",
     "to": "apps/webapp/src/script/components/fullscreenModal/fullscreenModal.tsx",
     "unresolvedTo": "../fullscreenModal/fullscreenModal",
     "dependencyTypes": [
@@ -154337,7 +154337,7 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/FileFullscreenModal/FileFullscreenModal.tsx",
+        "name": "apps/webapp/src/script/components/fileFullscreenModal/fileFullscreenModal.tsx",
         "dependencyTypes": [
           "local",
           "import"
@@ -154347,7 +154347,7 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/FileFullscreenModal/FileFullscreenModal.tsx",
+    "from": "apps/webapp/src/script/components/fileFullscreenModal/fileFullscreenModal.tsx",
     "to": "apps/webapp/src/script/util/util.ts",
     "unresolvedTo": "../../util/util",
     "dependencyTypes": [
@@ -154559,7 +154559,7 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/FileFullscreenModal/FileFullscreenModal.tsx",
+        "name": "apps/webapp/src/script/components/fileFullscreenModal/fileFullscreenModal.tsx",
         "dependencyTypes": [
           "local",
           "import"
@@ -154569,7 +154569,7 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/FileFullscreenModal/FileHeader/FileHeader.tsx",
+    "from": "apps/webapp/src/script/components/fileFullscreenModal/fileHeader/fileHeader.tsx",
     "to": "apps/webapp/src/script/components/avatar/index.ts",
     "unresolvedTo": "../../avatar",
     "dependencyTypes": [
@@ -154879,14 +154879,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/FileFullscreenModal/FileFullscreenModal.tsx",
+        "name": "apps/webapp/src/script/components/fileFullscreenModal/fileFullscreenModal.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/FileFullscreenModal/FileHeader/FileHeader.tsx",
+        "name": "apps/webapp/src/script/components/fileFullscreenModal/fileHeader/fileHeader.tsx",
         "dependencyTypes": [
           "local",
           "import"
@@ -154896,7 +154896,7 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/FileFullscreenModal/FileHeader/FileHeader.tsx",
+    "from": "apps/webapp/src/script/components/fileFullscreenModal/fileHeader/fileHeader.tsx",
     "to": "apps/webapp/src/script/components/messagesList/message/messageTime.tsx",
     "unresolvedTo": "../../messagesList/message/messageTime",
     "dependencyTypes": [
@@ -155180,14 +155180,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/FileFullscreenModal/FileFullscreenModal.tsx",
+        "name": "apps/webapp/src/script/components/fileFullscreenModal/fileFullscreenModal.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/FileFullscreenModal/FileHeader/FileHeader.tsx",
+        "name": "apps/webapp/src/script/components/fileFullscreenModal/fileHeader/fileHeader.tsx",
         "dependencyTypes": [
           "local",
           "import"
@@ -155197,7 +155197,7 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/FileFullscreenModal/FileHeader/FileHeader.tsx",
+    "from": "apps/webapp/src/script/components/fileFullscreenModal/fileHeader/fileHeader.tsx",
     "to": "apps/webapp/src/script/util/useChannelsFeatureFlag.ts",
     "unresolvedTo": "../../../util/useChannelsFeatureFlag",
     "dependencyTypes": [
@@ -155423,14 +155423,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/FileFullscreenModal/FileFullscreenModal.tsx",
+        "name": "apps/webapp/src/script/components/fileFullscreenModal/fileFullscreenModal.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/FileFullscreenModal/FileHeader/FileHeader.tsx",
+        "name": "apps/webapp/src/script/components/fileFullscreenModal/fileHeader/fileHeader.tsx",
         "dependencyTypes": [
           "local",
           "import"
@@ -155440,7 +155440,7 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/FileFullscreenModal/FileHeader/FileHeader.tsx",
+    "from": "apps/webapp/src/script/components/fileFullscreenModal/fileHeader/fileHeader.tsx",
     "to": "apps/webapp/src/script/util/util.ts",
     "unresolvedTo": "../../../util/util",
     "dependencyTypes": [
@@ -155652,14 +155652,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/FileFullscreenModal/FileFullscreenModal.tsx",
+        "name": "apps/webapp/src/script/components/fileFullscreenModal/fileFullscreenModal.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/FileFullscreenModal/FileHeader/FileHeader.tsx",
+        "name": "apps/webapp/src/script/components/fileFullscreenModal/fileHeader/fileHeader.tsx",
         "dependencyTypes": [
           "local",
           "import"
@@ -155669,7 +155669,7 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/FileFullscreenModal/NoPreviewAvailable/NoPreviewAvailable.tsx",
+    "from": "apps/webapp/src/script/components/fileFullscreenModal/noPreviewAvailable/noPreviewAvailable.tsx",
     "to": "apps/webapp/src/script/util/util.ts",
     "unresolvedTo": "../../../util/util",
     "dependencyTypes": [
@@ -155881,14 +155881,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/FileFullscreenModal/FileFullscreenModal.tsx",
+        "name": "apps/webapp/src/script/components/fileFullscreenModal/fileFullscreenModal.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/FileFullscreenModal/NoPreviewAvailable/NoPreviewAvailable.tsx",
+        "name": "apps/webapp/src/script/components/fileFullscreenModal/noPreviewAvailable/noPreviewAvailable.tsx",
         "dependencyTypes": [
           "local",
           "import"
@@ -155898,9 +155898,9 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/FileFullscreenModal/PdfViewer/PdfViewer.tsx",
-    "to": "apps/webapp/src/script/components/FileFullscreenModal/PdfViewer/PdfError/PdfError.tsx",
-    "unresolvedTo": "./PdfError/PdfError",
+    "from": "apps/webapp/src/script/components/fileFullscreenModal/pdfViewer/pdfViewer.tsx",
+    "to": "apps/webapp/src/script/components/fileFullscreenModal/pdfViewer/pdfError/pdfError.tsx",
+    "unresolvedTo": "./pdfError/pdfError",
     "dependencyTypes": [
       "local",
       "import"
@@ -155911,7 +155911,7 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/FileFullscreenModal/PdfViewer/PdfError/PdfError.tsx",
+        "name": "apps/webapp/src/script/components/fileFullscreenModal/pdfViewer/pdfError/pdfError.tsx",
         "dependencyTypes": [
           "local",
           "import"
@@ -156210,14 +156210,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/FileFullscreenModal/FileFullscreenModal.tsx",
+        "name": "apps/webapp/src/script/components/fileFullscreenModal/fileFullscreenModal.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/FileFullscreenModal/PdfViewer/PdfViewer.tsx",
+        "name": "apps/webapp/src/script/components/fileFullscreenModal/pdfViewer/pdfViewer.tsx",
         "dependencyTypes": [
           "local",
           "import"
@@ -184051,8 +184051,8 @@
   {
     "type": "cycle",
     "from": "apps/webapp/src/script/components/inputBar/replyBar/replyBar.tsx",
-    "to": "apps/webapp/src/script/components/asset/RestrictedVideo.tsx",
-    "unresolvedTo": "../../asset/RestrictedVideo",
+    "to": "apps/webapp/src/script/components/asset/restrictedVideo.tsx",
+    "unresolvedTo": "../../asset/restrictedVideo",
     "dependencyTypes": [
       "local",
       "import"
@@ -184063,7 +184063,7 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/asset/RestrictedVideo.tsx",
+        "name": "apps/webapp/src/script/components/asset/restrictedVideo.tsx",
         "dependencyTypes": [
           "local",
           "import"
@@ -191394,9 +191394,9 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/LegalHoldDot/index.tsx",
-    "to": "apps/webapp/src/script/components/LegalHoldDot/LegalHoldDot.tsx",
-    "unresolvedTo": "./LegalHoldDot",
+    "from": "apps/webapp/src/script/components/legalHoldDot/index.tsx",
+    "to": "apps/webapp/src/script/components/legalHoldDot/legalHoldDot.tsx",
+    "unresolvedTo": "./legalHoldDot",
     "dependencyTypes": [
       "local",
       "export"
@@ -191407,7 +191407,7 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/LegalHoldDot/LegalHoldDot.tsx",
+        "name": "apps/webapp/src/script/components/legalHoldDot/legalHoldDot.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -191487,7 +191487,7 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/LegalHoldDot/index.tsx",
+        "name": "apps/webapp/src/script/components/legalHoldDot/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
@@ -219647,8 +219647,8 @@
   {
     "type": "cycle",
     "from": "apps/webapp/src/script/components/meeting/meetingParticipantsPicker/meetingParticipantsPicker.tsx",
-    "to": "apps/webapp/src/script/components/UserSearchableList/index.tsx",
-    "unresolvedTo": "../../UserSearchableList",
+    "to": "apps/webapp/src/script/components/userSearchableList/index.tsx",
+    "unresolvedTo": "../../userSearchableList",
     "dependencyTypes": [
       "local",
       "import"
@@ -219659,14 +219659,14 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/UserSearchableList/index.tsx",
+        "name": "apps/webapp/src/script/components/userSearchableList/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserSearchableList/UserSearchableList.tsx",
+        "name": "apps/webapp/src/script/components/userSearchableList/userSearchableList.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -233986,7 +233986,7 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/PasswordFields/PasswordFields.tsx",
+        "name": "apps/webapp/src/script/components/passwordFields/passwordFields.tsx",
         "dependencyTypes": [
           "local",
           "import"
@@ -243091,7 +243091,7 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/PasswordFields/PasswordFields.tsx",
+        "name": "apps/webapp/src/script/components/passwordFields/passwordFields.tsx",
         "dependencyTypes": [
           "local",
           "import"
@@ -255462,8 +255462,8 @@
   {
     "type": "cycle",
     "from": "apps/webapp/src/script/components/meeting/shared/meetingLinkForm/meetingLinkForm.tsx",
-    "to": "apps/webapp/src/script/components/PasswordGeneratorButton/index.tsx",
-    "unresolvedTo": "../../../PasswordGeneratorButton",
+    "to": "apps/webapp/src/script/components/passwordGeneratorButton/index.tsx",
+    "unresolvedTo": "../../../passwordGeneratorButton",
     "dependencyTypes": [
       "local",
       "import"
@@ -255474,14 +255474,14 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/PasswordGeneratorButton/index.tsx",
+        "name": "apps/webapp/src/script/components/passwordGeneratorButton/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/PasswordGeneratorButton/PasswordGeneratorButton.tsx",
+        "name": "apps/webapp/src/script/components/passwordGeneratorButton/passwordGeneratorButton.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -261545,8 +261545,8 @@
   {
     "type": "cycle",
     "from": "apps/webapp/src/script/components/meeting/shared/submit/showMeetingPartialAddFailureModal.tsx",
-    "to": "apps/webapp/src/script/components/UserName/index.tsx",
-    "unresolvedTo": "../../../UserName",
+    "to": "apps/webapp/src/script/components/userName/index.tsx",
+    "unresolvedTo": "../../../userName",
     "dependencyTypes": [
       "local",
       "import"
@@ -261557,14 +261557,14 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/UserName/index.tsx",
+        "name": "apps/webapp/src/script/components/userName/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserName/UserName.tsx",
+        "name": "apps/webapp/src/script/components/userName/userName.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -292440,8 +292440,8 @@
   {
     "type": "cycle",
     "from": "apps/webapp/src/script/components/messagesList/message/contentMessage/asset/multipartAssetPreview.tsx",
-    "to": "apps/webapp/src/script/components/FileFullscreenModal/FileFullscreenModal.tsx",
-    "unresolvedTo": "../../../../FileFullscreenModal/FileFullscreenModal",
+    "to": "apps/webapp/src/script/components/fileFullscreenModal/fileFullscreenModal.tsx",
+    "unresolvedTo": "../../../../fileFullscreenModal/fileFullscreenModal",
     "dependencyTypes": [
       "local",
       "import"
@@ -292452,7 +292452,7 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/FileFullscreenModal/FileFullscreenModal.tsx",
+        "name": "apps/webapp/src/script/components/fileFullscreenModal/fileFullscreenModal.tsx",
         "dependencyTypes": [
           "local",
           "import"
@@ -293304,8 +293304,8 @@
   {
     "type": "cycle",
     "from": "apps/webapp/src/script/components/messagesList/message/contentMessage/asset/multipartAssets/fileAssetCard/common/filePreviewModal/filePreviewModal.tsx",
-    "to": "apps/webapp/src/script/components/FileFullscreenModal/FileFullscreenModal.tsx",
-    "unresolvedTo": "../../../../../../../../FileFullscreenModal/FileFullscreenModal",
+    "to": "apps/webapp/src/script/components/fileFullscreenModal/fileFullscreenModal.tsx",
+    "unresolvedTo": "../../../../../../../../fileFullscreenModal/fileFullscreenModal",
     "dependencyTypes": [
       "local",
       "import"
@@ -293316,7 +293316,7 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/FileFullscreenModal/FileFullscreenModal.tsx",
+        "name": "apps/webapp/src/script/components/fileFullscreenModal/fileFullscreenModal.tsx",
         "dependencyTypes": [
           "local",
           "import"
@@ -295925,7 +295925,7 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/FileFullscreenModal/FileFullscreenModal.tsx",
+        "name": "apps/webapp/src/script/components/fileFullscreenModal/fileFullscreenModal.tsx",
         "dependencyTypes": [
           "local",
           "import"
@@ -296954,8 +296954,8 @@
   {
     "type": "cycle",
     "from": "apps/webapp/src/script/components/messagesList/message/contentMessage/asset/multipartAssets/imageAssetCard/imageAssetLarge/imageAssetLarge.tsx",
-    "to": "apps/webapp/src/script/components/FileFullscreenModal/FileFullscreenModal.tsx",
-    "unresolvedTo": "../../../../../../../FileFullscreenModal/FileFullscreenModal",
+    "to": "apps/webapp/src/script/components/fileFullscreenModal/fileFullscreenModal.tsx",
+    "unresolvedTo": "../../../../../../../fileFullscreenModal/fileFullscreenModal",
     "dependencyTypes": [
       "local",
       "import"
@@ -296966,7 +296966,7 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/FileFullscreenModal/FileFullscreenModal.tsx",
+        "name": "apps/webapp/src/script/components/fileFullscreenModal/fileFullscreenModal.tsx",
         "dependencyTypes": [
           "local",
           "import"
@@ -297239,8 +297239,8 @@
   {
     "type": "cycle",
     "from": "apps/webapp/src/script/components/messagesList/message/contentMessage/asset/multipartAssets/imageAssetCard/imageAssetSmall/imageAssetSmall.tsx",
-    "to": "apps/webapp/src/script/components/FileFullscreenModal/FileFullscreenModal.tsx",
-    "unresolvedTo": "../../../../../../../FileFullscreenModal/FileFullscreenModal",
+    "to": "apps/webapp/src/script/components/fileFullscreenModal/fileFullscreenModal.tsx",
+    "unresolvedTo": "../../../../../../../fileFullscreenModal/fileFullscreenModal",
     "dependencyTypes": [
       "local",
       "import"
@@ -297251,7 +297251,7 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/FileFullscreenModal/FileFullscreenModal.tsx",
+        "name": "apps/webapp/src/script/components/fileFullscreenModal/fileFullscreenModal.tsx",
         "dependencyTypes": [
           "local",
           "import"
@@ -300866,7 +300866,7 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/FileFullscreenModal/FileFullscreenModal.tsx",
+        "name": "apps/webapp/src/script/components/fileFullscreenModal/fileFullscreenModal.tsx",
         "dependencyTypes": [
           "local",
           "import"
@@ -302672,8 +302672,8 @@
   {
     "type": "cycle",
     "from": "apps/webapp/src/script/components/messagesList/message/contentMessage/asset/multipartAssets/videoAssetCard/videoAssetSmall/videoAssetSmall.tsx",
-    "to": "apps/webapp/src/script/components/FileFullscreenModal/FileFullscreenModal.tsx",
-    "unresolvedTo": "../../../../../../../FileFullscreenModal/FileFullscreenModal",
+    "to": "apps/webapp/src/script/components/fileFullscreenModal/fileFullscreenModal.tsx",
+    "unresolvedTo": "../../../../../../../fileFullscreenModal/fileFullscreenModal",
     "dependencyTypes": [
       "local",
       "import"
@@ -302684,7 +302684,7 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/FileFullscreenModal/FileFullscreenModal.tsx",
+        "name": "apps/webapp/src/script/components/fileFullscreenModal/fileFullscreenModal.tsx",
         "dependencyTypes": [
           "local",
           "import"
@@ -303342,8 +303342,8 @@
   {
     "type": "cycle",
     "from": "apps/webapp/src/script/components/messagesList/message/contentMessage/asset/videoAsset/videoAsset.tsx",
-    "to": "apps/webapp/src/script/components/asset/RestrictedVideo.tsx",
-    "unresolvedTo": "../../../../../asset/RestrictedVideo",
+    "to": "apps/webapp/src/script/components/asset/restrictedVideo.tsx",
+    "unresolvedTo": "../../../../../asset/restrictedVideo",
     "dependencyTypes": [
       "local",
       "import"
@@ -303354,7 +303354,7 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/asset/RestrictedVideo.tsx",
+        "name": "apps/webapp/src/script/components/asset/restrictedVideo.tsx",
         "dependencyTypes": [
           "local",
           "import"
@@ -306176,8 +306176,8 @@
   {
     "type": "cycle",
     "from": "apps/webapp/src/script/components/messagesList/message/contentMessage/contentMessage.tsx",
-    "to": "apps/webapp/src/script/components/FileFullscreenModal/FileFullscreenModalSourceConversationContext.tsx",
-    "unresolvedTo": "../../../FileFullscreenModal/FileFullscreenModalSourceConversationContext",
+    "to": "apps/webapp/src/script/components/fileFullscreenModal/fileFullscreenModalSourceConversationContext.tsx",
+    "unresolvedTo": "../../../fileFullscreenModal/fileFullscreenModalSourceConversationContext",
     "dependencyTypes": [
       "local",
       "import"
@@ -306188,7 +306188,7 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/FileFullscreenModal/FileFullscreenModalSourceConversationContext.tsx",
+        "name": "apps/webapp/src/script/components/fileFullscreenModal/fileFullscreenModalSourceConversationContext.tsx",
         "dependencyTypes": [
           "local",
           "import"
@@ -315708,8 +315708,8 @@
   {
     "type": "cycle",
     "from": "apps/webapp/src/script/components/messagesList/message/contentMessage/messageHeader.tsx",
-    "to": "apps/webapp/src/script/components/UserName/index.tsx",
-    "unresolvedTo": "../../../UserName",
+    "to": "apps/webapp/src/script/components/userName/index.tsx",
+    "unresolvedTo": "../../../userName",
     "dependencyTypes": [
       "local",
       "import"
@@ -315720,14 +315720,14 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/UserName/index.tsx",
+        "name": "apps/webapp/src/script/components/userName/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserName/UserName.tsx",
+        "name": "apps/webapp/src/script/components/userName/userName.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -325524,8 +325524,8 @@
   {
     "type": "cycle",
     "from": "apps/webapp/src/script/components/messagesList/message/failedToAddUsersMessage.tsx",
-    "to": "apps/webapp/src/script/components/UserName/index.tsx",
-    "unresolvedTo": "../../UserName",
+    "to": "apps/webapp/src/script/components/userName/index.tsx",
+    "unresolvedTo": "../../userName",
     "dependencyTypes": [
       "local",
       "import"
@@ -325536,14 +325536,14 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/UserName/index.tsx",
+        "name": "apps/webapp/src/script/components/userName/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserName/UserName.tsx",
+        "name": "apps/webapp/src/script/components/userName/userName.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -328573,8 +328573,8 @@
   {
     "type": "cycle",
     "from": "apps/webapp/src/script/components/messagesList/message/legalHoldMessage.tsx",
-    "to": "apps/webapp/src/script/components/LegalHoldDot/index.tsx",
-    "unresolvedTo": "../../LegalHoldDot",
+    "to": "apps/webapp/src/script/components/legalHoldDot/index.tsx",
+    "unresolvedTo": "../../legalHoldDot",
     "dependencyTypes": [
       "local",
       "import"
@@ -328585,14 +328585,14 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/LegalHoldDot/index.tsx",
+        "name": "apps/webapp/src/script/components/legalHoldDot/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/LegalHoldDot/LegalHoldDot.tsx",
+        "name": "apps/webapp/src/script/components/legalHoldDot/legalHoldDot.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -377682,8 +377682,8 @@
   {
     "type": "cycle",
     "from": "apps/webapp/src/script/components/Modals/CreateConversation/CreateConversationSteps/ConversationDetails/ConversationNameInput.tsx",
-    "to": "apps/webapp/src/script/components/TextInput/index.ts",
-    "unresolvedTo": "../../../../TextInput",
+    "to": "apps/webapp/src/script/components/textInput/index.ts",
+    "unresolvedTo": "../../../../textInput",
     "dependencyTypes": [
       "local",
       "import"
@@ -377694,14 +377694,14 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/TextInput/index.ts",
+        "name": "apps/webapp/src/script/components/textInput/index.ts",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/TextInput/TextInput.tsx",
+        "name": "apps/webapp/src/script/components/textInput/textInput.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -382476,8 +382476,8 @@
   {
     "type": "cycle",
     "from": "apps/webapp/src/script/components/Modals/CreateConversation/CreateConversationSteps/ParticipantsSelection.tsx",
-    "to": "apps/webapp/src/script/components/SearchInput/index.tsx",
-    "unresolvedTo": "../../../SearchInput",
+    "to": "apps/webapp/src/script/components/searchInput/index.tsx",
+    "unresolvedTo": "../../../searchInput",
     "dependencyTypes": [
       "local",
       "import"
@@ -382488,14 +382488,14 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/SearchInput/index.tsx",
+        "name": "apps/webapp/src/script/components/searchInput/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/SearchInput/SearchInput.tsx",
+        "name": "apps/webapp/src/script/components/searchInput/searchInput.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -382819,8 +382819,8 @@
   {
     "type": "cycle",
     "from": "apps/webapp/src/script/components/Modals/CreateConversation/CreateConversationSteps/ParticipantsSelection.tsx",
-    "to": "apps/webapp/src/script/components/UserSearchableList/index.tsx",
-    "unresolvedTo": "../../../UserSearchableList",
+    "to": "apps/webapp/src/script/components/userSearchableList/index.tsx",
+    "unresolvedTo": "../../../userSearchableList",
     "dependencyTypes": [
       "local",
       "import"
@@ -382831,14 +382831,14 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/UserSearchableList/index.tsx",
+        "name": "apps/webapp/src/script/components/userSearchableList/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserSearchableList/UserSearchableList.tsx",
+        "name": "apps/webapp/src/script/components/userSearchableList/userSearchableList.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -384579,8 +384579,8 @@
   {
     "type": "cycle",
     "from": "apps/webapp/src/script/components/Modals/CreateConversation/CreateConversationSteps/Preference.tsx",
-    "to": "apps/webapp/src/script/components/Note/AppsDisabledNote/AppsDisabledNote.tsx",
-    "unresolvedTo": "../../../Note/AppsDisabledNote/AppsDisabledNote",
+    "to": "apps/webapp/src/script/components/note/appsDisabledNote/appsDisabledNote.tsx",
+    "unresolvedTo": "../../../note/appsDisabledNote/appsDisabledNote",
     "dependencyTypes": [
       "local",
       "import"
@@ -384591,7 +384591,7 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/Note/AppsDisabledNote/AppsDisabledNote.tsx",
+        "name": "apps/webapp/src/script/components/note/appsDisabledNote/appsDisabledNote.tsx",
         "dependencyTypes": [
           "local",
           "import"
@@ -395704,8 +395704,8 @@
   {
     "type": "cycle",
     "from": "apps/webapp/src/script/components/Modals/GroupCreation/GroupCreationModal.tsx",
-    "to": "apps/webapp/src/script/components/Note/AppsDisabledNote/AppsDisabledNote.tsx",
-    "unresolvedTo": "../../Note/AppsDisabledNote/AppsDisabledNote",
+    "to": "apps/webapp/src/script/components/note/appsDisabledNote/appsDisabledNote.tsx",
+    "unresolvedTo": "../../note/appsDisabledNote/appsDisabledNote",
     "dependencyTypes": [
       "local",
       "import"
@@ -395716,7 +395716,7 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/Note/AppsDisabledNote/AppsDisabledNote.tsx",
+        "name": "apps/webapp/src/script/components/note/appsDisabledNote/appsDisabledNote.tsx",
         "dependencyTypes": [
           "local",
           "import"
@@ -396026,8 +396026,8 @@
   {
     "type": "cycle",
     "from": "apps/webapp/src/script/components/Modals/GroupCreation/GroupCreationModal.tsx",
-    "to": "apps/webapp/src/script/components/SearchInput/index.tsx",
-    "unresolvedTo": "../../SearchInput",
+    "to": "apps/webapp/src/script/components/searchInput/index.tsx",
+    "unresolvedTo": "../../searchInput",
     "dependencyTypes": [
       "local",
       "import"
@@ -396038,14 +396038,14 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/SearchInput/index.tsx",
+        "name": "apps/webapp/src/script/components/searchInput/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/SearchInput/SearchInput.tsx",
+        "name": "apps/webapp/src/script/components/searchInput/searchInput.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -396355,8 +396355,8 @@
   {
     "type": "cycle",
     "from": "apps/webapp/src/script/components/Modals/GroupCreation/GroupCreationModal.tsx",
-    "to": "apps/webapp/src/script/components/TextInput/index.ts",
-    "unresolvedTo": "../../TextInput",
+    "to": "apps/webapp/src/script/components/textInput/index.ts",
+    "unresolvedTo": "../../textInput",
     "dependencyTypes": [
       "local",
       "import"
@@ -396367,14 +396367,14 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/TextInput/index.ts",
+        "name": "apps/webapp/src/script/components/textInput/index.ts",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/TextInput/TextInput.tsx",
+        "name": "apps/webapp/src/script/components/textInput/textInput.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -396684,8 +396684,8 @@
   {
     "type": "cycle",
     "from": "apps/webapp/src/script/components/Modals/GroupCreation/GroupCreationModal.tsx",
-    "to": "apps/webapp/src/script/components/UserSearchableList/index.tsx",
-    "unresolvedTo": "../../UserSearchableList",
+    "to": "apps/webapp/src/script/components/userSearchableList/index.tsx",
+    "unresolvedTo": "../../userSearchableList",
     "dependencyTypes": [
       "local",
       "import"
@@ -396696,14 +396696,14 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/UserSearchableList/index.tsx",
+        "name": "apps/webapp/src/script/components/userSearchableList/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserSearchableList/UserSearchableList.tsx",
+        "name": "apps/webapp/src/script/components/userSearchableList/userSearchableList.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -399964,8 +399964,8 @@
   {
     "type": "cycle",
     "from": "apps/webapp/src/script/components/Modals/LegalHoldModal/LegalHoldModal.tsx",
-    "to": "apps/webapp/src/script/components/UserSearchableList/index.tsx",
-    "unresolvedTo": "../../UserSearchableList",
+    "to": "apps/webapp/src/script/components/userSearchableList/index.tsx",
+    "unresolvedTo": "../../userSearchableList",
     "dependencyTypes": [
       "local",
       "import"
@@ -399976,14 +399976,14 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/UserSearchableList/index.tsx",
+        "name": "apps/webapp/src/script/components/userSearchableList/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserSearchableList/UserSearchableList.tsx",
+        "name": "apps/webapp/src/script/components/userSearchableList/userSearchableList.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -412191,8 +412191,8 @@
   {
     "type": "cycle",
     "from": "apps/webapp/src/script/components/panel/userDetails.tsx",
-    "to": "apps/webapp/src/script/components/UserInfo/index.tsx",
-    "unresolvedTo": "../UserInfo",
+    "to": "apps/webapp/src/script/components/userInfo/index.tsx",
+    "unresolvedTo": "../userInfo",
     "dependencyTypes": [
       "local",
       "import"
@@ -412203,14 +412203,14 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/UserInfo/index.tsx",
+        "name": "apps/webapp/src/script/components/userInfo/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserInfo/UserInfo.tsx",
+        "name": "apps/webapp/src/script/components/userInfo/userInfo.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -412979,14 +412979,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserSearchableList/index.tsx",
+        "name": "apps/webapp/src/script/components/userSearchableList/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserSearchableList/UserSearchableList.tsx",
+        "name": "apps/webapp/src/script/components/userSearchableList/userSearchableList.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -413378,14 +413378,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserSearchableList/index.tsx",
+        "name": "apps/webapp/src/script/components/userSearchableList/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserSearchableList/UserSearchableList.tsx",
+        "name": "apps/webapp/src/script/components/userSearchableList/userSearchableList.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -413438,8 +413438,8 @@
   {
     "type": "cycle",
     "from": "apps/webapp/src/script/components/participantItemContent/participantItemContent.tsx",
-    "to": "apps/webapp/src/script/components/UserInfo/index.tsx",
-    "unresolvedTo": "../UserInfo",
+    "to": "apps/webapp/src/script/components/userInfo/index.tsx",
+    "unresolvedTo": "../userInfo",
     "dependencyTypes": [
       "local",
       "import"
@@ -413450,14 +413450,14 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/UserInfo/index.tsx",
+        "name": "apps/webapp/src/script/components/userInfo/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserInfo/UserInfo.tsx",
+        "name": "apps/webapp/src/script/components/userInfo/userInfo.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -413705,14 +413705,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserSearchableList/index.tsx",
+        "name": "apps/webapp/src/script/components/userSearchableList/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserSearchableList/UserSearchableList.tsx",
+        "name": "apps/webapp/src/script/components/userSearchableList/userSearchableList.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -413764,7 +413764,7 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/PasswordGeneratorButton/PasswordGeneratorButton.tsx",
+    "from": "apps/webapp/src/script/components/passwordGeneratorButton/passwordGeneratorButton.tsx",
     "to": "apps/webapp/src/script/util/stringUtil.ts",
     "unresolvedTo": "../../util/stringUtil",
     "dependencyTypes": [
@@ -414089,14 +414089,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/PasswordGeneratorButton/index.tsx",
+        "name": "apps/webapp/src/script/components/passwordGeneratorButton/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/PasswordGeneratorButton/PasswordGeneratorButton.tsx",
+        "name": "apps/webapp/src/script/components/passwordGeneratorButton/passwordGeneratorButton.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -414106,7 +414106,7 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/SearchInput/SearchInput.tsx",
+    "from": "apps/webapp/src/script/components/searchInput/searchInput.tsx",
     "to": "apps/webapp/src/script/repositories/entity/User/index.ts",
     "unresolvedTo": "../../repositories/entity/User",
     "dependencyTypes": [
@@ -414362,14 +414362,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/SearchInput/index.tsx",
+        "name": "apps/webapp/src/script/components/searchInput/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/SearchInput/SearchInput.tsx",
+        "name": "apps/webapp/src/script/components/searchInput/searchInput.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -414379,9 +414379,9 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/ServiceList/components/ServiceListItem/index.ts",
-    "to": "apps/webapp/src/script/components/ServiceList/components/ServiceListItem/ServiceListItem.tsx",
-    "unresolvedTo": "./ServiceListItem",
+    "from": "apps/webapp/src/script/components/serviceList/components/serviceListItem/index.ts",
+    "to": "apps/webapp/src/script/components/serviceList/components/serviceListItem/serviceListItem.tsx",
+    "unresolvedTo": "./serviceListItem",
     "dependencyTypes": [
       "local",
       "export"
@@ -414392,7 +414392,7 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/ServiceList/components/ServiceListItem/ServiceListItem.tsx",
+        "name": "apps/webapp/src/script/components/serviceList/components/serviceListItem/serviceListItem.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -414677,14 +414677,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/ServiceList/ServiceList.tsx",
+        "name": "apps/webapp/src/script/components/serviceList/serviceList.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/ServiceList/components/ServiceListItem/index.ts",
+        "name": "apps/webapp/src/script/components/serviceList/components/serviceListItem/index.ts",
         "dependencyTypes": [
           "local",
           "import"
@@ -414694,7 +414694,7 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/ServiceList/components/ServiceListItem/ServiceListItem.tsx",
+    "from": "apps/webapp/src/script/components/serviceList/components/serviceListItem/serviceListItem.tsx",
     "to": "apps/webapp/src/script/components/avatar/index.ts",
     "unresolvedTo": "../../../avatar",
     "dependencyTypes": [
@@ -414990,21 +414990,21 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/ServiceList/ServiceList.tsx",
+        "name": "apps/webapp/src/script/components/serviceList/serviceList.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/ServiceList/components/ServiceListItem/index.ts",
+        "name": "apps/webapp/src/script/components/serviceList/components/serviceListItem/index.ts",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/ServiceList/components/ServiceListItem/ServiceListItem.tsx",
+        "name": "apps/webapp/src/script/components/serviceList/components/serviceListItem/serviceListItem.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -415014,7 +415014,7 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/ServiceList/components/ServiceListItem/ServiceListItem.tsx",
+    "from": "apps/webapp/src/script/components/serviceList/components/serviceListItem/serviceListItem.tsx",
     "to": "apps/webapp/src/script/components/participantItemContent/index.ts",
     "unresolvedTo": "../../../participantItemContent",
     "dependencyTypes": [
@@ -415310,21 +415310,21 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/ServiceList/ServiceList.tsx",
+        "name": "apps/webapp/src/script/components/serviceList/serviceList.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/ServiceList/components/ServiceListItem/index.ts",
+        "name": "apps/webapp/src/script/components/serviceList/components/serviceListItem/index.ts",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/ServiceList/components/ServiceListItem/ServiceListItem.tsx",
+        "name": "apps/webapp/src/script/components/serviceList/components/serviceListItem/serviceListItem.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -415334,9 +415334,9 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/ServiceList/index.ts",
-    "to": "apps/webapp/src/script/components/ServiceList/ServiceList.tsx",
-    "unresolvedTo": "./ServiceList",
+    "from": "apps/webapp/src/script/components/serviceList/index.ts",
+    "to": "apps/webapp/src/script/components/serviceList/serviceList.tsx",
+    "unresolvedTo": "./serviceList",
     "dependencyTypes": [
       "local",
       "export"
@@ -415347,7 +415347,7 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/ServiceList/ServiceList.tsx",
+        "name": "apps/webapp/src/script/components/serviceList/serviceList.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -415589,7 +415589,7 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/ServiceList/index.ts",
+        "name": "apps/webapp/src/script/components/serviceList/index.ts",
         "dependencyTypes": [
           "local",
           "import"
@@ -415936,8 +415936,8 @@
   {
     "type": "cycle",
     "from": "apps/webapp/src/script/components/titleBar/titleBar.tsx",
-    "to": "apps/webapp/src/script/components/LegalHoldDot/index.tsx",
-    "unresolvedTo": "../LegalHoldDot",
+    "to": "apps/webapp/src/script/components/legalHoldDot/index.tsx",
+    "unresolvedTo": "../legalHoldDot",
     "dependencyTypes": [
       "local",
       "import"
@@ -415948,14 +415948,14 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/LegalHoldDot/index.tsx",
+        "name": "apps/webapp/src/script/components/legalHoldDot/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/LegalHoldDot/LegalHoldDot.tsx",
+        "name": "apps/webapp/src/script/components/legalHoldDot/legalHoldDot.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -418813,14 +418813,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/userDevices/components/DeviceList/index.tsx",
+        "name": "apps/webapp/src/script/components/userDevices/components/deviceList/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/userDevices/components/DeviceList/DeviceList.tsx",
+        "name": "apps/webapp/src/script/components/userDevices/components/deviceList/deviceList.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -418845,8 +418845,8 @@
   {
     "type": "cycle",
     "from": "apps/webapp/src/script/components/userDevices/components/deviceCard/deviceCard.tsx",
-    "to": "apps/webapp/src/script/components/LegalHoldDot/index.tsx",
-    "unresolvedTo": "../../../LegalHoldDot",
+    "to": "apps/webapp/src/script/components/legalHoldDot/index.tsx",
+    "unresolvedTo": "../../../legalHoldDot",
     "dependencyTypes": [
       "local",
       "import"
@@ -418857,14 +418857,14 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/LegalHoldDot/index.tsx",
+        "name": "apps/webapp/src/script/components/legalHoldDot/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/LegalHoldDot/LegalHoldDot.tsx",
+        "name": "apps/webapp/src/script/components/legalHoldDot/legalHoldDot.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -418972,14 +418972,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/userDevices/components/DeviceList/index.tsx",
+        "name": "apps/webapp/src/script/components/userDevices/components/deviceList/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/userDevices/components/DeviceList/DeviceList.tsx",
+        "name": "apps/webapp/src/script/components/userDevices/components/deviceList/deviceList.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -419231,14 +419231,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/userDevices/components/DeviceList/index.tsx",
+        "name": "apps/webapp/src/script/components/userDevices/components/deviceList/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/userDevices/components/DeviceList/DeviceList.tsx",
+        "name": "apps/webapp/src/script/components/userDevices/components/deviceList/deviceList.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -419376,14 +419376,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/userDevices/components/DeviceList/index.tsx",
+        "name": "apps/webapp/src/script/components/userDevices/components/deviceList/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/userDevices/components/DeviceList/DeviceList.tsx",
+        "name": "apps/webapp/src/script/components/userDevices/components/deviceList/deviceList.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -419515,14 +419515,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/userDevices/components/DeviceList/index.tsx",
+        "name": "apps/webapp/src/script/components/userDevices/components/deviceList/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/userDevices/components/DeviceList/DeviceList.tsx",
+        "name": "apps/webapp/src/script/components/userDevices/components/deviceList/deviceList.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -419645,14 +419645,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/userDevices/components/DeviceList/index.tsx",
+        "name": "apps/webapp/src/script/components/userDevices/components/deviceList/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/userDevices/components/DeviceList/DeviceList.tsx",
+        "name": "apps/webapp/src/script/components/userDevices/components/deviceList/deviceList.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -419676,7 +419676,7 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/userDevices/components/deviceDetails/DeviceDetails.tsx",
+    "from": "apps/webapp/src/script/components/userDevices/components/deviceDetails/deviceDetails.tsx",
     "to": "apps/webapp/src/script/e2eIdentity/index.ts",
     "unresolvedTo": "../../../../e2eIdentity",
     "dependencyTypes": [
@@ -419911,7 +419911,7 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/userDevices/components/deviceDetails/DeviceDetails.tsx",
+        "name": "apps/webapp/src/script/components/userDevices/components/deviceDetails/deviceDetails.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -419921,7 +419921,7 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/userDevices/components/deviceDetails/DeviceDetails.tsx",
+    "from": "apps/webapp/src/script/components/userDevices/components/deviceDetails/deviceDetails.tsx",
     "to": "apps/webapp/src/script/page/mainContent/panels/preferences/devicesPreferences/components/mlsDeviceDetails/index.ts",
     "unresolvedTo": "../../../../page/mainContent/panels/preferences/devicesPreferences/components/mlsDeviceDetails",
     "dependencyTypes": [
@@ -420170,7 +420170,7 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/userDevices/components/deviceDetails/DeviceDetails.tsx",
+        "name": "apps/webapp/src/script/components/userDevices/components/deviceDetails/deviceDetails.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -420180,7 +420180,7 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/userDevices/components/deviceDetails/DeviceDetails.tsx",
+    "from": "apps/webapp/src/script/components/userDevices/components/deviceDetails/deviceDetails.tsx",
     "to": "apps/webapp/src/script/page/rootProvider.tsx",
     "unresolvedTo": "../../../../page/rootProvider",
     "dependencyTypes": [
@@ -420301,7 +420301,7 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/userDevices/components/deviceDetails/DeviceDetails.tsx",
+        "name": "apps/webapp/src/script/components/userDevices/components/deviceDetails/deviceDetails.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -420311,7 +420311,7 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/userDevices/components/deviceDetails/DeviceDetails.tsx",
+    "from": "apps/webapp/src/script/components/userDevices/components/deviceDetails/deviceDetails.tsx",
     "to": "apps/webapp/src/script/repositories/client/index.ts",
     "unresolvedTo": "../../../../repositories/client",
     "dependencyTypes": [
@@ -420433,7 +420433,7 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/userDevices/components/deviceDetails/DeviceDetails.tsx",
+        "name": "apps/webapp/src/script/components/userDevices/components/deviceDetails/deviceDetails.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -420443,7 +420443,7 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/userDevices/components/deviceDetails/DeviceDetails.tsx",
+    "from": "apps/webapp/src/script/components/userDevices/components/deviceDetails/deviceDetails.tsx",
     "to": "apps/webapp/src/script/repositories/conversation/ConversationSelectors.ts",
     "unresolvedTo": "../../../../repositories/conversation/ConversationSelectors",
     "dependencyTypes": [
@@ -420633,7 +420633,7 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/userDevices/components/deviceDetails/DeviceDetails.tsx",
+        "name": "apps/webapp/src/script/components/userDevices/components/deviceDetails/deviceDetails.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -420643,7 +420643,7 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/userDevices/components/deviceDetails/DeviceDetails.tsx",
+    "from": "apps/webapp/src/script/components/userDevices/components/deviceDetails/deviceDetails.tsx",
     "to": "apps/webapp/src/script/repositories/conversation/ConversationState.ts",
     "unresolvedTo": "../../../../repositories/conversation/ConversationState",
     "dependencyTypes": [
@@ -420841,7 +420841,7 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/userDevices/components/deviceDetails/DeviceDetails.tsx",
+        "name": "apps/webapp/src/script/components/userDevices/components/deviceDetails/deviceDetails.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -420851,7 +420851,7 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/userDevices/components/deviceDetails/DeviceDetails.tsx",
+    "from": "apps/webapp/src/script/components/userDevices/components/deviceDetails/deviceDetails.tsx",
     "to": "apps/webapp/src/script/repositories/conversation/MessageRepository.ts",
     "unresolvedTo": "../../../../repositories/conversation/MessageRepository",
     "dependencyTypes": [
@@ -421081,7 +421081,7 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/userDevices/components/deviceDetails/DeviceDetails.tsx",
+        "name": "apps/webapp/src/script/components/userDevices/components/deviceDetails/deviceDetails.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -421091,7 +421091,7 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/userDevices/components/deviceDetails/DeviceDetails.tsx",
+    "from": "apps/webapp/src/script/components/userDevices/components/deviceDetails/deviceDetails.tsx",
     "to": "apps/webapp/src/script/repositories/cryptography/CryptographyRepository.ts",
     "unresolvedTo": "../../../../repositories/cryptography/CryptographyRepository",
     "dependencyTypes": [
@@ -421298,7 +421298,7 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/userDevices/components/deviceDetails/DeviceDetails.tsx",
+        "name": "apps/webapp/src/script/components/userDevices/components/deviceDetails/deviceDetails.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -421308,7 +421308,7 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/userDevices/components/deviceDetails/DeviceDetails.tsx",
+    "from": "apps/webapp/src/script/components/userDevices/components/deviceDetails/deviceDetails.tsx",
     "to": "apps/webapp/src/script/repositories/entity/User/index.ts",
     "unresolvedTo": "../../../../repositories/entity/User",
     "dependencyTypes": [
@@ -421408,7 +421408,7 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/userDevices/components/deviceDetails/DeviceDetails.tsx",
+        "name": "apps/webapp/src/script/components/userDevices/components/deviceDetails/deviceDetails.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -421418,7 +421418,7 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/userDevices/components/deviceDetails/DeviceDetails.tsx",
+    "from": "apps/webapp/src/script/components/userDevices/components/deviceDetails/deviceDetails.tsx",
     "to": "apps/webapp/src/script/util/stringUtil.ts",
     "unresolvedTo": "../../../../util/stringUtil",
     "dependencyTypes": [
@@ -421524,7 +421524,7 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/userDevices/components/deviceDetails/DeviceDetails.tsx",
+        "name": "apps/webapp/src/script/components/userDevices/components/deviceDetails/deviceDetails.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -421534,7 +421534,7 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/userDevices/components/DeviceList/DeviceList.tsx",
+    "from": "apps/webapp/src/script/components/userDevices/components/deviceList/deviceList.tsx",
     "to": "apps/webapp/src/script/e2eIdentity/index.ts",
     "unresolvedTo": "../../../../e2eIdentity",
     "dependencyTypes": [
@@ -421762,14 +421762,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/userDevices/components/DeviceList/index.tsx",
+        "name": "apps/webapp/src/script/components/userDevices/components/deviceList/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/userDevices/components/DeviceList/DeviceList.tsx",
+        "name": "apps/webapp/src/script/components/userDevices/components/deviceList/deviceList.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -421779,7 +421779,7 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/userDevices/components/DeviceList/DeviceList.tsx",
+    "from": "apps/webapp/src/script/components/userDevices/components/deviceList/deviceList.tsx",
     "to": "apps/webapp/src/script/page/rootProvider.tsx",
     "unresolvedTo": "../../../../page/rootProvider",
     "dependencyTypes": [
@@ -421893,14 +421893,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/userDevices/components/DeviceList/index.tsx",
+        "name": "apps/webapp/src/script/components/userDevices/components/deviceList/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/userDevices/components/DeviceList/DeviceList.tsx",
+        "name": "apps/webapp/src/script/components/userDevices/components/deviceList/deviceList.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -421910,7 +421910,7 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/userDevices/components/DeviceList/DeviceList.tsx",
+    "from": "apps/webapp/src/script/components/userDevices/components/deviceList/deviceList.tsx",
     "to": "apps/webapp/src/script/repositories/client/ClientEntity.ts",
     "unresolvedTo": "../../../../repositories/client/ClientEntity",
     "dependencyTypes": [
@@ -422018,14 +422018,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/userDevices/components/DeviceList/index.tsx",
+        "name": "apps/webapp/src/script/components/userDevices/components/deviceList/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/userDevices/components/DeviceList/DeviceList.tsx",
+        "name": "apps/webapp/src/script/components/userDevices/components/deviceList/deviceList.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -422035,7 +422035,7 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/userDevices/components/DeviceList/DeviceList.tsx",
+    "from": "apps/webapp/src/script/components/userDevices/components/deviceList/deviceList.tsx",
     "to": "apps/webapp/src/script/repositories/entity/User/index.ts",
     "unresolvedTo": "../../../../repositories/entity/User",
     "dependencyTypes": [
@@ -422128,14 +422128,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/userDevices/components/DeviceList/index.tsx",
+        "name": "apps/webapp/src/script/components/userDevices/components/deviceList/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/userDevices/components/DeviceList/DeviceList.tsx",
+        "name": "apps/webapp/src/script/components/userDevices/components/deviceList/deviceList.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -422145,9 +422145,9 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/userDevices/components/NoDevicesFound/index.tsx",
-    "to": "apps/webapp/src/script/components/userDevices/components/NoDevicesFound/NoDevicesFound.tsx",
-    "unresolvedTo": "./NoDevicesFound",
+    "from": "apps/webapp/src/script/components/userDevices/components/noDevicesFound/index.tsx",
+    "to": "apps/webapp/src/script/components/userDevices/components/noDevicesFound/noDevicesFound.tsx",
+    "unresolvedTo": "./noDevicesFound",
     "dependencyTypes": [
       "local",
       "export"
@@ -422158,7 +422158,7 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/userDevices/components/NoDevicesFound/NoDevicesFound.tsx",
+        "name": "apps/webapp/src/script/components/userDevices/components/noDevicesFound/noDevicesFound.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -422266,7 +422266,7 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/userDevices/components/NoDevicesFound/index.tsx",
+        "name": "apps/webapp/src/script/components/userDevices/components/noDevicesFound/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
@@ -422276,7 +422276,7 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/userDevices/components/NoDevicesFound/NoDevicesFound.tsx",
+    "from": "apps/webapp/src/script/components/userDevices/components/noDevicesFound/noDevicesFound.tsx",
     "to": "apps/webapp/src/script/repositories/entity/User/index.ts",
     "unresolvedTo": "../../../../repositories/entity/User",
     "dependencyTypes": [
@@ -422369,14 +422369,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/userDevices/components/NoDevicesFound/index.tsx",
+        "name": "apps/webapp/src/script/components/userDevices/components/noDevicesFound/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/userDevices/components/NoDevicesFound/NoDevicesFound.tsx",
+        "name": "apps/webapp/src/script/components/userDevices/components/noDevicesFound/noDevicesFound.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -422386,9 +422386,9 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/userDevices/components/SelfFingerprint/index.tsx",
-    "to": "apps/webapp/src/script/components/userDevices/components/SelfFingerprint/SelfFingerprint.tsx",
-    "unresolvedTo": "./SelfFingerprint",
+    "from": "apps/webapp/src/script/components/userDevices/components/selfFingerprint/index.tsx",
+    "to": "apps/webapp/src/script/components/userDevices/components/selfFingerprint/selfFingerprint.tsx",
+    "unresolvedTo": "./selfFingerprint",
     "dependencyTypes": [
       "local",
       "export"
@@ -422399,7 +422399,7 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/userDevices/components/SelfFingerprint/SelfFingerprint.tsx",
+        "name": "apps/webapp/src/script/components/userDevices/components/selfFingerprint/selfFingerprint.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -422507,7 +422507,7 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/userDevices/components/SelfFingerprint/index.tsx",
+        "name": "apps/webapp/src/script/components/userDevices/components/selfFingerprint/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
@@ -422517,7 +422517,7 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/userDevices/components/SelfFingerprint/SelfFingerprint.tsx",
+    "from": "apps/webapp/src/script/components/userDevices/components/selfFingerprint/selfFingerprint.tsx",
     "to": "apps/webapp/src/script/components/userDevices/components/deviceCard/index.tsx",
     "unresolvedTo": "../deviceCard",
     "dependencyTypes": [
@@ -422759,14 +422759,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/userDevices/components/SelfFingerprint/index.tsx",
+        "name": "apps/webapp/src/script/components/userDevices/components/selfFingerprint/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/userDevices/components/SelfFingerprint/SelfFingerprint.tsx",
+        "name": "apps/webapp/src/script/components/userDevices/components/selfFingerprint/selfFingerprint.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -422776,7 +422776,7 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/userDevices/components/SelfFingerprint/SelfFingerprint.tsx",
+    "from": "apps/webapp/src/script/components/userDevices/components/selfFingerprint/selfFingerprint.tsx",
     "to": "apps/webapp/src/script/repositories/client/ClientState.ts",
     "unresolvedTo": "../../../../repositories/client/ClientState",
     "dependencyTypes": [
@@ -422889,14 +422889,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/userDevices/components/SelfFingerprint/index.tsx",
+        "name": "apps/webapp/src/script/components/userDevices/components/selfFingerprint/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/userDevices/components/SelfFingerprint/SelfFingerprint.tsx",
+        "name": "apps/webapp/src/script/components/userDevices/components/selfFingerprint/selfFingerprint.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -422906,7 +422906,7 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/userDevices/components/SelfFingerprint/SelfFingerprint.tsx",
+    "from": "apps/webapp/src/script/components/userDevices/components/selfFingerprint/selfFingerprint.tsx",
     "to": "apps/webapp/src/script/repositories/cryptography/CryptographyRepository.ts",
     "unresolvedTo": "../../../../repositories/cryptography/CryptographyRepository",
     "dependencyTypes": [
@@ -423106,14 +423106,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/userDevices/components/SelfFingerprint/index.tsx",
+        "name": "apps/webapp/src/script/components/userDevices/components/selfFingerprint/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/userDevices/components/SelfFingerprint/SelfFingerprint.tsx",
+        "name": "apps/webapp/src/script/components/userDevices/components/selfFingerprint/selfFingerprint.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -423123,7 +423123,7 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/userDevices/components/SelfFingerprint/SelfFingerprint.tsx",
+    "from": "apps/webapp/src/script/components/userDevices/components/selfFingerprint/selfFingerprint.tsx",
     "to": "apps/webapp/src/script/util/stringUtil.ts",
     "unresolvedTo": "../../../../util/stringUtil",
     "dependencyTypes": [
@@ -423222,14 +423222,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/userDevices/components/SelfFingerprint/index.tsx",
+        "name": "apps/webapp/src/script/components/userDevices/components/selfFingerprint/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/userDevices/components/SelfFingerprint/SelfFingerprint.tsx",
+        "name": "apps/webapp/src/script/components/userDevices/components/selfFingerprint/selfFingerprint.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -424093,9 +424093,9 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/UserInfo/UserInfo.tsx",
-    "to": "apps/webapp/src/script/components/UserName/index.tsx",
-    "unresolvedTo": "../UserName",
+    "from": "apps/webapp/src/script/components/userInfo/userInfo.tsx",
+    "to": "apps/webapp/src/script/components/userName/index.tsx",
+    "unresolvedTo": "../userName",
     "dependencyTypes": [
       "local",
       "import"
@@ -424106,14 +424106,14 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/UserName/index.tsx",
+        "name": "apps/webapp/src/script/components/userName/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserName/UserName.tsx",
+        "name": "apps/webapp/src/script/components/userName/userName.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -424440,14 +424440,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserInfo/index.tsx",
+        "name": "apps/webapp/src/script/components/userInfo/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserInfo/UserInfo.tsx",
+        "name": "apps/webapp/src/script/components/userInfo/userInfo.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -424769,14 +424769,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserSearchableList/index.tsx",
+        "name": "apps/webapp/src/script/components/userSearchableList/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserSearchableList/UserSearchableList.tsx",
+        "name": "apps/webapp/src/script/components/userSearchableList/userSearchableList.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -425161,14 +425161,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserSearchableList/index.tsx",
+        "name": "apps/webapp/src/script/components/userSearchableList/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserSearchableList/UserSearchableList.tsx",
+        "name": "apps/webapp/src/script/components/userSearchableList/userSearchableList.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -425207,8 +425207,8 @@
   {
     "type": "cycle",
     "from": "apps/webapp/src/script/components/userList/components/userListItem/userListItem.tsx",
-    "to": "apps/webapp/src/script/components/UserName/index.tsx",
-    "unresolvedTo": "../../../UserName",
+    "to": "apps/webapp/src/script/components/userName/index.tsx",
+    "unresolvedTo": "../../../userName",
     "dependencyTypes": [
       "local",
       "import"
@@ -425219,14 +425219,14 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/UserName/index.tsx",
+        "name": "apps/webapp/src/script/components/userName/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserName/UserName.tsx",
+        "name": "apps/webapp/src/script/components/userName/userName.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -425546,14 +425546,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserSearchableList/index.tsx",
+        "name": "apps/webapp/src/script/components/userSearchableList/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserSearchableList/UserSearchableList.tsx",
+        "name": "apps/webapp/src/script/components/userSearchableList/userSearchableList.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -425845,14 +425845,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserSearchableList/index.tsx",
+        "name": "apps/webapp/src/script/components/userSearchableList/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserSearchableList/UserSearchableList.tsx",
+        "name": "apps/webapp/src/script/components/userSearchableList/userSearchableList.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -426152,14 +426152,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserSearchableList/index.tsx",
+        "name": "apps/webapp/src/script/components/userSearchableList/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserSearchableList/UserSearchableList.tsx",
+        "name": "apps/webapp/src/script/components/userSearchableList/userSearchableList.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -426530,14 +426530,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserSearchableList/index.tsx",
+        "name": "apps/webapp/src/script/components/userSearchableList/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserSearchableList/UserSearchableList.tsx",
+        "name": "apps/webapp/src/script/components/userSearchableList/userSearchableList.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -426731,14 +426731,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserSearchableList/index.tsx",
+        "name": "apps/webapp/src/script/components/userSearchableList/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserSearchableList/UserSearchableList.tsx",
+        "name": "apps/webapp/src/script/components/userSearchableList/userSearchableList.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -427018,14 +427018,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserSearchableList/index.tsx",
+        "name": "apps/webapp/src/script/components/userSearchableList/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserSearchableList/UserSearchableList.tsx",
+        "name": "apps/webapp/src/script/components/userSearchableList/userSearchableList.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -427318,14 +427318,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserSearchableList/index.tsx",
+        "name": "apps/webapp/src/script/components/userSearchableList/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserSearchableList/UserSearchableList.tsx",
+        "name": "apps/webapp/src/script/components/userSearchableList/userSearchableList.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -427349,7 +427349,7 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/UserName/UserName.tsx",
+    "from": "apps/webapp/src/script/components/userName/userName.tsx",
     "to": "apps/webapp/src/script/repositories/entity/User/index.ts",
     "unresolvedTo": "../../repositories/entity/User",
     "dependencyTypes": [
@@ -427659,14 +427659,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserName/index.tsx",
+        "name": "apps/webapp/src/script/components/userName/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserName/UserName.tsx",
+        "name": "apps/webapp/src/script/components/userName/userName.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -427676,7 +427676,7 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/UserName/UserName.tsx",
+    "from": "apps/webapp/src/script/components/userName/userName.tsx",
     "to": "apps/webapp/src/script/util/localizerUtil/index.ts",
     "unresolvedTo": "../../util/localizerUtil",
     "dependencyTypes": [
@@ -428003,14 +428003,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserName/index.tsx",
+        "name": "apps/webapp/src/script/components/userName/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserName/UserName.tsx",
+        "name": "apps/webapp/src/script/components/userName/userName.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -428020,7 +428020,7 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/UserSearchableList/UserSearchableList.tsx",
+    "from": "apps/webapp/src/script/components/userSearchableList/userSearchableList.tsx",
     "to": "apps/webapp/src/script/repositories/conversation/ConversationState.ts",
     "unresolvedTo": "../../repositories/conversation/ConversationState",
     "dependencyTypes": [
@@ -428197,14 +428197,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserSearchableList/index.tsx",
+        "name": "apps/webapp/src/script/components/userSearchableList/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserSearchableList/UserSearchableList.tsx",
+        "name": "apps/webapp/src/script/components/userSearchableList/userSearchableList.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -428214,7 +428214,7 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/UserSearchableList/UserSearchableList.tsx",
+    "from": "apps/webapp/src/script/components/userSearchableList/userSearchableList.tsx",
     "to": "apps/webapp/src/script/repositories/entity/User/index.ts",
     "unresolvedTo": "../../repositories/entity/User",
     "dependencyTypes": [
@@ -428470,14 +428470,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserSearchableList/index.tsx",
+        "name": "apps/webapp/src/script/components/userSearchableList/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserSearchableList/UserSearchableList.tsx",
+        "name": "apps/webapp/src/script/components/userSearchableList/userSearchableList.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -428487,7 +428487,7 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/UserSearchableList/UserSearchableList.tsx",
+    "from": "apps/webapp/src/script/components/userSearchableList/userSearchableList.tsx",
     "to": "apps/webapp/src/script/repositories/search/searchRepository.ts",
     "unresolvedTo": "../../repositories/search/searchRepository",
     "dependencyTypes": [
@@ -428673,14 +428673,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserSearchableList/index.tsx",
+        "name": "apps/webapp/src/script/components/userSearchableList/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserSearchableList/UserSearchableList.tsx",
+        "name": "apps/webapp/src/script/components/userSearchableList/userSearchableList.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -428690,7 +428690,7 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/UserSearchableList/UserSearchableList.tsx",
+    "from": "apps/webapp/src/script/components/userSearchableList/userSearchableList.tsx",
     "to": "apps/webapp/src/script/repositories/team/TeamRepository.ts",
     "unresolvedTo": "../../repositories/team/TeamRepository",
     "dependencyTypes": [
@@ -428962,14 +428962,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserSearchableList/index.tsx",
+        "name": "apps/webapp/src/script/components/userSearchableList/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserSearchableList/UserSearchableList.tsx",
+        "name": "apps/webapp/src/script/components/userSearchableList/userSearchableList.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -428979,7 +428979,7 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/UserSearchableList/UserSearchableList.tsx",
+    "from": "apps/webapp/src/script/components/userSearchableList/userSearchableList.tsx",
     "to": "apps/webapp/src/script/repositories/team/TeamState.ts",
     "unresolvedTo": "../../repositories/team/TeamState",
     "dependencyTypes": [
@@ -429248,14 +429248,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserSearchableList/index.tsx",
+        "name": "apps/webapp/src/script/components/userSearchableList/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserSearchableList/UserSearchableList.tsx",
+        "name": "apps/webapp/src/script/components/userSearchableList/userSearchableList.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -429265,7 +429265,7 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/components/UserSearchableList/UserSearchableList.tsx",
+    "from": "apps/webapp/src/script/components/userSearchableList/userSearchableList.tsx",
     "to": "apps/webapp/src/script/util/stringUtil.ts",
     "unresolvedTo": "../../util/stringUtil",
     "dependencyTypes": [
@@ -429527,14 +429527,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserSearchableList/index.tsx",
+        "name": "apps/webapp/src/script/components/userSearchableList/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserSearchableList/UserSearchableList.tsx",
+        "name": "apps/webapp/src/script/components/userSearchableList/userSearchableList.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -489911,8 +489911,8 @@
   {
     "type": "cycle",
     "from": "apps/webapp/src/script/page/leftSidebar/panels/startUi/servicesTab.tsx",
-    "to": "apps/webapp/src/script/components/ServiceList/ServiceList.tsx",
-    "unresolvedTo": "../../../../components/ServiceList/ServiceList",
+    "to": "apps/webapp/src/script/components/serviceList/serviceList.tsx",
+    "unresolvedTo": "../../../../components/serviceList/serviceList",
     "dependencyTypes": [
       "local",
       "import"
@@ -489923,7 +489923,7 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/ServiceList/ServiceList.tsx",
+        "name": "apps/webapp/src/script/components/serviceList/serviceList.tsx",
         "dependencyTypes": [
           "local",
           "import"
@@ -491120,8 +491120,8 @@
   {
     "type": "cycle",
     "from": "apps/webapp/src/script/page/leftSidebar/panels/startUi/startUi.tsx",
-    "to": "apps/webapp/src/script/components/SearchInput/index.tsx",
-    "unresolvedTo": "../../../../components/SearchInput",
+    "to": "apps/webapp/src/script/components/searchInput/index.tsx",
+    "unresolvedTo": "../../../../components/searchInput",
     "dependencyTypes": [
       "local",
       "import"
@@ -491132,14 +491132,14 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/SearchInput/index.tsx",
+        "name": "apps/webapp/src/script/components/searchInput/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/SearchInput/SearchInput.tsx",
+        "name": "apps/webapp/src/script/components/searchInput/searchInput.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -495489,8 +495489,8 @@
   {
     "type": "cycle",
     "from": "apps/webapp/src/script/page/leftSidebar/userDetails/userDetails.tsx",
-    "to": "apps/webapp/src/script/components/LegalHoldDot/index.tsx",
-    "unresolvedTo": "../../../components/LegalHoldDot",
+    "to": "apps/webapp/src/script/components/legalHoldDot/index.tsx",
+    "unresolvedTo": "../../../components/legalHoldDot",
     "dependencyTypes": [
       "local",
       "import"
@@ -495501,14 +495501,14 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/LegalHoldDot/index.tsx",
+        "name": "apps/webapp/src/script/components/legalHoldDot/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/LegalHoldDot/LegalHoldDot.tsx",
+        "name": "apps/webapp/src/script/components/legalHoldDot/legalHoldDot.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -510051,14 +510051,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/TextInput/index.ts",
+        "name": "apps/webapp/src/script/components/textInput/index.ts",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/TextInput/TextInput.tsx",
+        "name": "apps/webapp/src/script/components/textInput/textInput.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -519305,14 +519305,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/TextInput/index.ts",
+        "name": "apps/webapp/src/script/components/textInput/index.ts",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/TextInput/TextInput.tsx",
+        "name": "apps/webapp/src/script/components/textInput/textInput.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -520071,14 +520071,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/TextInput/index.ts",
+        "name": "apps/webapp/src/script/components/textInput/index.ts",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/TextInput/TextInput.tsx",
+        "name": "apps/webapp/src/script/components/textInput/textInput.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -521015,14 +521015,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/TextInput/index.ts",
+        "name": "apps/webapp/src/script/components/textInput/index.ts",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/TextInput/TextInput.tsx",
+        "name": "apps/webapp/src/script/components/textInput/textInput.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -532131,7 +532131,7 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/userDevices/components/deviceDetails/DeviceDetails.tsx",
+        "name": "apps/webapp/src/script/components/userDevices/components/deviceDetails/deviceDetails.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -536612,8 +536612,8 @@
   {
     "type": "cycle",
     "from": "apps/webapp/src/script/page/rightSidebar/addParticipants/addParticipants.tsx",
-    "to": "apps/webapp/src/script/components/SearchInput/index.tsx",
-    "unresolvedTo": "../../../components/SearchInput",
+    "to": "apps/webapp/src/script/components/searchInput/index.tsx",
+    "unresolvedTo": "../../../components/searchInput",
     "dependencyTypes": [
       "local",
       "import"
@@ -536624,14 +536624,14 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/SearchInput/index.tsx",
+        "name": "apps/webapp/src/script/components/searchInput/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/SearchInput/SearchInput.tsx",
+        "name": "apps/webapp/src/script/components/searchInput/searchInput.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -536863,8 +536863,8 @@
   {
     "type": "cycle",
     "from": "apps/webapp/src/script/page/rightSidebar/addParticipants/addParticipants.tsx",
-    "to": "apps/webapp/src/script/components/ServiceList/ServiceList.tsx",
-    "unresolvedTo": "../../../components/ServiceList/ServiceList",
+    "to": "apps/webapp/src/script/components/serviceList/serviceList.tsx",
+    "unresolvedTo": "../../../components/serviceList/serviceList",
     "dependencyTypes": [
       "local",
       "import"
@@ -536875,7 +536875,7 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/ServiceList/ServiceList.tsx",
+        "name": "apps/webapp/src/script/components/serviceList/serviceList.tsx",
         "dependencyTypes": [
           "local",
           "import"
@@ -537107,8 +537107,8 @@
   {
     "type": "cycle",
     "from": "apps/webapp/src/script/page/rightSidebar/addParticipants/addParticipants.tsx",
-    "to": "apps/webapp/src/script/components/UserSearchableList/index.tsx",
-    "unresolvedTo": "../../../components/UserSearchableList",
+    "to": "apps/webapp/src/script/components/userSearchableList/index.tsx",
+    "unresolvedTo": "../../../components/userSearchableList",
     "dependencyTypes": [
       "local",
       "import"
@@ -537119,14 +537119,14 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/UserSearchableList/index.tsx",
+        "name": "apps/webapp/src/script/components/userSearchableList/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserSearchableList/UserSearchableList.tsx",
+        "name": "apps/webapp/src/script/components/userSearchableList/userSearchableList.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -541095,8 +541095,8 @@
   {
     "type": "cycle",
     "from": "apps/webapp/src/script/page/rightSidebar/conversationDetails/components/conversationDetailsOptions/conversationDetailsOptions.tsx",
-    "to": "apps/webapp/src/script/components/toggle/ReceiptModeToggle.tsx",
-    "unresolvedTo": "../../../../../components/toggle/ReceiptModeToggle",
+    "to": "apps/webapp/src/script/components/toggle/receiptModeToggle.tsx",
+    "unresolvedTo": "../../../../../components/toggle/receiptModeToggle",
     "dependencyTypes": [
       "local",
       "import"
@@ -541107,7 +541107,7 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/toggle/ReceiptModeToggle.tsx",
+        "name": "apps/webapp/src/script/components/toggle/receiptModeToggle.tsx",
         "dependencyTypes": [
           "local",
           "import"
@@ -548141,8 +548141,8 @@
   {
     "type": "cycle",
     "from": "apps/webapp/src/script/page/rightSidebar/conversationParticipants/conversationParticipants.tsx",
-    "to": "apps/webapp/src/script/components/SearchInput/index.tsx",
-    "unresolvedTo": "../../../components/SearchInput",
+    "to": "apps/webapp/src/script/components/searchInput/index.tsx",
+    "unresolvedTo": "../../../components/searchInput",
     "dependencyTypes": [
       "local",
       "import"
@@ -548153,14 +548153,14 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/SearchInput/index.tsx",
+        "name": "apps/webapp/src/script/components/searchInput/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/SearchInput/SearchInput.tsx",
+        "name": "apps/webapp/src/script/components/searchInput/searchInput.tsx",
         "dependencyTypes": [
           "local",
           "export"
@@ -548392,8 +548392,8 @@
   {
     "type": "cycle",
     "from": "apps/webapp/src/script/page/rightSidebar/conversationParticipants/conversationParticipants.tsx",
-    "to": "apps/webapp/src/script/components/UserSearchableList/index.tsx",
-    "unresolvedTo": "../../../components/UserSearchableList",
+    "to": "apps/webapp/src/script/components/userSearchableList/index.tsx",
+    "unresolvedTo": "../../../components/userSearchableList",
     "dependencyTypes": [
       "local",
       "import"
@@ -548404,14 +548404,14 @@
     },
     "cycle": [
       {
-        "name": "apps/webapp/src/script/components/UserSearchableList/index.tsx",
+        "name": "apps/webapp/src/script/components/userSearchableList/index.tsx",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/components/UserSearchableList/UserSearchableList.tsx",
+        "name": "apps/webapp/src/script/components/userSearchableList/userSearchableList.tsx",
         "dependencyTypes": [
           "local",
           "export"

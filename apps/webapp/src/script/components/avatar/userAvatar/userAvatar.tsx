@@ -30,7 +30,7 @@ import {TeamState} from '../../../repositories/team/TeamState';
 import {COLOR} from '../../../uiKit/identity/colors/colors';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {AvailabilityIcon} from '../../availabilityIcon';
-import {useUserName} from '../../UserName';
+import {useUserName} from '../../userName';
 import {AVATAR_SIZE, STATE} from '../avatar';
 import {AvatarBackground} from '../avatarBackground';
 import {AvatarBadge} from '../avatarBadge';

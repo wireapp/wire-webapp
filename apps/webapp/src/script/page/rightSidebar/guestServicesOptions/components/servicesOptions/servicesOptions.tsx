@@ -21,7 +21,7 @@ import {FC} from 'react';
 
 import {serviceOptionContainer} from './serviceOptions.styles';
 
-import {BaseToggle} from '../../../../../components/toggle/BaseToggle';
+import {BaseToggle} from '../../../../../components/toggle/baseToggle';
 import {ACCESS_TYPES} from '../../../../../repositories/conversation/ConversationAccessPermission';
 import {Conversation} from '../../../../../repositories/entity/Conversation';
 import {TeamState} from '../../../../../repositories/team/TeamState';

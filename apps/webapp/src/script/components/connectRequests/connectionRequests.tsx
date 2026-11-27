@@ -35,7 +35,7 @@ import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {Avatar, AVATAR_SIZE} from '../avatar';
 import {UserClassifiedBar} from '../classifiedBar/classifiedBar';
 import {UnverifiedUserWarning} from '../Modals/UserModal';
-import {UserName} from '../UserName';
+import {UserName} from '../userName';
 
 interface ConnectRequestsProps {
   readonly userState: UserState;
