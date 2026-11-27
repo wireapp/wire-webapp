@@ -22,15 +22,14 @@ import {useEffect, useMemo, useRef, useState} from 'react';
 import {
   createBulkDownloadOperation,
   resolveBulkDownloadSelection,
+  type BulkDownloadNode,
   type BulkDownloadOperationState,
   type BulkDownloadRejectionReason,
   type BulkDownloadSelection,
 } from './bulkDownloadOperation';
 
 import {CellsRepository} from '../../../../repositories/cells/cellsRepository';
-import type {CellNode} from '../../../../types/cellNode';
 import type {Translate} from '../../../../util/localizerUtil/translationTypes';
-import {downloadBlob, formatBytes} from '../../../../util/util';
 import {getCellsFilesPath} from '../common/getCellsFilesPath/getCellsFilesPath';
 
 const getArchiveParentPath = (): string => {
@@ -71,7 +70,11 @@ const getUnavailableReason = (
   return selection.reason;
 };
 
-const getStatusMessage = (state: BulkDownloadViewState, translate: Translate): string | null => {
+const getStatusMessage = (
+  state: BulkDownloadViewState,
+  translate: Translate,
+  formatBytes: (bytes: number) => string,
+): string | null => {
   switch (state.kind) {
     case 'starting':
       return translate('cells.bulkDownload.starting');
@@ -90,13 +93,15 @@ const getStatusMessage = (state: BulkDownloadViewState, translate: Translate): s
 
 interface UseBulkDownloadSelectionOptions {
   readonly cellsRepository: CellsRepository;
-  readonly selectedNodes: readonly CellNode[];
+  readonly selectedNodes: readonly BulkDownloadNode[];
   readonly selectedCount: number;
   readonly canDownload: boolean;
   readonly isSupportedLocation: boolean;
   readonly isSelectionEnabled: boolean;
   readonly isSelectionDisabled: boolean;
   readonly translate: Translate;
+  readonly formatBytes: (bytes: number) => string;
+  readonly downloadBlob: (blob: Blob, filename: string, mimeType?: string) => number;
 }
 
 interface BulkDownloadSelectionControls {
@@ -117,6 +122,8 @@ export const useBulkDownloadSelection = ({
   isSelectionEnabled,
   isSelectionDisabled,
   translate,
+  formatBytes,
+  downloadBlob,
 }: UseBulkDownloadSelectionOptions): BulkDownloadSelectionControls => {
   const operation = useMemo(() => {
     return createBulkDownloadOperation(request => {
@@ -143,7 +150,7 @@ export const useBulkDownloadSelection = ({
   const isActive = state.kind === 'starting' || state.kind === 'downloading' || state.kind === 'stream-consumed';
   const isDisabled = !isSelectionEnabled || isSelectionDisabled || isActive || selection.kind !== 'eligible';
   const isFailure = state.kind === 'failed';
-  const statusMessage = getStatusMessage(state, translate);
+  const statusMessage = getStatusMessage(state, translate, formatBytes);
 
   const start = async (): Promise<void> => {
     if (isStartingRef.current || isDisabled || selection.kind !== 'eligible') {

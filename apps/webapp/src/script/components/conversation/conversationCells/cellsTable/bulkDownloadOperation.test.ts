@@ -19,11 +19,6 @@
 
 import {ReadableStream} from 'node:stream/web';
 
-import {CellNodeType, type CellNode} from '../../../../types/cellNode';
-import {
-  CELLS_SELF_USER_DRIVE_ROLE,
-  type CellsSelfUserDriveRole,
-} from '../common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import {
   type BulkDownloadSelection,
   createBulkDownloadOperation,
@@ -48,14 +43,8 @@ const eligibleSelection = (paths: readonly string[]): BulkDownloadSelection => {
   return {kind: 'eligible', paths} as const;
 };
 
-const createNode = (path: string, role: CellsSelfUserDriveRole = CELLS_SELF_USER_DRIVE_ROLE.EDITOR): CellNode => {
-  return {
-    id: path,
-    name: path.split('/').at(-1) ?? path,
-    path,
-    type: path.endsWith('/') ? CellNodeType.FOLDER : CellNodeType.FILE,
-    selfUserDriveRole: role,
-  } as CellNode;
+const createNode = (path: string, isDownloadable = true): {path: string; isDownloadable: boolean} => {
+  return {path, isDownloadable};
 };
 
 describe('resolveBulkDownloadSelection', () => {
@@ -91,7 +80,7 @@ describe('resolveBulkDownloadSelection', () => {
     });
     expect(
       resolveBulkDownloadSelection({
-        nodes: [createNode('allowed'), createNode('denied', CELLS_SELF_USER_DRIVE_ROLE.VIEWER)],
+        nodes: [createNode('allowed'), createNode('denied', false)],
         canDownload: true,
       }),
     ).toEqual({kind: 'rejected', reason: 'forbidden'});

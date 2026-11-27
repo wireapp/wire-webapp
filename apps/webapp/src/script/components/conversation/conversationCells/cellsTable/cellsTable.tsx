@@ -90,7 +90,7 @@ import {CloseIcon} from '../../../../uiKit/dataDisplay/icon/closeIcon';
 import {TrashIcon} from '../../../../uiKit/dataDisplay/icon/trashIcon';
 import {UploadIcon} from '../../../../uiKit/dataDisplay/icon/uploadIcon';
 import {Button, ButtonVariant} from '../../../../uiKit/inputs/button/button';
-import {formatBytes} from '../../../../util/util';
+import {downloadBlob, formatBytes} from '../../../../util/util';
 import {PrimaryModal, removeCurrentModal, usePrimaryModalState} from '../../../Modals/PrimaryModal';
 import {getCellsBackgroundActionEvidence} from '../common/cellsBackgroundActionPolling/cellsBackgroundActionJobs';
 import type {CellsBackgroundActionOutcome} from '../common/cellsBackgroundActionPolling/cellsBackgroundActionPolling';
@@ -993,13 +993,23 @@ export const CellsTable = ({
   });
   const bulkDownload = useBulkDownloadSelection({
     cellsRepository,
-    selectedNodes,
+    selectedNodes: selectedNodes.map(node => {
+      return {
+        path: node.path,
+        isDownloadable: canPerformCellsAction({
+          action: CELLS_ACTION.DOWNLOAD,
+          selfUserDriveRole: node.selfUserDriveRole,
+        }),
+      };
+    }),
     selectedCount: selectedNodeIds.size,
     canDownload: canPerformCurrentDriveAction(CELLS_ACTION.DOWNLOAD),
     isSupportedLocation: !isInRecycleBin(),
     isSelectionEnabled: selectionEnabled && isSelectionEnabled,
     isSelectionDisabled,
     translate,
+    formatBytes,
+    downloadBlob,
   });
   const selectedFilesTotalSize =
     selectedNodes.length === selectedNodeIds.size ? getSelectedFilesTotalSize(selectedNodes) : Maybe.nothing();

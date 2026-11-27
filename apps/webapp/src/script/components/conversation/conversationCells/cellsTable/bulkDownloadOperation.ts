@@ -17,10 +17,12 @@
  *
  */
 
-import type {CellNode} from '../../../../types/cellNode';
-import {canPerformCellsAction, CELLS_ACTION} from '../common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
-
 export type BulkDownloadRejectionReason = 'empty' | 'selection-unavailable' | 'forbidden';
+
+export interface BulkDownloadNode {
+  readonly path: string;
+  readonly isDownloadable: boolean;
+}
 
 export type BulkDownloadSelection =
   | {readonly kind: 'eligible'; readonly paths: readonly string[]}
@@ -31,7 +33,7 @@ export const resolveBulkDownloadSelection = ({
   canDownload,
   selectedCount = nodes.length,
 }: {
-  nodes: readonly CellNode[];
+  nodes: readonly BulkDownloadNode[];
   canDownload: boolean;
   selectedCount?: number;
 }): BulkDownloadSelection => {
@@ -44,7 +46,7 @@ export const resolveBulkDownloadSelection = ({
   if (
     !canDownload ||
     nodes.some(node => {
-      return !canPerformCellsAction({action: CELLS_ACTION.DOWNLOAD, selfUserDriveRole: node.selfUserDriveRole});
+      return !node.isDownloadable;
     })
   ) {
     return {kind: 'rejected', reason: 'forbidden'};
