@@ -30,7 +30,7 @@ import {Conversation} from '../entity/conversation';
 import {SelfService} from '../self/selfService';
 import {TeamService} from '../team/teamService';
 import {UserRepository} from '../user/userRepository';
-import {generateUser} from '../../../../test/helper/UserGenerator';
+import {generateUser} from '../../../../test/helper/userGenerator';
 import type {Translate} from '../../util/localizerUtil';
 import {translateForTest} from '../../util/test/translateForTest';
 import {requireValueForTest} from '../../page/testSupport/rootContextTestSupport';

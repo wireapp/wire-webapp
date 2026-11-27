@@ -32,7 +32,7 @@ import {
 
 import {GuestServicesOptions} from './guestServicesOptions';
 
-import {TestFactory} from '../../../../../test/helper/TestFactory';
+import {TestFactory} from '../../../../../test/helper/testFactory';
 import {translateForTest} from '../../../util/test/translateForTest';
 import {CONVERSATION_CELLS_STATE} from '../../../apiClient/conversation/conversation';
 import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';

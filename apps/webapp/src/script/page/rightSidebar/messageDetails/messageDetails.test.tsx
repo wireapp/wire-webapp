@@ -36,7 +36,7 @@ import {createUuid} from '../../../util/uuid';
 
 import {MessageDetails} from './messageDetails';
 
-import {TestFactory} from '../../../../../test/helper/TestFactory';
+import {TestFactory} from '../../../../../test/helper/testFactory';
 import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
 
 const testFactory = new TestFactory();

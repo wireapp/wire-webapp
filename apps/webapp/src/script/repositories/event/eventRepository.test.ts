@@ -42,7 +42,7 @@ import {EventRepository} from './eventRepository';
 import {EventSource} from './eventSource';
 import {NOTIFICATION_HANDLING_STATE} from './notificationHandlingState';
 
-import {TestFactory} from '../../../../test/helper/TestFactory';
+import {TestFactory} from '../../../../test/helper/testFactory';
 import {requireValueForTest} from '../../page/testSupport/rootContextTestSupport';
 
 const testFactory = new TestFactory();

@@ -24,13 +24,13 @@ import {CALL_TYPE, CONV_TYPE, Wcall} from '@wireapp/avs';
 import {Conversation} from '../entity/conversation';
 import {User} from '../entity/user';
 import {MediaDevicesHandler} from '../media/mediaDevicesHandler';
-import {generateConversation} from '../../../../test/helper/ConversationGenerator';
+import {generateConversation} from '../../../../test/helper/conversationGenerator';
 
 import {Call} from './call';
 import {CallingRepository} from './callingRepository';
 import {Participant} from './participant';
 
-import {TestFactory} from '../../../../test/helper/TestFactory';
+import {TestFactory} from '../../../../test/helper/testFactory';
 import {translateForTest} from '../../util/test/translateForTest';
 
 const createSelfParticipant = (): Participant => {

@@ -31,7 +31,7 @@ import type {Conversation as ConversationEntity} from '../../../../repositories/
 import {User} from '../../../../repositories/entity/user';
 import {Core} from '../../../../service/coreSingleton';
 import {requireValueForTest} from '../../../../page/testSupport/rootContextTestSupport';
-import {TestFactory} from '../../../../../../test/helper/TestFactory';
+import {TestFactory} from '../../../../../../test/helper/testFactory';
 import {translate} from '../../../../util/localizerUtil';
 import {createUuid} from '../../../../util/uuid';
 

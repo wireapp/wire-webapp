@@ -27,7 +27,7 @@ import {createUuid} from '../../util/uuid';
 
 import {ConversationRoleRepository, Permissions} from './conversationRoleRepository';
 
-import {TestFactory} from '../../../../test/helper/TestFactory';
+import {TestFactory} from '../../../../test/helper/testFactory';
 import {translateForTest} from '../../util/test/translateForTest';
 
 describe('ConversationRoleRepository', () => {

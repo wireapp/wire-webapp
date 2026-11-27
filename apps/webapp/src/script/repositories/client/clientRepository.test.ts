@@ -34,7 +34,7 @@ import {type Translate} from '../../util/localizerUtil';
 import {ClientRepository, ClientMapper, ClientEntity} from './.';
 
 import {entities} from '../../../../test/api/payloads';
-import {TestFactory} from '../../../../test/helper/TestFactory';
+import {TestFactory} from '../../../../test/helper/testFactory';
 import {translateForTest} from '../../util/test/translateForTest';
 
 describe('ClientRepository', () => {

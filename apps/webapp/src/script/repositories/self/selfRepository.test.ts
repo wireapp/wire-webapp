@@ -24,7 +24,7 @@ import {UserType} from '../../apiClient/user/user';
 import {container} from 'tsyringe';
 
 import {ClientEntity} from '../client';
-import {TestFactory} from '../../../../test/helper/TestFactory';
+import {TestFactory} from '../../../../test/helper/testFactory';
 import {requireValueForTest} from '../../page/testSupport/rootContextTestSupport';
 import {TIME_IN_MILLIS} from '../../util/timeUtil';
 

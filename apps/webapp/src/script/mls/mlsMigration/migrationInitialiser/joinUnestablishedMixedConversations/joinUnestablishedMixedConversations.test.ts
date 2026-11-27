@@ -26,7 +26,7 @@ import {Conversation} from '../../../../repositories/entity/conversation';
 import {User} from '../../../../repositories/entity/user';
 import {Core} from '../../../../service/coreSingleton';
 import {requireValueForTest} from '../../../../page/testSupport/rootContextTestSupport';
-import {TestFactory} from '../../../../../../test/helper/TestFactory';
+import {TestFactory} from '../../../../../../test/helper/testFactory';
 import {createUuid} from '../../../../util/uuid';
 
 import {joinUnestablishedMixedConversations} from '.';

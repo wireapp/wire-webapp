@@ -55,7 +55,7 @@ import {ConversationError} from '../../error/conversationError';
 import {requireValueForTest} from '../../page/testSupport/rootContextTestSupport';
 import {createCoreTestFixture} from '../../util/test/createCoreTestFixture';
 import {MessageTimer} from '../../core/conversation/messageTimer/messageTimer';
-import {generateQualifiedId} from '../../../../test/helper/UserGenerator';
+import {generateQualifiedId} from '../../../../test/helper/userGenerator';
 import type {Translate} from '../../util/localizerUtil';
 import {translateForTest} from '../../util/test/translateForTest';
 import {createUuid} from '../../util/uuid';

@@ -21,7 +21,7 @@ import {RegisteredClient} from '../../../apiClient/client/registeredClient';
 import {CONVERSATION_PROTOCOL, FEATURE_STATUS, FeatureList} from '../../../apiClient/team/feature/featureList.types';
 
 import {MLSMigrationStatus} from '../../../mls/mlsMigration/migrationStatus';
-import {TestFactory} from '../../../../../test/helper/TestFactory';
+import {TestFactory} from '../../../../../test/helper/testFactory';
 import {TIME_IN_MILLIS} from '../../../util/timeUtil';
 
 import {evaluateSelfSupportedProtocols} from './selfSupportedProtocols';

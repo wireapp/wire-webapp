@@ -44,7 +44,7 @@ import {
 
 import {LegalHoldModal, LegalHoldModalProps, LegalHoldModalType} from './legalHoldModal';
 
-import {TestFactory} from '../../../../../test/helper/TestFactory';
+import {TestFactory} from '../../../../../test/helper/testFactory';
 import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
 
 const userRepository = {} as UserRepository;

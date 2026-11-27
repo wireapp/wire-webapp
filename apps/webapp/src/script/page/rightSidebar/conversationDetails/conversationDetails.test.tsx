@@ -58,7 +58,7 @@ import {createUuid} from '../../../util/uuid';
 
 import {ConversationDetails} from './conversationDetails';
 
-import {TestFactory} from '../../../../../test/helper/TestFactory';
+import {TestFactory} from '../../../../../test/helper/testFactory';
 import {ActionsViewModel} from '../../../viewModel/actionsViewModel';
 import {MainViewModel} from '../../../viewModel/mainViewModel';
 import {withThemeAndRootContext} from '../../../auth/util/test/testUtil';

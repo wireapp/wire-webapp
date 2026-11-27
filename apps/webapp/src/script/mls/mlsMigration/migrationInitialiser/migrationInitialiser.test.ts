@@ -25,7 +25,7 @@ import {container} from 'tsyringe';
 import {MixedConversation, ProteusConversation} from '../../../repositories/conversation/conversationSelectors';
 import {Conversation} from '../../../repositories/entity/conversation';
 import {Core} from '../../../service/coreSingleton';
-import {TestFactory} from '../../../../../test/helper/TestFactory';
+import {TestFactory} from '../../../../../test/helper/testFactory';
 import {createUuid} from '../../../util/uuid';
 
 import {initialiseMigrationOfProteusConversations} from '.';

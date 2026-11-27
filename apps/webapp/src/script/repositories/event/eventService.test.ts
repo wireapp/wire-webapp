@@ -21,7 +21,7 @@ import {MemoryEngine} from '../../core/storage/engine/memoryEngine';
 
 import {StorageService} from '../storage';
 import {StorageSchemata} from '../storage/storageSchemata';
-import {createMessageAddEvent, toSavedEvent} from '../../../../test/helper/EventGenerator';
+import {createMessageAddEvent, toSavedEvent} from '../../../../test/helper/eventGenerator';
 
 import {EventService} from './eventService';
 

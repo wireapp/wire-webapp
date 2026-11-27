@@ -26,7 +26,7 @@ import {ClientEvent} from '../event/client';
 import {requireValueForTest} from '../../page/testSupport/rootContextTestSupport';
 import {createCoreTestFixture} from '../../util/test/createCoreTestFixture';
 import {translateForTest} from '../../util/test/translateForTest';
-import {createMessageAddEvent} from '../../../../test/helper/EventGenerator';
+import {createMessageAddEvent} from '../../../../test/helper/eventGenerator';
 
 describe('PDF preview message mapping', () => {
   it('restores independent preview encryption data through protobuf and event mapping', async () => {

@@ -23,7 +23,7 @@ import {container} from 'tsyringe';
 
 import {APIClient} from '../../src/script/service/apiClientSingleton';
 
-import {TestFactory} from './TestFactory';
+import {TestFactory} from './testFactory';
 
 describe('TestFactory resource ownership', () => {
   const factories: TestFactory[] = [];

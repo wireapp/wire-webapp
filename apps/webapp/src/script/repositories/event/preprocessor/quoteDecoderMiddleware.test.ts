@@ -27,7 +27,7 @@ import {
   createMessageAddEvent,
   createMultipartMessageAddEvent,
   toSavedEvent,
-} from '../../../../../test/helper/EventGenerator';
+} from '../../../../../test/helper/eventGenerator';
 import {arrayToBase64} from '../../../util/util';
 import {createUuid} from '../../../util/uuid';
 

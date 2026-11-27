@@ -35,7 +35,7 @@ import {
 } from '../../../../../../testSupport/rootContextTestSupport';
 import {Core} from '../../../../../../../service/coreSingleton';
 import {createCoreTestFixture} from '../../../../../../../util/test/createCoreTestFixture';
-import {generateAPIConversation} from '../../../../../../../../../test/helper/ConversationGenerator';
+import {generateAPIConversation} from '../../../../../../../../../test/helper/conversationGenerator';
 
 import {E2EICertificateDetails} from './e2eiCertificateDetails';
 import {translateForTest} from '../../../../../../../util/test/translateForTest';

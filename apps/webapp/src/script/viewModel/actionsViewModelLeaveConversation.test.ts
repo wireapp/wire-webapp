@@ -32,7 +32,7 @@ import {IntegrationRepository} from '../repositories/integration/integrationRepo
 import {SelfRepository} from '../repositories/self/selfRepository';
 import {TeamState} from '../repositories/team/teamState';
 import {UserState} from '../repositories/user/userState';
-import {generateConversation} from '../../../test/helper/ConversationGenerator';
+import {generateConversation} from '../../../test/helper/conversationGenerator';
 import type {Translate} from '../util/localizerUtil';
 import {translateForTest} from '../util/test/translateForTest';
 import {createUuid} from '../util/uuid';

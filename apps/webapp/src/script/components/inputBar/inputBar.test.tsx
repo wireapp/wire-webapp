@@ -48,7 +48,7 @@ import {
 } from '../../page/testSupport/rootContextTestSupport';
 import {createUuid} from '../../util/uuid';
 
-import {TestFactory} from '../../../../test/helper/TestFactory';
+import {TestFactory} from '../../../../test/helper/testFactory';
 import {translateForTest} from '../../util/test/translateForTest';
 import type {ReactNode} from 'react';
 

@@ -51,7 +51,7 @@ import {MainViewModel, type ViewModelRepositories} from '../../viewModel/mainVie
 import {MessageListWrapper} from '../messagesList/messageListWrapper';
 import {TitleBar} from '../titleBar';
 
-import {TestFactory} from '../../../../test/helper/TestFactory';
+import {TestFactory} from '../../../../test/helper/testFactory';
 
 const conversationId = 'conversation';
 const conversationDomain = 'example.com';

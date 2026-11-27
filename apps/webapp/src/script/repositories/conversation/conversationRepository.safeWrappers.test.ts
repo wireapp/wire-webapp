@@ -21,9 +21,9 @@ import {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {container} from 'tsyringe';
 import {AddUsersFailureReasons} from '../../core/conversation';
 
-import {generateConversation as _generateConversation} from '../../../../test/helper/ConversationGenerator';
-import {TestFactory} from '../../../../test/helper/TestFactory';
-import {generateUser} from '../../../../test/helper/UserGenerator';
+import {generateConversation as _generateConversation} from '../../../../test/helper/conversationGenerator';
+import {TestFactory} from '../../../../test/helper/testFactory';
+import {generateUser} from '../../../../test/helper/userGenerator';
 import {requireValueForTest} from '../../page/testSupport/rootContextTestSupport';
 import {Core} from '../../service/coreSingleton';
 import {createCoreTestFixture} from '../../util/test/createCoreTestFixture';

@@ -45,7 +45,7 @@ import {
 } from '../../page/testSupport/rootContextTestSupport';
 import {setStrings, translate} from '../../util/localizerUtil';
 
-import {TestFactory} from '../../../../test/helper/TestFactory';
+import {TestFactory} from '../../../../test/helper/testFactory';
 import {PanelState} from '../../page/rightSidebar/rightSidebar';
 import {ViewModelRepositories} from '../../viewModel/mainViewModel';
 import {translateForTest} from '../../util/test/translateForTest';

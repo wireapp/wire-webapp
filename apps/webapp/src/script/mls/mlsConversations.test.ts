@@ -36,7 +36,7 @@ import {User} from '../repositories/entity/user';
 import {UserState} from '../repositories/user/userState';
 import {Core} from '../service/coreSingleton';
 import {requireValueForTest} from '../page/testSupport/rootContextTestSupport';
-import {TestFactory} from '../../../test/helper/TestFactory';
+import {TestFactory} from '../../../test/helper/testFactory';
 import {translateForTest} from '../util/test/translateForTest';
 import {createCoreTestFixture} from '../util/test/createCoreTestFixture';
 

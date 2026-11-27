@@ -1128,7 +1128,7 @@ const config = [
   },
   {
     files: jestTestFilePatterns,
-    ignores: ['apps/webapp/test/e2e_tests/**'],
+    ignores: ['apps/webapp/test/e2eTests/**'],
     plugins: {
       jest: jestPlugin,
     },

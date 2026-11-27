@@ -93,8 +93,8 @@ import {ConversationError} from '../../error/conversationError';
 import {
   generateConversation as _generateConversation,
   generateAPIConversation,
-} from '../../../../test/helper/ConversationGenerator';
-import {createDeleteEvent, createMessageAddEvent} from '../../../../test/helper/EventGenerator';
+} from '../../../../test/helper/conversationGenerator';
+import {createDeleteEvent, createMessageAddEvent} from '../../../../test/helper/eventGenerator';
 import type {Translate} from '../../util/localizerUtil';
 import {translateForTest} from '../../util/test/translateForTest';
 import {escapeRegex} from '../../util/sanitizationUtil';
@@ -118,9 +118,9 @@ import {MessageRepository} from './messageRepository';
 import {NOTIFICATION_STATE} from './notificationSetting';
 
 import {entities, payload} from '../../../../test/api/payloads';
-import {TestFactory} from '../../../../test/helper/TestFactory';
+import {TestFactory} from '../../../../test/helper/testFactory';
 import {createMockHttpServer, MockHttpServer} from '../../../../test/helper/mockHttpServer';
-import {generateUser} from '../../../../test/helper/UserGenerator';
+import {generateUser} from '../../../../test/helper/userGenerator';
 import {Core} from '../../service/coreSingleton';
 import {createCoreTestFixture} from '../../util/test/createCoreTestFixture';
 

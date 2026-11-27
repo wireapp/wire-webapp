@@ -24,7 +24,7 @@ import {TimeInMillis} from '../../../commons/util/timeUtil';
 import {EventMapper} from '../../../repositories/conversation/eventMapper';
 import {Conversation} from '../../../repositories/entity/conversation';
 import {Message} from '../../../repositories/entity/message/message';
-import {createGroupCreationEvent, createMessageAddEvent} from '../../../../../test/helper/EventGenerator';
+import {createGroupCreationEvent, createMessageAddEvent} from '../../../../../test/helper/eventGenerator';
 import {translate} from '../../../util/localizerUtil';
 import {getRandomNumber} from '../../../util/numberUtil';
 import {createUuid} from '../../../util/uuid';

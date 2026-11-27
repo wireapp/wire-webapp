@@ -85,7 +85,7 @@ const config: Config = {
   testPathIgnorePatterns: [
     '<rootDir>/server',
     '<rootDir>/.yalc',
-    '<rootDir>/test/e2e_tests',
+    '<rootDir>/test/e2eTests',
     '<rootDir>/src/script/core/',
     '<rootDir>/src/script/apiClient/',
     '<rootDir>/src/script/commons/',

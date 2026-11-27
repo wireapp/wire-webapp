@@ -24,7 +24,7 @@ import {
   createMessageAddEvent,
   createMultipartMessageAddEvent,
   toSavedEvent,
-} from '../../../../../test/helper/EventGenerator';
+} from '../../../../../test/helper/eventGenerator';
 import {createUuid} from '../../../util/uuid';
 
 import {RepliesUpdaterMiddleware} from './repliesUpdaterMiddleware';

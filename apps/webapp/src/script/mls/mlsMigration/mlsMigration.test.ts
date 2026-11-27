@@ -20,7 +20,7 @@
 import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
 import {asyncNoop} from 'noop-esm';
 
-import {generateConversation} from '../../../../test/helper/ConversationGenerator';
+import {generateConversation} from '../../../../test/helper/conversationGenerator';
 import {translateForTest} from '../../util/test/translateForTest';
 import {TIME_IN_MILLIS} from '../../util/timeUtil';
 

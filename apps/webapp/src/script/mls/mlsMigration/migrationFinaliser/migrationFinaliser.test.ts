@@ -24,8 +24,8 @@ import type {ObservableArray} from 'knockout';
 import {MixedConversation, MLSConversation} from '../../../repositories/conversation/conversationSelectors';
 import {Conversation} from '../../../repositories/entity/conversation';
 import type {User} from '../../../repositories/entity/user';
-import {TestFactory} from '../../../../../test/helper/TestFactory';
-import {generateUser} from '../../../../../test/helper/UserGenerator';
+import {TestFactory} from '../../../../../test/helper/testFactory';
+import {generateUser} from '../../../../../test/helper/userGenerator';
 import {createUuid} from '../../../util/uuid';
 
 import {finaliseMigrationOfMixedConversations} from './migrationFinaliser';
