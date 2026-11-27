@@ -33,6 +33,7 @@ import {AppPermissionState} from './AppPermissionState';
 import {NotificationPreference, WebappProperties} from '../../apiClient/user/data/userPropertiesSetData';
 import type {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {Runtime} from '../../commons/util/Runtime';
+import {isEveryoneMentionApplicable, isSelfMentioned, isSelfTargeted} from '../../message/selfMention';
 import {SuperType} from '../../message/superType';
 import {SystemMessageType} from '../../message/systemMessageType';
 import type {SystemNotificationApi, SystemNotificationHandle} from '../../notification/systemNotificationTypes';
@@ -271,7 +272,7 @@ export class NotificationRepository {
 
     const isUserBusy = this.userState.self().availability() === Availability.Type.BUSY;
     const isSelfMentionOrReply =
-      messageEntity.isContent() && messageEntity.isUserTargeted(this.userState.self().qualifiedId);
+      messageEntity.isContent() && isSelfTargeted(messageEntity, conversationEntity, this.userState.self().qualifiedId);
     const isCallMessage = messageEntity.super_type === SuperType.CALL;
 
     if (isUserBusy && !isSelfMentionOrReply && !isCallMessage && !isComposite) {
@@ -359,13 +360,14 @@ export class NotificationRepository {
    * @param messageEntity Normal message entity
    * @returns Notification message body
    */
-  private createBodyContent(messageEntity: ContentMessage): string | void {
+  private createBodyContent(messageEntity: ContentMessage, conversationEntity?: Conversation): string | void {
     if (messageEntity.hasAssetText()) {
+      const includeEveryone = isEveryoneMentionApplicable(conversationEntity, messageEntity);
       for (const assetEntity of messageEntity.assets()) {
         if (assetEntity.isText() || assetEntity.isMultipart()) {
           let notificationText;
 
-          if (assetEntity.isUserMentioned(this.userState.self().qualifiedId)) {
+          if (assetEntity.isUserMentioned(this.userState.self().qualifiedId, {includeEveryone})) {
             notificationText = this.translate('notificationMention', {text: assetEntity.text}, {}, true);
           } else if (messageEntity.isUserQuoted(this.userState.self().id)) {
             notificationText = this.translate('notificationReply', {text: assetEntity.text}, {}, true);
@@ -484,11 +486,11 @@ export class NotificationRepository {
    * @param messageEntity Message to obfuscate body for
    * @returns Notification message body
    */
-  private createBodyObfuscated(messageEntity: Message): string {
+  private createBodyObfuscated(messageEntity: Message, conversationEntity?: Conversation): string {
     if (messageEntity.isContent()) {
-      const isSelfMentioned = messageEntity.isUserMentioned(this.userState.self().qualifiedId);
+      const isMentioned = isSelfMentioned(messageEntity, conversationEntity, this.userState.self().qualifiedId);
 
-      if (isSelfMentioned) {
+      if (isMentioned) {
         return this.translate('notificationObfuscatedMention');
       }
 
@@ -576,7 +578,7 @@ export class NotificationRepository {
       const shouldObfuscateMessage = this.shouldObfuscateNotificationMessage(messageEntity);
       return {
         options: {
-          body: shouldObfuscateMessage ? this.createBodyObfuscated(messageEntity) : body,
+          body: shouldObfuscateMessage ? this.createBodyObfuscated(messageEntity, conversationEntity) : body,
           data: this.createOptionsData(messageEntity, connectionEntity, conversationEntity),
           icon: iconUrl,
           silent: true, // @note When Firefox supports this we can remove the fix for WEBAPP-731
@@ -604,7 +606,7 @@ export class NotificationRepository {
       case SuperType.CALL:
         return this.createBodyCall(messageEntity as CallMessage);
       case SuperType.CONTENT:
-        return this.createBodyContent(messageEntity as ContentMessage);
+        return this.createBodyContent(messageEntity as ContentMessage, conversationEntity);
       case SuperType.MEMBER:
         return this.createBodyMemberUpdate(messageEntity as MemberMessage, conversationEntity);
       case SuperType.PING:
@@ -735,7 +737,8 @@ export class NotificationRepository {
     const conversationId = this.getConversationId(connectionEntity, conversationEntity);
 
     const containsSelfMention =
-      messageEntity.isContent() && (messageEntity as ContentMessage).isUserMentioned(this.userState.self().qualifiedId);
+      messageEntity.isContent() &&
+      isSelfMentioned(messageEntity as ContentMessage, conversationEntity, this.userState.self().qualifiedId);
     if (containsSelfMention) {
       const showOptions = {exposeMessage: messageEntity, openFirstSelfMention: true};
       return () => {
@@ -1067,7 +1070,7 @@ export class NotificationRepository {
       return isEventToNotify;
     }
 
-    const isSelfMentionOrReply = messageEntity.isContent() && messageEntity.isUserTargeted(userId);
+    const isSelfMentionOrReply = messageEntity.isContent() && isSelfTargeted(messageEntity, conversationEntity, userId);
     const isCallMessage = messageEntity.super_type === SuperType.CALL;
     return isEventToNotify && (isCallMessage || isSelfMentionOrReply);
   }

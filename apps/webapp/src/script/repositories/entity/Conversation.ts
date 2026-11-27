@@ -161,6 +161,8 @@ export class Conversation {
   public readonly isChannel: ko.PureComputed<boolean>;
   public readonly isMeeting: ko.PureComputed<boolean>;
   public readonly isGroupOrChannel: ko.PureComputed<boolean>;
+  /** Groups, channels and meetings: the conversations where a mention of everyone (`@all`) applies. */
+  public readonly isGroupLike: ko.PureComputed<boolean>;
   public readonly isGuest: ko.Observable<boolean>;
   public readonly isGuestRoom: ko.PureComputed<boolean>;
   public readonly isGuestAndServicesRoom: ko.PureComputed<boolean>;
@@ -339,6 +341,10 @@ export class Conversation {
 
     this.isGroupOrChannel = ko.pureComputed(() => {
       return this.isGroup() || this.isChannel();
+    });
+
+    this.isGroupLike = ko.pureComputed(() => {
+      return this.isGroup() || this.isChannel() || this.isMeeting();
     });
 
     this.is1to1 = ko.pureComputed(() => {
@@ -625,7 +631,9 @@ export class Conversation {
           const isSelfMentioned =
             isMessage &&
             selfUser !== undefined &&
-            (messageEntity as ContentMessage).isUserMentioned(selfUser.qualifiedId);
+            (messageEntity as ContentMessage).isUserMentioned(selfUser.qualifiedId, {
+              includeEveryone: this.isGroupLike(),
+            });
           const isSelfQuoted =
             isMessage && selfUser !== undefined && (messageEntity as ContentMessage).isUserQuoted(selfUser.id);
 

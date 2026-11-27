@@ -57,6 +57,8 @@ interface ContentAssetProps {
   selfId: QualifiedId;
   isMessageFocused: boolean;
   is1to1Conversation: boolean;
+  /** Whether mentions of everyone (`@all`) in the message are highlighted as mentioning the self user. */
+  highlightEveryoneMention?: boolean;
   isFileShareRestricted: boolean;
   onClickDetails: () => void;
 }
@@ -70,6 +72,7 @@ const ContentAsset: FunctionComponent<ContentAssetProps> = ({
   onClickButton,
   isMessageFocused,
   is1to1Conversation,
+  highlightEveryoneMention = false,
   onClickDetails,
 }: ContentAssetProps) => {
   const {isObfuscated, status, senderName, timestamp} = useKoSubscribableChildren(message, [
@@ -84,7 +87,7 @@ const ContentAsset: FunctionComponent<ContentAssetProps> = ({
     case AssetType.MULTIPART:
       const multipartAsset = asset as Multipart;
       const shouldRenderTextMultipart = multipartAsset.should_render_text();
-      const renderTextMultipart = multipartAsset.render(selfId, message.accent_color());
+      const renderTextMultipart = multipartAsset.render(selfId, message.accent_color(), {highlightEveryoneMention});
 
       const filesMultipart = multipartAsset.getCellAssets();
 
@@ -130,7 +133,7 @@ const ContentAsset: FunctionComponent<ContentAssetProps> = ({
       );
     case AssetType.TEXT:
       const shouldRenderText = (asset as Text).should_render_text();
-      const renderText = (asset as Text).render(selfId, message.accent_color());
+      const renderText = (asset as Text).render(selfId, message.accent_color(), {highlightEveryoneMention});
 
       return (
         <>
