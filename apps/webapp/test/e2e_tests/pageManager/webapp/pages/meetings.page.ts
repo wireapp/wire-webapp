@@ -112,6 +112,60 @@ export class MeetingsPage {
     await this.scheduleMeetingButton.click();
   }
 
+  scheduleMeetingHeading(): Locator {
+    return this.scheduleMeetingModal.getByRole('heading', {
+      name: 'Schedule a meeting',
+      exact: true,
+    });
+  }
+
+  meetingParticipantsInput(): Locator {
+    return this.scheduleMeetingModal.getByTestId('schedule-meeting-participants-input');
+  }
+
+  meetingTitleRequiredError(): Locator {
+    return this.scheduleMeetingModal.getByTestId('schedule-meeting-title-error');
+  }
+
+  meetingDatePart(part: 'month' | 'day' | 'year'): Locator {
+    return this.scheduleMeetingModal.getByTestId('schedule-meeting-date').getByRole('spinbutton', {
+      name: new RegExp(part, 'i'),
+    });
+  }
+
+  calendarPreviousMonthButton(): Locator {
+    return this.page.getByRole('button', {
+      name: 'Previous month',
+      exact: true,
+    });
+  }
+
+  async closeStartDateCalendar(): Promise<void> {
+    await this.page.keyboard.press('Escape');
+  }
+
+  async openMeetingTimeOptions(groupName: 'Starts' | 'Ends'): Promise<void> {
+    const field = this.timePicker(groupName);
+
+    await field.scrollIntoViewIfNeeded();
+    await field.click();
+  }
+
+  meetingTimeOption(label: string): Locator {
+    return this.page.getByRole('option', {
+      name: label,
+      exact: true,
+    });
+  }
+
+  meetingTimeField(groupName: 'Starts' | 'Ends'): Locator {
+    return this.timePicker(groupName);
+  }
+
+  async clickScheduleMeetingSubmit(options: {clickCount?: number} = {}): Promise<void> {
+    await this.scheduleMeetingSubmitButton.click(options);
+  }
+
   async scheduleMeetingOnDate(
     title: string,
     dateLabel: string,
@@ -429,9 +483,20 @@ export class MeetingsPage {
     });
   }
 
+  meetingTimeDropdown(): Locator {
+    return this.page.getByRole('listbox');
+  }
+
+  meetingEndTimeError(): Locator {
+    return this.scheduleMeetingModal.getByTestId('schedule-meeting-end-time-error');
+  }
   async joinMeetingFromPrep(): Promise<void> {
     await this.meetingPrepModal.getByRole('button', {name: 'Join', exact: true}).click();
     await expect(this.meetingPrepModal).toBeHidden();
+  }
+
+  async closeScheduleMeetingModal(): Promise<void> {
+    await this.scheduleMeetingModal.getByRole('button', {name: 'Close', exact: true}).click();
   }
 
   meetingAttendingStatus(meeting: Locator): Locator {

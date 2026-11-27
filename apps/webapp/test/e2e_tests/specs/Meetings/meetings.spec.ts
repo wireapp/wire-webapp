@@ -24,12 +24,16 @@ import {
   meetingWindowWithinPastEditPeriod,
   createMidnightMeetingTimes,
   createOrderedMeetingListData,
+  createScheduleMeetingDefaultsData,
+  createPastMeetingSelectionData,
 } from '../../utils/meetingTime.util';
 import {prepareMeetingParticipantProfiles} from '../../utils/meetingSetup.util';
 import {createMeetingsTeam, loginMeetingsUsers} from '../../utils/meetings.util';
 import {getImageFilePath} from '../../utils/sendImage.util';
+import {holdMeetingCreationRequest} from '../../utils/meetingRequest.util';
 
 const MEETING_TITLE = 'Team sync';
+const SUPPORTED_MEETING_TITLE = `${MEETING_TITLE} – QA & Dev 🚀`;
 const UPDATED_MEETING_TITLE = 'Updated team sync';
 const LARGE_MEETING_TITLE = 'Large meeting';
 const DAILY_ONGOING_TITLE = 'Daily ongoing edit e2e';
@@ -39,10 +43,23 @@ const UPDATED_DAILY_TITLE = 'Daily ongoing edit updated';
 const LONG_NAME = 'Alexandria-Marie O’Connor-Sørensen';
 const ORDERING_OCCURRENCE_COUNT = 53;
 const RECURRENCE_SCENARIOS = [
-  {label: 'Daily', intervalDays: 1},
-  {label: 'Weekly', intervalDays: 7},
-  {label: 'Every two weeks', intervalDays: 14},
-  {label: 'Every four weeks', intervalDays: 28},
+  {testCaseId: '11699', label: 'Never', intervalDays: 0},
+  {testCaseId: '11649', label: 'Daily', intervalDays: 1},
+  {testCaseId: '13604', label: 'Weekly', intervalDays: 7},
+  {testCaseId: '13605', label: 'Every two weeks', intervalDays: 14},
+  {testCaseId: '13606', label: 'Every four weeks', intervalDays: 28},
+] as const;
+const LATE_MEETING_SCENARIOS = [
+  {
+    title: `${MEETING_TITLE} – 23:15`,
+    startLabels: ['11:00 PM', '11:15 PM'],
+    timeRange: '11:15 - 11:45 PM',
+  },
+  {
+    title: `${MEETING_TITLE} – 23:30`,
+    startLabels: ['11:30 PM'],
+    timeRange: '11:30 - 11:45 PM',
+  },
 ] as const;
 
 test.describe('Meetings', () => {
@@ -69,7 +86,7 @@ test.describe('Meetings', () => {
     );
 
     test(
-      'TC-11653: User can view meeting details and participant information',
+      'TC-11653 , TC-11741: User can view meeting details and participant information',
       {tag: ['@regression']},
       async ({createUser, createTeam, createPage}) => {
         const {owner, members} = await createMeetingsTeam(createUser, createTeam, 4);
@@ -404,7 +421,7 @@ test.describe('Meetings', () => {
 
     for (const scenario of RECURRENCE_SCENARIOS) {
       test(
-        `TC-11649: User can view recurring meeting instances: ${scenario.label}`,
+        `TC-${scenario.testCaseId}: Host can schedule and view a meeting with Repeat set to : ${scenario.label}`,
         {tag: ['@regression']},
         async ({createUser, createTeam, createPage}) => {
           const {owner} = await createMeetingsTeam(createUser, createTeam, 0);
@@ -414,9 +431,10 @@ test.describe('Meetings', () => {
 
           const timeZone = await meetings.getLocalTimeZone();
           const referenceDate = new Date();
+          const occurrenceCount = scenario.label === 'Never' ? 1 : 3;
 
           // All expected dates use the same starting instant.
-          const expectedOccurrences = [0, 1, 2].map(index => {
+          const expectedOccurrences = Array.from({length: occurrenceCount}, (_, index) => {
             return createMeetingDetailsData(referenceDate, timeZone, 1 + index * scenario.intervalDays);
           });
 
@@ -426,10 +444,10 @@ test.describe('Meetings', () => {
             recurrence: scenario.label,
           });
 
-          const actualOccurrences = await meetings.readFirstMeetingOccurrences(MEETING_TITLE, 3);
+          const actualOccurrences = await meetings.readFirstMeetingOccurrences(MEETING_TITLE, occurrenceCount);
 
           // The first three occurrences follow the selected repeat pattern.
-          await expect(actualOccurrences).toHaveLength(3);
+          await expect(actualOccurrences).toHaveLength(occurrenceCount);
           expect(
             actualOccurrences.map(occurrence => {
               return occurrence.dayHeading;
@@ -447,13 +465,24 @@ test.describe('Meetings', () => {
                 return occurrence.dayHeading;
               }),
             ).size,
-          ).toBe(3);
+          ).toBe(occurrenceCount);
 
           // Every inspected occurrence has the expected details and label.
           for (const occurrence of actualOccurrences) {
             expect(occurrence.text).toContain(MEETING_TITLE);
             expect(occurrence.text).toContain(first.timeRange);
-            expect(occurrence.text).toContain(scenario.label);
+
+            // Recurring meetings display their repeat label.
+            if (scenario.label !== 'Never') {
+              expect(occurrence.text).toContain(scenario.label);
+            }
+          }
+
+          if (scenario.label === 'Never') {
+            const meeting = meetings.meetingOccurrence(MEETING_TITLE, first.dayHeading);
+
+            await expect(meeting).toBeVisible();
+            await expect(meetings.meetingEntries).toHaveCount(1);
           }
         },
       );
@@ -614,59 +643,389 @@ test.describe('Meetings', () => {
       await meetings.assertConversationCodeRequest(requestPromise, 'MeetingSecret1!');
     });
 
-    test('host sees a new meeting in the list', async ({createUser, createTeam, createPage}) => {
-      const {owner, members} = await createMeetingsTeam(createUser, createTeam, 1);
-      const member = members[0];
+    test(
+      'TC-11686,TC-11687,TC-11688,TC-13063 : Host sees schedule defaults, title validation, and a meeting with a supported title and no other participants',
+      {tag: ['@regression']},
+      async ({createUser, createTeam, createPage}) => {
+        const {owner} = await createMeetingsTeam(createUser, createTeam, 0);
 
-      const [ownerPage] = await loginMeetingsUsers(createPage, [owner, member]);
-      const meetings = PageManager.from(ownerPage).webapp.pages.meetings();
+        const [ownerPage] = await loginMeetingsUsers(createPage, [owner]);
+        const meetings = PageManager.from(ownerPage).webapp.pages.meetings();
 
-      await meetings.openMeetingsTab();
-      await meetings.scheduleMeeting(MEETING_TITLE, [member.fullName]);
-      await meetings.waitForMeetingInList(MEETING_TITLE);
-      await expect(meetings.meetingListItem(MEETING_TITLE)).toBeVisible();
-    });
+        const details = createScheduleMeetingDefaultsData(new Date(), await meetings.getLocalTimeZone());
 
-    test('invitee sees a meeting they were added to', async ({createUser, createTeam, createPage}) => {
-      const {owner, members} = await createMeetingsTeam(createUser, createTeam, 1);
-      const member = members[0];
+        await meetings.openMeetingsAt(details.browserTime);
+        await expect(meetings.emptyMeetingsTitle).toBeVisible();
 
-      const [ownerPage, memberPage] = await loginMeetingsUsers(createPage, [owner, member]);
-      const ownerMeetings = PageManager.from(ownerPage).webapp.pages.meetings();
-      const memberMeetings = PageManager.from(memberPage).webapp.pages.meetings();
+        await meetings.openScheduleMeetingModal();
 
-      await ownerMeetings.openMeetingsTab();
-      await ownerMeetings.scheduleMeeting(MEETING_TITLE, [member.fullName]);
+        // Verify the untouched modal and field defaults.
+        await expect(meetings.scheduleMeetingModal).toBeVisible();
+        await expect(meetings.scheduleMeetingHeading()).toBeVisible();
 
-      await memberMeetings.openMeetingsTab();
-      await memberMeetings.waitForMeetingInList(MEETING_TITLE);
-      await expect(memberMeetings.meetingListItem(MEETING_TITLE)).toBeVisible();
-    });
+        await expect(meetings.meetingTitleInput()).toBeVisible();
+        await expect(meetings.meetingTitleInput()).toHaveValue('');
+        await expect(meetings.meetingTitleInput()).toHaveAttribute('placeholder', 'Enter a title');
 
-    test('host cannot pick a start date in the past', async ({createUser, createTeam, createPage}) => {
-      const {owner, members} = await createMeetingsTeam(createUser, createTeam, 1);
-      const member = members[0];
+        await expect(meetings.meetingParticipantsInput()).toBeVisible();
+        await expect(meetings.meetingParticipantsInput()).toHaveValue('');
+        await expect(meetings.meetingParticipantsInput()).toHaveAttribute('placeholder', 'Search by name');
 
-      const [ownerPage] = await loginMeetingsUsers(createPage, [owner, member]);
-      const meetings = PageManager.from(ownerPage).webapp.pages.meetings();
+        await expect(meetings.meetingDatePart('year')).toHaveAttribute('aria-valuenow', details.year);
+        await expect(meetings.meetingDatePart('month')).toHaveAttribute('aria-valuenow', details.month);
+        await expect(meetings.meetingDatePart('day')).toHaveAttribute('aria-valuenow', details.day);
 
-      await meetings.openMeetingsTab();
-      await meetings.openScheduleMeetingModal();
-      await meetings.fillMeetingTitle('Past start create e2e');
-      await meetings.addParticipant(member.fullName);
+        await expect(meetings.meetingTimeField('Starts')).toContainText(details.startLabel);
 
-      const yesterday = new Date();
-      yesterday.setDate(yesterday.getDate() - 1);
-      const yesterdayLabel = yesterday.toLocaleDateString('en-US', {
-        weekday: 'long',
-        month: 'long',
-        day: 'numeric',
-        year: 'numeric',
-      });
+        await expect(meetings.meetingTimeField('Ends')).toContainText(details.endLabel);
 
-      await meetings.openStartDateCalendar();
-      await expect(meetings.calendarDateButton(yesterdayLabel)).toBeDisabled();
-    });
+        await expect(meetings.recurrenceSelect()).toBeVisible();
+        await expect(meetings.recurrenceSelect()).toContainText('Never');
+        await expect(meetings.scheduleMeetingSubmitButton).toBeEnabled();
+
+        // An empty title prevents creation and keeps the modal open.
+        await meetings.clickScheduleMeetingSubmit();
+
+        await expect(meetings.meetingTitleRequiredError()).toHaveText('Title is required');
+        await expect(meetings.scheduleMeetingModal).toBeVisible();
+        await expect(meetings.meetingEntries).toHaveCount(0);
+
+        // Enter a supported title and preserve all other default values.
+        await meetings.fillMeetingTitle(SUPPORTED_MEETING_TITLE);
+
+        await expect(meetings.meetingTitleInput()).toHaveValue(SUPPORTED_MEETING_TITLE);
+
+        await meetings.clickScheduleMeetingSubmit();
+
+        await expect(meetings.scheduleMeetingModal).toBeHidden();
+
+        // Verify the saved meeting using existing Meeting List locators.
+        const meeting = meetings.meetingOccurrence(SUPPORTED_MEETING_TITLE, details.dayHeading);
+
+        await expect(meeting).toHaveCount(1);
+        await expect(meeting).toBeVisible();
+        await expect(meetings.meetingTitle(meeting, SUPPORTED_MEETING_TITLE)).toHaveText(SUPPORTED_MEETING_TITLE);
+        await expect(meeting).toContainText(details.timeRange);
+
+        // The host is the only participant and remains the organizer.
+        const avatars = meetings.participantAvatars(meeting);
+        const organizerLabel = `${owner.fullName} (Organizer)`;
+
+        await expect(avatars).toHaveCount(1);
+        await expect(avatars).toBeVisible();
+        await expect(avatars).toHaveAttribute('aria-label', organizerLabel);
+      },
+    );
+
+    test(
+      'TC-13059: Invitee sees a meeting they were added to',
+      {tag: ['@regression']},
+      async ({createUser, createTeam, createPage}) => {
+        const {owner, members} = await createMeetingsTeam(createUser, createTeam, 1);
+        const member = members[0];
+
+        const [ownerPage, memberPage] = await loginMeetingsUsers(createPage, [owner, member]);
+        const ownerMeetings = PageManager.from(ownerPage).webapp.pages.meetings();
+        const memberMeetings = PageManager.from(memberPage).webapp.pages.meetings();
+
+        await ownerMeetings.openMeetingsTab();
+        await ownerMeetings.scheduleMeeting(MEETING_TITLE, [member.fullName]);
+
+        await memberMeetings.openMeetingsTab();
+        await memberMeetings.waitForMeetingInList(MEETING_TITLE);
+        await expect(memberMeetings.meetingListItem(MEETING_TITLE)).toBeVisible();
+      },
+    );
+
+    test(
+      'TC-11693: Host cannot schedule a meeting in the past',
+      {tag: ['@regression']},
+      async ({createUser, createTeam, createPage}) => {
+        const {owner} = await createMeetingsTeam(createUser, createTeam, 0);
+        const [ownerPage] = await loginMeetingsUsers(createPage, [owner]);
+        const meetings = PageManager.from(ownerPage).webapp.pages.meetings();
+
+        const details = createPastMeetingSelectionData(new Date(), await meetings.getLocalTimeZone());
+
+        await meetings.openMeetingsAt(details.browserTime);
+        await meetings.openScheduleMeetingModal();
+
+        await expect(meetings.scheduleMeetingModal).toBeVisible();
+
+        // Past dates cannot be selected.
+        await meetings.openStartDateCalendar();
+
+        if (details.yesterdayInCurrentMonth) {
+          await expect(meetings.calendarDateButton(details.yesterdayLabel)).toBeDisabled();
+        } else {
+          // On the first day of a month, the previous month is unavailable.
+          await expect(meetings.calendarPreviousMonthButton()).toBeDisabled();
+        }
+
+        await meetings.closeStartDateCalendar();
+
+        // Today must not offer any start time at or before 10:10 AM.
+        await meetings.openMeetingTimeOptions('Starts');
+
+        // Confirm the dropdown is open before checking absent options.
+        await expect(meetings.meetingTimeDropdown()).toBeVisible();
+
+        for (const label of details.unavailableStartLabels) {
+          await expect(meetings.meetingTimeOption(label)).toHaveCount(0);
+        }
+      },
+    );
+
+    test(
+      'TC-11690, TC-11697: Host can select a future date and schedule late meetings without crossing midnight',
+      {tag: ['@regression']},
+      async ({createUser, createTeam, createPage}) => {
+        const {owner} = await createMeetingsTeam(createUser, createTeam, 0);
+        const [ownerPage] = await loginMeetingsUsers(createPage, [owner]);
+        const meetings = PageManager.from(ownerPage).webapp.pages.meetings();
+
+        const timeZone = await meetings.getLocalTimeZone();
+        const defaults = createScheduleMeetingDefaultsData(new Date(), timeZone);
+
+        await meetings.openMeetingsAt(defaults.browserTime);
+        await expect(meetings.emptyMeetingsTitle).toBeVisible();
+
+        // Select tomorrow relative to the controlled browser date.
+        const details = createMeetingDetailsData(defaults.browserTime, timeZone, 1);
+
+        for (const scenario of LATE_MEETING_SCENARIOS) {
+          // Each meeting starts from a fresh modal and default duration.
+          await meetings.openScheduleMeetingModal();
+          await expect(meetings.scheduleMeetingModal).toBeVisible();
+
+          await meetings.fillMeetingTitle(scenario.title);
+          await meetings.selectMeetingDate(details.dateLabel);
+
+          await expect(meetings.meetingTimeField('Starts')).toContainText(defaults.startLabel);
+          await expect(meetings.meetingTimeField('Ends')).toContainText(defaults.endLabel);
+
+          // Change only Start; the application must calculate End.
+          for (const startLabel of scenario.startLabels) {
+            await meetings.selectTimeForGroup('Starts', startLabel);
+
+            await expect(meetings.meetingTimeField('Starts')).toContainText(startLabel);
+            await expect(meetings.meetingTimeField('Ends')).toContainText('11:45 PM');
+          }
+
+          // The selected future date remains unchanged after time adjustment.
+          await expect(meetings.meetingDatePart('year')).toHaveAttribute('aria-valuenow', details.year);
+          await expect(meetings.meetingDatePart('month')).toHaveAttribute('aria-valuenow', details.month);
+          await expect(meetings.meetingDatePart('day')).toHaveAttribute('aria-valuenow', details.day);
+
+          await meetings.clickScheduleMeetingSubmit();
+
+          await expect(meetings.scheduleMeetingModal).toBeHidden();
+
+          const meeting = meetings.meetingOccurrence(scenario.title, details.dayHeading);
+
+          await expect(meeting).toHaveCount(1);
+          await expect(meeting).toBeVisible();
+          await expect(meetings.meetingTitle(meeting, scenario.title)).toHaveText(scenario.title);
+          await expect(meeting).toContainText(scenario.timeRange);
+        }
+
+        // Both saved meetings remain present under the selected day.
+        for (const scenario of LATE_MEETING_SCENARIOS) {
+          const meeting = meetings.meetingOccurrence(scenario.title, details.dayHeading);
+
+          await expect(meeting).toHaveCount(1);
+          await expect(meeting).toContainText(scenario.timeRange);
+        }
+
+        await expect(meetings.meetingEntries).toHaveCount(2);
+      },
+    );
+
+    test(
+      'TC-11691: Host adjusts invalid time ranges and cannot schedule equal start and end times',
+      {tag: ['@regression']},
+      async ({createUser, createTeam, createPage}) => {
+        const {owner} = await createMeetingsTeam(createUser, createTeam, 0);
+        const [ownerPage] = await loginMeetingsUsers(createPage, [owner]);
+        const meetings = PageManager.from(ownerPage).webapp.pages.meetings();
+
+        const timeZone = await meetings.getLocalTimeZone();
+        const defaults = createScheduleMeetingDefaultsData(new Date(), timeZone);
+
+        await meetings.openMeetingsAt(defaults.browserTime);
+        await expect(meetings.emptyMeetingsTitle).toBeVisible();
+
+        const details = createMeetingDetailsData(defaults.browserTime, timeZone, 1);
+
+        await meetings.openScheduleMeetingModal();
+        await expect(meetings.scheduleMeetingModal).toBeVisible();
+
+        await meetings.fillMeetingTitle(MEETING_TITLE);
+        await meetings.selectMeetingDate(details.dateLabel);
+
+        // Establish a one-hour range on the future date.
+        await meetings.selectTimeForGroup('Starts', '1:00 PM');
+
+        await expect(meetings.meetingTimeField('Starts')).toContainText('1:00 PM');
+        await expect(meetings.meetingTimeField('Ends')).toContainText('2:00 PM');
+
+        // An earlier End moves Start backward, preserving the duration.
+        await meetings.selectTimeForGroup('Ends', '12:00 PM');
+
+        await expect(meetings.meetingTimeField('Starts')).toContainText('11:00 AM');
+        await expect(meetings.meetingTimeField('Ends')).toContainText('12:00 PM');
+
+        // An End equal to the current Start also moves Start backward.
+        await meetings.selectTimeForGroup('Ends', '11:00 AM');
+
+        await expect(meetings.meetingTimeField('Starts')).toContainText('10:00 AM');
+        await expect(meetings.meetingTimeField('Ends')).toContainText('11:00 AM');
+
+        // At the latest supported Start, End cannot move beyond 23:45.
+        await meetings.selectTimeForGroup('Starts', '11:45 PM');
+
+        await expect(meetings.meetingTimeField('Starts')).toContainText('11:45 PM');
+        await expect(meetings.meetingTimeField('Ends')).toContainText('11:45 PM');
+
+        await meetings.clickScheduleMeetingSubmit();
+
+        // Equal start and end times must prevent creation.
+        await expect(meetings.meetingEndTimeError()).toBeVisible();
+        await expect(meetings.meetingEndTimeError()).toHaveText('End time must be after start time');
+        await expect(meetings.scheduleMeetingModal).toBeVisible();
+        await expect(meetings.meetingEntries).toHaveCount(0);
+      },
+    );
+
+    test(
+      'TC-11704: host can close Schedule Meeting without creating a meeting',
+      {tag: ['@regression']},
+      async ({createUser, createTeam, createPage}) => {
+        const {owner} = await createMeetingsTeam(createUser, createTeam, 0);
+        const [ownerPage] = await loginMeetingsUsers(createPage, [owner]);
+        const meetings = PageManager.from(ownerPage).webapp.pages.meetings();
+
+        await meetings.openMeetingsTab();
+        await expect(meetings.emptyMeetingsTitle).toBeVisible();
+
+        await meetings.openScheduleMeetingModal();
+        await expect(meetings.scheduleMeetingModal).toBeVisible();
+
+        await meetings.fillMeetingTitle(MEETING_TITLE);
+        await meetings.closeScheduleMeetingModal();
+
+        await expect(meetings.scheduleMeetingModal).toBeHidden();
+        await expect(meetings.meetingEntries).toHaveCount(0);
+        await expect(meetings.emptyMeetingsTitle).toHaveText('No meetings yet.');
+      },
+    );
+
+    test(
+      'TC-11705:Host cannot create duplicate meetings by clicking Schedule multiple times',
+      {tag: ['@regression']},
+      async ({createUser, createTeam, createPage}) => {
+        const {owner} = await createMeetingsTeam(createUser, createTeam, 0);
+        const [ownerPage] = await loginMeetingsUsers(createPage, [owner]);
+        const meetings = PageManager.from(ownerPage).webapp.pages.meetings();
+
+        await meetings.openMeetingsTab();
+        await expect(meetings.emptyMeetingsTitle).toBeVisible();
+
+        const details = createMeetingDetailsData(new Date(), await meetings.getLocalTimeZone());
+
+        await meetings.openScheduleMeetingModal();
+        await meetings.fillMeetingTitle(MEETING_TITLE);
+        await meetings.selectMeetingDate(details.dateLabel);
+        await meetings.selectTimeForGroup('Starts', details.startLabel);
+        await meetings.selectTimeForGroup('Ends', details.endLabel);
+
+        const creationRequest = await holdMeetingCreationRequest(ownerPage);
+
+        try {
+          await meetings.clickScheduleMeetingSubmit({clickCount: 3});
+
+          await expect
+            .poll(() => {
+              return creationRequest.getRequestCount();
+            })
+            .toBe(1);
+
+          await expect(meetings.scheduleMeetingSubmitButton).toBeDisabled();
+
+          const response = await creationRequest.release();
+
+          expect(response.ok()).toBe(true);
+          await expect(meetings.scheduleMeetingModal).toBeHidden();
+
+          const meeting = meetings.meetingOccurrence(MEETING_TITLE, details.dayHeading);
+          await expect(meeting).toBeVisible();
+          await expect(meeting).toContainText(details.timeRange);
+          await expect(meetings.meetingEntries).toHaveCount(1);
+          expect(creationRequest.getRequestCount()).toBe(1);
+        } finally {
+          await creationRequest.dispose();
+        }
+      },
+    );
+
+    test(
+      'TC-11663 Host can retry scheduling a meeting after a network failure',
+      {tag: ['@regression']},
+      async ({createUser, createTeam, createPage}) => {
+        const {owner} = await createMeetingsTeam(createUser, createTeam, 0);
+        const [ownerPage] = await loginMeetingsUsers(createPage, [owner]);
+
+        const {pages, modals} = PageManager.from(ownerPage).webapp;
+        const meetings = pages.meetings();
+        const errorDialog = modals.acknowledge();
+        const context = ownerPage.context();
+
+        await meetings.openMeetingsTab();
+        await expect(meetings.emptyMeetingsTitle).toBeVisible();
+
+        const details = createMeetingDetailsData(new Date(), await meetings.getLocalTimeZone());
+
+        // Prepare valid details while online.
+        await meetings.openScheduleMeetingModal();
+        await meetings.fillMeetingTitle(MEETING_TITLE);
+        await meetings.selectMeetingDate(details.dateLabel);
+        await meetings.selectTimeForGroup('Starts', details.startLabel);
+        await meetings.selectTimeForGroup('Ends', details.endLabel);
+
+        try {
+          // The first submission fails while this browser session is offline.
+          await context.setOffline(true);
+          await meetings.clickScheduleMeetingSubmit();
+
+          await expect(errorDialog.modalTitle).toHaveText('Could not schedule meeting');
+          await expect(meetings.meetingEntries).toHaveCount(0);
+
+          // Restore networking and dismiss only the error dialog.
+          await context.setOffline(false);
+          await errorDialog.clickAction();
+
+          await expect(errorDialog.modalTitle).toBeHidden();
+          await expect(meetings.scheduleMeetingModal).toBeVisible();
+
+          // The original details remain available for retry.
+          await expect(meetings.meetingTitleInput()).toHaveValue(MEETING_TITLE);
+
+          // Retry the same form without refreshing or navigating away.
+          await meetings.clickScheduleMeetingSubmit();
+
+          await expect(meetings.scheduleMeetingModal).toBeHidden();
+
+          const meeting = meetings.meetingOccurrence(MEETING_TITLE, details.dayHeading);
+
+          await expect(meeting).toBeVisible();
+          await expect(meeting).toContainText(details.timeRange);
+          await expect(meetings.meetingEntries).toHaveCount(1);
+        } finally {
+          // Always restore networking before fixture cleanup.
+          await context.setOffline(false);
+        }
+      },
+    );
   });
 
   test.describe('Edit', () => {
