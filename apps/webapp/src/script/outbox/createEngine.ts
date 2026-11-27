@@ -79,6 +79,9 @@ import type {
 const MAXIMUM_TIMER_MILLISECONDS = 2_147_483_647;
 
 type Timer = State<'armed', {timer: TimerId}> | State<'disarmed'>;
+/** Once closed, `answer` is what the commands still waiting on an attempt answer */
+type Queue =
+  State<'open', {tail: Promise<unknown>}> | State<'closed', {tail: Promise<unknown>; answer: OutboxUnavailable}>;
 type Previous = State<'initial'> | OperationSnapshot;
 type Lookup = Outcome<'operation-found', {operation: OperationSnapshot}> | OperationNotFound;
 
@@ -91,10 +94,10 @@ type StepOutcome = CommitOutcome | Outcome<'step-skipped'>;
 type Command<Result> =
   | Outcome<'command-refused', {answer: Result}>
   | Outcome<'command-accepted', {apply: (lookup: Lookup) => Promise<Result>}>;
-type Parked<Result> = Result | EndedWhileWaiting | OutboxNotStarted;
+type Parked<Result> = Result | EndedWhileWaiting | OutboxUnavailable;
 type ParkedCommand = {
   applyTo: (lookup: Lookup) => Promise<void>;
-  answer: (answer: EndedWhileWaiting | OutboxNotStarted) => void;
+  answer: (answer: EndedWhileWaiting | OutboxUnavailable) => void;
 };
 
 type RunningAttempt = {
@@ -147,9 +150,14 @@ function parsePayload(
 
 /**
  * Owns all runtime state of a started outbox. Commands, scheduler passes and load run one after another through
- * `serialized`; the timer and kind callbacks only record a result and request a pass.
+ * `serialized`; the timer and kind callbacks only record a result and request a pass. A failed save stops the
+ * engine, which then calls `reportStopped` once.
  */
-export function createEngine(kinds: ReadonlyMap<string, ResolvedKind>, dependencies: OutboxDependencies): Engine {
+export function createEngine(
+  kinds: ReadonlyMap<string, ResolvedKind>,
+  dependencies: OutboxDependencies,
+  reportStopped: () => void,
+): Engine {
   const {store, clock, random, createId, logger} = dependencies;
   const configuration = resolveConfiguration(dependencies.configuration);
 
@@ -157,7 +165,7 @@ export function createEngine(kinds: ReadonlyMap<string, ResolvedKind>, dependenc
 
   const operations = new Map<string, OperationSnapshot>();
   const attempts = new Map<string, RunningAttempt>();
-  let queue: State<'open' | 'closed', {tail: Promise<unknown>}> = {state: 'open', tail: Promise.resolve()};
+  let queue: Queue = {state: 'open', tail: Promise.resolve()};
   let run: Run = {state: 'paused'};
   let pass: State<'idle'> | State<'queued'> = {state: 'idle'};
   let wake: Timer = {state: 'disarmed'};
@@ -349,7 +357,8 @@ export function createEngine(kinds: ReadonlyMap<string, ResolvedKind>, dependenc
 
   /**
    * Stores the snapshot first, and changes nothing if that fails. It knows nothing about attempts or callers.
-   * `laneWhenEnded` is the kind's, unless the owner's command overrides it.
+   * `laneWhenEnded` is the kind's, unless the owner's command overrides it. When it answers a failed save, its own or
+   * the cascade's, the engine has stopped, unless only a new operation didn't fit.
    */
   async function commit(
     previous: Previous,
@@ -379,9 +388,8 @@ export function createEngine(kinds: ReadonlyMap<string, ResolvedKind>, dependenc
     await rememberOrForget(appendResult.operation);
     notifyChanged(appendResult.operation);
     requestPass();
-    // A cascade that fails partway has ended the operation already; a later pass finishes it
-    await followLane(appendResult.operation.id);
-    return appendResult;
+    const followResult = await followLane(appendResult.operation.id);
+    return isStorageProblem(followResult) ? followResult : appendResult;
   }
 
   async function appendSnapshot(
@@ -401,14 +409,19 @@ export function createEngine(kinds: ReadonlyMap<string, ResolvedKind>, dependenc
     const appendResult = await callStore(async () => {
       return store.append(snapshot);
     });
-    return isOutcome('snapshot-appended')(appendResult)
-      ? {outcome: 'operation-transitioned', operation: snapshot}
-      : appendResult;
+    if (isOutcome('snapshot-appended')(appendResult)) {
+      return {outcome: 'operation-transitioned', operation: snapshot};
+    }
+    // Quota may free up, and a new operation that doesn't fit changes nothing that is stored
+    if (!isOutcome('storage-full')(appendResult) || !isInState('initial')(previous)) {
+      stopAfterFailedSave(appendResult);
+    }
+    return appendResult;
   }
 
   /**
-   * Once the final snapshot is stored the operation has ended, whether or not deleting its snapshots worked. One
-   * whose cascade is still pending stays until the operations behind it have ended.
+   * Once the final snapshot is stored the operation has ended, so a failed delete doesn't stop the outbox; load
+   * deletes what it left behind. One whose cascade is still pending stays until the operations behind it have ended.
    */
   async function rememberOrForget(operation: OperationSnapshot): Promise<void> {
     if (!isFinal(operation) || isCascadePending(operation)) {
@@ -420,7 +433,6 @@ export function createEngine(kinds: ReadonlyMap<string, ResolvedKind>, dependenc
       return store.remove([operation.id]);
     });
     if (isOutcome('storage-failed')(removeResult)) {
-      // Load deletes what the failed delete left behind
       logger.warn('Operation not deleted', {errorName: removeResult.errorName});
     }
   }
@@ -445,7 +457,7 @@ export function createEngine(kinds: ReadonlyMap<string, ResolvedKind>, dependenc
 
   /**
    * Ends the operations behind one whose stored cascade is `pending`, then stores the cascade as done. The ending is
-   * stored before them, so a store failure or a reload partway leaves the cascade pending, and the next pass finishes
+   * stored before them, so a failed save or a reload partway leaves the cascade pending, and the next load finishes
    * it. Nothing behind the operation can go out meanwhile, because it still blocks its lane.
    */
   async function followLane(operationId: string): Promise<StepOutcome> {
@@ -484,9 +496,9 @@ export function createEngine(kinds: ReadonlyMap<string, ResolvedKind>, dependenc
   }
 
   /**
-   * Settles the finished attempts, finishes the interrupted cascades, expires what is due and starts what may
-   * start. Each step checks its own precondition again, so a plan that went stale does no harm; every commit
-   * requests the next pass.
+   * Settles the finished attempts, expires what is due and starts what may start. Each step checks its own
+   * precondition again, so a plan that went stale does no harm; every commit requests the next pass. A failed save
+   * has stopped the engine, so the pass ends there.
    */
   async function runPass(): Promise<void> {
     pass = {state: 'idle'};
@@ -499,36 +511,22 @@ export function createEngine(kinds: ReadonlyMap<string, ResolvedKind>, dependenc
     const finished = [...attempts.values()].filter(attempt => {
       return isInState('finished')(attempt.result);
     });
-    const cascading = [...operations.values()].filter(isCascadePending);
-    const results: StepOutcome[] = [];
     for (const {operationId} of finished) {
-      results.push(await settleAttempt(operationId));
-    }
-    for (const {id} of cascading) {
-      results.push(await followLane(id));
+      if (isStorageProblem(await settleAttempt(operationId))) {
+        return;
+      }
     }
     for (const operationId of plan.expire) {
-      results.push(await expireOperation(operationId));
+      if (isStorageProblem(await expireOperation(operationId))) {
+        return;
+      }
     }
     for (const operationId of plan.start) {
-      results.push(await startAttempt(operationId));
+      if (isStorageProblem(await startAttempt(operationId))) {
+        return;
+      }
     }
-    const storageProblems = results.filter(isStorageProblem);
-    if (storageProblems.length === 0) {
-      wake = armWake(plan.wake);
-      return;
-    }
-    logger.warn('Pass hit a store failure', {
-      outcomes: storageProblems.map(({outcome}) => {
-        return outcome;
-      }),
-    });
-    // A commit that went through before the failure requests a pass that repeats the failed step at once; failing
-    // again within the backoff is the same failure, so it doesn't grow the backoff again
-    if (backoffRemaining() === 0) {
-      growBackoff();
-    }
-    wake = armWake({state: 'wake-in', milliseconds: backoffRemaining()});
+    wake = armWake(plan.wake);
   }
 
   async function expireOperation(operationId: string): Promise<StepOutcome> {
@@ -629,7 +627,6 @@ export function createEngine(kinds: ReadonlyMap<string, ResolvedKind>, dependenc
     requestPass();
   }
 
-  /** A store failure leaves the attempt finished, to be settled again at a later pass */
   async function settleAttempt(operationId: string): Promise<StepOutcome> {
     const attemptResult = findAttempt(operationId);
     const lookup = findById(operationId);
@@ -659,7 +656,10 @@ export function createEngine(kinds: ReadonlyMap<string, ResolvedKind>, dependenc
     return commitResult;
   }
 
-  /** Each parked command answers how the operation ended, or applies to it as the earlier ones left it */
+  /**
+   * Each parked command answers how the operation ended, or applies to it as the earlier ones left it. Once one of
+   * them has stopped the engine, the rest answer as the stop says.
+   */
   async function finishAttempt(attempt: RunningAttempt, operation: OperationView): Promise<void> {
     attempts.delete(attempt.operationId);
     disarm(attempt.timeout);
@@ -671,7 +671,11 @@ export function createEngine(kinds: ReadonlyMap<string, ResolvedKind>, dependenc
       return;
     }
     for (const command of attempt.parked) {
-      await command.applyTo(findById(operation.id));
+      if (isInState('closed')(queue)) {
+        command.answer(queue.answer);
+      } else {
+        await command.applyTo(findById(operation.id));
+      }
     }
   }
 
@@ -717,6 +721,12 @@ export function createEngine(kinds: ReadonlyMap<string, ResolvedKind>, dependenc
           return interruptResult;
         }
       }
+      for (const {id} of usable.filter(isCascadePending)) {
+        const followResult = await followLane(id);
+        if (isStorageProblem(followResult)) {
+          return followResult;
+        }
+      }
       const quarantinedCount = loadResult.quarantinedCount + unusableIds.length;
       logger.info('Operations loaded', {count: operations.size, quarantinedCount});
       requestPass();
@@ -726,18 +736,38 @@ export function createEngine(kinds: ReadonlyMap<string, ResolvedKind>, dependenc
 
   // Stopping
 
-  async function stop(): Promise<void> {
-    queue = {state: 'closed', tail: queue.tail};
+  /** Aborts the running attempts, and the commands waiting on them answer `answer` */
+  function closeQueue(answer: OutboxUnavailable): void {
+    queue = {state: 'closed', tail: queue.tail, answer};
     run = {state: 'paused'};
+    wake = disarm(wake);
     const stopped = [...attempts.values()];
     attempts.clear();
     for (const attempt of stopped) {
       attempt.controller.abort();
       disarm(attempt.timeout);
       for (const command of attempt.parked) {
-        command.answer({outcome: 'outbox-not-started'});
+        command.answer(answer);
       }
     }
+  }
+
+  /**
+   * Memory and storage would disagree from here on, and carrying on could send an operation twice, so the engine
+   * stops; the next `start` loads from storage. The running task ends with the failure and stores nothing more.
+   */
+  function stopAfterFailedSave(failure: StorageFull | StorageFailed): void {
+    // The task that was running when `stop` closed the queue may still fail to save
+    if (isInState('closed')(queue)) {
+      return;
+    }
+    logger.error('Stopped by a failed save', failure);
+    closeQueue(failure);
+    reportStopped();
+  }
+
+  async function stop(): Promise<void> {
+    closeQueue({outcome: 'outbox-not-started'});
     await queue.tail;
     // A pass that was running when the queue closed may have armed it again
     wake = disarm(wake);

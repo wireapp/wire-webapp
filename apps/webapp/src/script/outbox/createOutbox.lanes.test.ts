@@ -614,17 +614,17 @@ describe('createOutbox lanes', () => {
       expect(testKind.attemptedTexts()).toEqual(['a']);
     });
 
-    it('survives a store failure partway and a reload, which finish the cascade from it', async () => {
+    it('stops the outbox when a save fails partway, and the next start finishes the cascade from it', async () => {
       const testKind = kit.registerKind();
       await kit.start({run: false});
       await enqueueABC(testKind);
       kit.store.failAfter('append', 2);
 
-      expect(await end(kit, 'a', {lane: 'follows'})).toMatchObject({operation: {state: ending}});
-      expect(testKind.stateOf('b')).toBe(FOUND_AS[ending]);
-      expect(testKind.stateOf('c')).toBe('queued');
+      expect(await end(kit, 'a', {lane: 'follows'})).toEqual({outcome: 'storage-failed', errorName: 'TestFailure'});
+      expect(kit.outbox.isStarted()).toBe(false);
+      expect(storedCascades('a').at(-1)).toBe('pending');
+      expect(kit.triggersOf('operation-3')).toEqual(['operation-queued']);
 
-      await kit.outbox.stop();
       kit.store.fail('append', false);
       await kit.start();
 
@@ -860,8 +860,8 @@ describe('createOutbox lanes', () => {
     });
   });
 
-  describe('a cascade that a store failure interrupted', () => {
-    it('leaves the ending stored, keeps the lane blocked, and is finished at a later pass', async () => {
+  describe('a cascade that a failed save interrupted', () => {
+    it('stops the outbox with the ending stored as pending, and is finished at the next start', async () => {
       const testKind = kit.registerKind({laneWhenDeadLettered: 'follows'});
       await kit.start();
       await enqueueABC(testKind);
@@ -869,39 +869,21 @@ describe('createOutbox lanes', () => {
 
       await testKind.attemptOf('a').answer({outcome: 'attempt-dead-lettered'});
 
-      expect(testKind.stateOf('a')).toBe('dead-lettered');
-      expect(testKind.stateOf('b')).toBe('dead-lettered');
-      expect(testKind.stateOf('c')).toBe('queued');
-      expect(laneContents('lane')).toEqual([
-        ['a', 'dead-lettered'],
-        ['c', 'queued'],
-      ]);
+      expect(kit.outbox.isStarted()).toBe(false);
+      expect(storedCascades('a').at(-1)).toBe('pending');
+      expect(storedTriggers('b').at(-1)).toBe('lane-dead-lettered');
+      expect(kit.triggersOf('operation-3')).toEqual(['operation-queued']);
 
       kit.store.fail('append', false);
-      await kit.clock.advance(5_000);
+      await kit.start();
 
+      expect(kit.outbox.lane('lane')).toEqual({outcome: 'lane-empty'});
       expect(testKind.stateOf('c')).toBe('dead-lettered');
-      expect(testKind.attemptedTexts()).toEqual(['a']);
-      expect(testKind.endedOrder()).toEqual(['a', 'b', 'c']);
       expect(storedCascades('a').at(-1)).toBe('none');
+      expect(testKind.attemptedTexts()).toEqual(['a']);
     });
 
-    it('is repeated after exactly one backoff period', async () => {
-      const testKind = kit.registerKind({laneWhenDeadLettered: 'follows'});
-      await kit.start();
-      await enqueueABC(testKind);
-      kit.store.failAfter('append', 2);
-      await testKind.attemptOf('a').answer({outcome: 'attempt-dead-lettered'});
-      kit.store.fail('append', false);
-
-      await kit.clock.advance(4_999);
-      expect(testKind.stateOf('c')).toBe('queued');
-      await kit.clock.advance(1);
-
-      expect(testKind.stateOf('c')).toBe('dead-lettered');
-    });
-
-    it('is finished at a later pass when an ending by expiry was interrupted', async () => {
+    it('is finished at the next start when an ending by expiry was interrupted', async () => {
       const testKind = kit.registerKind({laneWhenDeadLettered: 'follows'});
       await kit.start({run: false});
       await enqueue(testKind, 'a', {expiresAfterMilliseconds: 1_000});
@@ -911,38 +893,33 @@ describe('createOutbox lanes', () => {
 
       await kit.clock.advance(1_000);
 
-      expect(testKind.stateOf('a')).toBe('dead-lettered');
-      expect(testKind.stateOf('b')).toBe('dead-lettered');
-      expect(testKind.stateOf('c')).toBe('queued');
+      expect(kit.outbox.isStarted()).toBe(false);
+      expect(kit.triggersOf('operation-3')).toEqual(['operation-queued']);
 
       kit.store.fail('append', false);
-      await kit.clock.advance(5_000);
+      await kit.start({run: false});
 
-      expect(testKind.endedOrder()).toEqual(['a', 'b', 'c']);
+      expect(testKind.stateOf('c')).toBe('dead-lettered');
+      expect(storedTriggers('c').at(-1)).toBe('lane-dead-lettered');
     });
 
-    it('keeps a deleted operation until the operations behind it are deleted, then forgets it', async () => {
+    it('keeps a deleted operation stored until the operations behind it are deleted at the next start', async () => {
       const testKind = kit.registerKind({laneWhenDeleted: 'follows'});
       await kit.start({run: false});
       await enqueueABC(testKind);
       kit.store.failAfter('append', 2);
 
-      expect(await kit.outbox.delete('a')).toMatchObject({outcome: 'operation-deleted'});
-
-      expect(laneContents('lane')).toEqual([
-        ['a', 'deleted'],
-        ['c', 'queued'],
-      ]);
+      expect(await kit.outbox.delete('a')).toEqual({outcome: 'storage-failed', errorName: 'TestFailure'});
       expect(kit.store.operationIds()).toEqual(['operation-1', 'operation-3']);
 
       kit.store.fail('append', false);
-      await kit.clock.advance(5_000);
+      await kit.start({run: false});
 
       expect(kit.outbox.lanes()).toEqual({outcome: 'lanes-listed', lanes: []});
       expect(kit.store.operationIds()).toEqual([]);
     });
 
-    it("changes nothing when the owner's ending fails at its first step", async () => {
+    it("stores nothing more when the owner's ending fails at its first step", async () => {
       const testKind = kit.registerKind({laneWhenDeleted: 'follows'});
       await kit.start({run: false});
       await enqueue(testKind, 'a');
@@ -951,13 +928,11 @@ describe('createOutbox lanes', () => {
 
       expect(await kit.outbox.delete('a')).toEqual({outcome: 'storage-failed', errorName: 'TestFailure'});
 
-      expect(laneContents('lane')).toEqual([
-        ['a', 'queued'],
-        ['b', 'queued'],
-      ]);
+      expect(kit.store.history('operation-1')).toHaveLength(1);
+      expect(kit.store.history('operation-2')).toHaveLength(1);
     });
 
-    it('keeps the attempt of the operation running when its ending fails', async () => {
+    it('aborts the attempt of the operation when its ending fails', async () => {
       const testKind = kit.registerKind({laneWhenDeleted: 'follows'});
       await kit.start();
       await enqueue(testKind, 'a');
@@ -966,9 +941,8 @@ describe('createOutbox lanes', () => {
 
       await kit.outbox.delete('a');
 
-      expect(testKind.attemptOf('a').signal.aborted).toBe(false);
-      expect(testKind.stateOf('a')).toBe('in-progress');
-      expect(testKind.stateOf('b')).toBe('queued');
+      expect(testKind.attemptOf('a').signal.aborted).toBe(true);
+      expect(kit.store.history('operation-1').at(-1)).toMatchObject({state: 'in-progress'});
     });
   });
 

@@ -17,15 +17,18 @@
  *
  */
 
-import {createOutbox} from './createOutbox';
-import {createOutboxTestKit, createStoredSnapshot, type OutboxTestKit} from './testing/createOutboxTestKit';
+import {
+  createOutboxTestKit,
+  createStoredSnapshot,
+  type OutboxTestKit,
+  type TestKind,
+} from './testing/createOutboxTestKit';
 import type {AttemptOutcome} from './types';
 
 type Breakage = {
   name: string;
   /** Makes every `append` fail the way the name says */
   breakStore: (kit: OutboxTestKit) => void;
-  repairStore: (kit: OutboxTestKit) => void;
   answer: object;
 };
 
@@ -35,9 +38,6 @@ const BREAKAGES: Breakage[] = [
     breakStore: kit => {
       kit.store.fail('append', true);
     },
-    repairStore: kit => {
-      kit.store.fail('append', false);
-    },
     answer: {outcome: 'storage-failed', errorName: 'TestFailure'},
   },
   {
@@ -45,10 +45,63 @@ const BREAKAGES: Breakage[] = [
     breakStore: kit => {
       kit.store.fill(true);
     },
-    repairStore: kit => {
-      kit.store.fill(false);
-    },
     answer: {outcome: 'storage-full'},
+  },
+];
+
+type FailingCall = {
+  name: string;
+  /** Brings the operation `key` to where the call applies, with the outbox paused */
+  prepare: (kit: OutboxTestKit, testKind: TestKind) => Promise<unknown>;
+  call: (kit: OutboxTestKit, testKind: TestKind) => Promise<unknown>;
+};
+
+const FAILING_CALLS: FailingCall[] = [
+  {
+    name: 'the enqueue of a version',
+    prepare: async (kit, testKind) => {
+      return kit.enqueueKeyed(testKind, 'key');
+    },
+    call: async (kit, testKind) => {
+      return kit.enqueue(testKind, {correlationKey: 'key', payload: {text: 'second'}});
+    },
+  },
+  {
+    name: 'hold',
+    prepare: async (kit, testKind) => {
+      return kit.enqueueKeyed(testKind, 'key');
+    },
+    call: async kit => {
+      return kit.outbox.hold('key');
+    },
+  },
+  {
+    name: 'release',
+    prepare: async (kit, testKind) => {
+      await kit.enqueueKeyed(testKind, 'key');
+      return kit.outbox.hold('key');
+    },
+    call: async kit => {
+      return kit.outbox.release('key');
+    },
+  },
+  {
+    name: 'deadLetter',
+    prepare: async (kit, testKind) => {
+      return kit.enqueueKeyed(testKind, 'key');
+    },
+    call: async kit => {
+      return kit.outbox.deadLetter('key');
+    },
+  },
+  {
+    name: 'delete',
+    prepare: async (kit, testKind) => {
+      return kit.enqueueKeyed(testKind, 'key');
+    },
+    call: async kit => {
+      return kit.outbox.delete('key');
+    },
   },
 ];
 
@@ -59,164 +112,38 @@ describe('createOutbox storage failures', () => {
     kit = createOutboxTestKit();
   });
 
-  describe.each(BREAKAGES)('when the store $name', ({breakStore, repairStore, answer}) => {
-    it('answers enqueue, and keeps no operation', async () => {
-      const testKind = await kit.startKind();
+  function expectStopped(): void {
+    expect(kit.outbox.isStarted()).toBe(false);
+    expect(kit.outbox.findByCorrelationKey('key')).toEqual({outcome: 'outbox-not-started'});
+  }
+
+  describe.each(BREAKAGES)('when a save $name', ({breakStore, answer}) => {
+    it.each(FAILING_CALLS)('stops the outbox when $name cannot be stored, and answers it', async ({prepare, call}) => {
+      const testKind = kit.registerKind();
+      await kit.start({run: false});
+      await prepare(kit, testKind);
+      const storedCount = kit.store.history('operation-1').length;
       breakStore(kit);
 
-      expect(await kit.enqueue(testKind, {correlationKey: 'key'})).toEqual(answer);
+      expect(await call(kit, testKind)).toEqual(answer);
 
-      expect(kit.outbox.findByCorrelationKey('key')).toEqual({outcome: 'operation-not-found'});
-      expect(kit.store.operationIds()).toEqual([]);
-      expect(testKind.changes).toEqual([]);
-      expect(testKind.attempts).toHaveLength(0);
+      expectStopped();
+      expect(await kit.outbox.hold('key')).toEqual({outcome: 'outbox-not-started'});
+      expect(kit.store.history('operation-1')).toHaveLength(storedCount);
     });
 
-    it('answers the enqueue of a version, and keeps the operation as it was', async () => {
-      const testKind = await kit.startKind();
-      kit.outbox.pause();
-      await kit.enqueue(testKind, {correlationKey: 'key', payload: {text: 'first'}});
+    it('stops the outbox when the start of an attempt cannot be stored', async () => {
+      const testKind = kit.registerKind();
+      await kit.start({run: false});
+      await kit.enqueueKeyed(testKind, 'key');
       breakStore(kit);
 
-      expect(await kit.enqueue(testKind, {correlationKey: 'key', payload: {text: 'second'}})).toEqual(answer);
+      kit.outbox.resume();
+      await kit.clock.settle();
 
-      expect(testKind.operation('key')).toMatchObject({state: 'queued', payload: {text: 'first'}});
+      expectStopped();
+      expect(testKind.attempts).toHaveLength(0);
       expect(kit.triggersOf('operation-1')).toEqual(['operation-queued']);
-    });
-
-    it('answers hold, and leaves the operation queued', async () => {
-      const testKind = await kit.startKind();
-      kit.outbox.pause();
-      await kit.enqueueKeyed(testKind, 'key');
-      breakStore(kit);
-
-      expect(await kit.outbox.hold('key')).toEqual(answer);
-
-      expect(testKind.operation('key').state).toBe('queued');
-      expect(testKind.changes).toHaveLength(1);
-    });
-
-    it('answers release, and leaves the operation on hold', async () => {
-      const testKind = await kit.startKind();
-      kit.outbox.pause();
-      await kit.enqueueKeyed(testKind, 'key');
-      await kit.outbox.hold('key');
-      breakStore(kit);
-
-      expect(await kit.outbox.release('key')).toEqual(answer);
-
-      expect(testKind.operation('key').state).toBe('on-hold');
-    });
-
-    it('answers deadLetter and delete, and leaves the operation as it was', async () => {
-      const testKind = await kit.startKind();
-      kit.outbox.pause();
-      await kit.enqueueKeyed(testKind, 'key');
-      breakStore(kit);
-
-      expect(await kit.outbox.deadLetter('key')).toEqual(answer);
-      expect(await kit.outbox.delete('key')).toEqual(answer);
-
-      expect(testKind.operation('key').state).toBe('queued');
-      expect(
-        kit.store.calls.filter(({method}) => {
-          return method === 'remove';
-        }),
-      ).toEqual([]);
-    });
-
-    it('answers deadLetter and delete without aborting the running attempt', async () => {
-      const testKind = await kit.startKind();
-      await kit.enqueueKeyed(testKind, 'key');
-      const attempt = testKind.lastAttempt();
-      breakStore(kit);
-
-      expect(await kit.outbox.deadLetter('key')).toEqual(answer);
-      expect(await kit.outbox.delete('key')).toEqual(answer);
-      expect(attempt.signal.aborted).toBe(false);
-      repairStore(kit);
-      await attempt.answer({outcome: 'attempt-succeeded'});
-
-      expect(testKind.changes.at(-1)).toMatchObject({state: 'succeeded'});
-    });
-
-    it('keeps an operation queued when the start of its attempt cannot be stored', async () => {
-      const testKind = kit.registerKind();
-      await kit.start({run: false});
-      await kit.enqueueKeyed(testKind, 'key');
-      breakStore(kit);
-
-      kit.outbox.resume();
-      await kit.clock.settle();
-
-      expect(testKind.operation('key')).toMatchObject({state: 'queued', attempts: 0});
-      expect(testKind.attempts).toHaveLength(0);
-    });
-
-    it('starts the attempt again after the backoff', async () => {
-      const testKind = kit.registerKind();
-      await kit.start({run: false});
-      await kit.enqueueKeyed(testKind, 'key');
-      breakStore(kit);
-      kit.outbox.resume();
-      await kit.clock.settle();
-      repairStore(kit);
-
-      await kit.clock.advance(4_999);
-      expect(testKind.attempts).toHaveLength(0);
-      await kit.clock.advance(1);
-
-      expect(testKind.attempts).toHaveLength(1);
-      expect(testKind.lastAttempt().operation).toMatchObject({state: 'in-progress', attempts: 1});
-    });
-
-    it('starts the attempt again at once on resume', async () => {
-      const testKind = kit.registerKind();
-      await kit.start({run: false});
-      await kit.enqueueKeyed(testKind, 'key');
-      breakStore(kit);
-      kit.outbox.resume();
-      await kit.clock.settle();
-      repairStore(kit);
-
-      kit.outbox.resume();
-      await kit.clock.settle();
-
-      expect(testKind.attempts).toHaveLength(1);
-    });
-
-    it('holds back the attempts of the other operations too, until the backoff has passed', async () => {
-      const testKind = kit.registerKind();
-      await kit.start({run: false});
-      await kit.enqueueKeyed(testKind, 'first');
-      breakStore(kit);
-      kit.outbox.resume();
-      await kit.clock.settle();
-      repairStore(kit);
-
-      await kit.enqueueKeyed(testKind, 'second');
-      expect(testKind.attempts).toHaveLength(0);
-      await kit.clock.advance(5_000);
-
-      expect(testKind.attempts).toHaveLength(2);
-    });
-
-    it('logs the pass that hit the failure, with the outcome only', async () => {
-      const testKind = kit.registerKind();
-      await kit.start({run: false});
-      await kit.enqueueKeyed(testKind, 'key');
-      breakStore(kit);
-
-      kit.outbox.resume();
-      await kit.clock.settle();
-
-      expect(kit.logger.entriesOf('Pass hit a store failure')).toEqual([
-        {
-          level: 'warn',
-          message: 'Pass hit a store failure',
-          attributes: {outcomes: [(answer as {outcome: string}).outcome]},
-        },
-      ]);
     });
 
     it.each([
@@ -225,14 +152,15 @@ describe('createOutbox storage failures', () => {
       'attempt-held',
       'attempt-dead-lettered',
       'attempt-deleted',
-    ] as const)('keeps the operation in progress when the end of the attempt, %s, cannot be stored', async outcome => {
+    ] as const)('stops the outbox when the end of the attempt, %s, cannot be stored', async outcome => {
       const testKind = await kit.startKind();
       await kit.enqueueKeyed(testKind, 'key');
       breakStore(kit);
 
       await testKind.lastAttempt().answer({outcome} satisfies AttemptOutcome);
 
-      expect(testKind.operation('key').state).toBe('in-progress');
+      expectStopped();
+      expect(kit.triggersOf('operation-1')).toEqual(['operation-queued', 'attempt-started']);
       expect(
         testKind.changes.map(({state}) => {
           return state;
@@ -240,64 +168,67 @@ describe('createOutbox storage failures', () => {
       ).toEqual(['queued', 'in-progress']);
     });
 
-    it.each([
-      ['attempt-succeeded', 'succeeded'],
-      ['attempt-failed', 'queued'],
-      ['attempt-held', 'on-hold'],
-      ['attempt-dead-lettered', 'dead-lettered'],
-      ['attempt-deleted', 'deleted'],
-    ] as const)('stores the end of the attempt, %s, again after the backoff', async (outcome, state) => {
-      const testKind = await kit.startKind();
-      await kit.enqueueKeyed(testKind, 'key');
-      breakStore(kit);
-      await testKind.lastAttempt().answer({outcome});
-      repairStore(kit);
-
-      await kit.clock.advance(4_999);
-      expect(testKind.operation('key').state).toBe('in-progress');
-      await kit.clock.advance(1);
-
-      expect(testKind.changes.at(-1)?.state).toBe(state);
-    });
-
-    it('keeps the commands parked on the attempt waiting until its end is stored', async () => {
-      const testKind = await kit.startKind();
-      await kit.enqueueKeyed(testKind, 'key');
-      const holdResult = kit.outbox.hold('key');
-      await kit.clock.settle();
-      breakStore(kit);
-      await testKind.lastAttempt().answer({outcome: 'attempt-failed'});
-      let isAnswered = false;
-      void holdResult.finally(() => {
-        isAnswered = true;
-      });
-      await kit.clock.settle();
-      expect(isAnswered).toBe(false);
-      repairStore(kit);
-
-      await kit.clock.advance(5_000);
-
-      expect(await holdResult).toMatchObject({outcome: 'operation-held', operation: {state: 'on-hold'}});
-    });
-
-    it('keeps a queued operation that is due to expire, and expires it after the backoff', async () => {
+    it('stops the outbox when an expiry cannot be stored', async () => {
       const testKind = await kit.startKind({expiresAfterMilliseconds: 1_000});
       kit.outbox.pause();
       await kit.enqueueKeyed(testKind, 'key');
       breakStore(kit);
 
       await kit.clock.advance(1_000);
-      expect(testKind.operation('key').state).toBe('queued');
-      repairStore(kit);
-      await kit.clock.advance(5_000);
 
-      expect(testKind.operation('key').state).toBe('dead-lettered');
-      expect(kit.triggersOf('operation-1').at(-1)).toBe('operation-expired');
+      expectStopped();
+      expect(kit.triggersOf('operation-1')).toEqual(['operation-queued']);
+    });
+
+    it('aborts the running attempts, answers the commands waiting on them, and clears the timers', async () => {
+      const testKind = await kit.startKind({attemptTimeoutMilliseconds: 10_000});
+      await kit.enqueueKeyed(testKind, 'running', {laneKey: 'lane'});
+      await kit.enqueueKeyed(testKind, 'waiting', {laneKey: 'lane'});
+      const holdResult = kit.outbox.hold('running');
+      await kit.clock.settle();
+      breakStore(kit);
+
+      expect(await kit.outbox.hold('waiting')).toEqual(answer);
+
+      expect(await holdResult).toEqual(answer);
+      expect(testKind.attemptOf('running').signal.aborted).toBe(true);
+      expect(kit.clock.pendingTimers()).toEqual([]);
+    });
+
+    it('logs the stop once, with the outcome and the name of the error only', async () => {
+      const testKind = kit.registerKind();
+      await kit.start({run: false});
+      await kit.enqueueKeyed(testKind, 'key');
+      breakStore(kit);
+
+      await kit.outbox.hold('key');
+      await kit.outbox.hold('key');
+
+      expect(kit.logger.entriesOf('Stopped by a failed save')).toEqual([
+        {level: 'error', message: 'Stopped by a failed save', attributes: answer},
+      ]);
+    });
+  });
+
+  describe('when a new operation does not fit', () => {
+    it('refuses its enqueue storage-full, and keeps running', async () => {
+      const testKind = await kit.startKind();
+      kit.store.fill(true);
+
+      expect(await kit.enqueueKeyed(testKind, 'refused')).toEqual({outcome: 'storage-full'});
+      expect(kit.outbox.isStarted()).toBe(true);
+      expect(kit.store.operationIds()).toEqual([]);
+      expect(testKind.changes).toEqual([]);
+      kit.store.fill(false);
+
+      expect(await kit.enqueueKeyed(testKind, 'key')).toMatchObject({outcome: 'operation-queued'});
+      expect(testKind.attemptedTexts()).toEqual(['key']);
+      expect(kit.logger.entriesOf('Stopped by a failed save')).toEqual([]);
     });
   });
 
   describe('when the store rejects', () => {
-    it('answers enqueue storage-failed with the name of the error only', async () => {
+    it('answers storage-failed with the name of the error only', async () => {
       const testKind = await kit.startKind();
       kit.store.rejectWith('append', new RangeError('contains secret'));
 
@@ -306,31 +237,8 @@ describe('createOutbox storage failures', () => {
         errorName: 'RangeError',
       });
 
+      expectStopped();
       expect(JSON.stringify(kit.logger.entries)).not.toContain('secret');
-    });
-
-    it('answers the other commands storage-failed too', async () => {
-      const testKind = await kit.startKind();
-      kit.outbox.pause();
-      await kit.enqueueKeyed(testKind, 'key');
-      kit.store.rejectWith('append', new TypeError('rejected'));
-
-      expect(await kit.outbox.hold('key')).toEqual({outcome: 'storage-failed', errorName: 'TypeError'});
-      expect(await kit.outbox.deadLetter('key')).toEqual({outcome: 'storage-failed', errorName: 'TypeError'});
-      expect(await kit.outbox.delete('key')).toEqual({outcome: 'storage-failed', errorName: 'TypeError'});
-      expect(testKind.operation('key').state).toBe('queued');
-    });
-
-    it('settles the end of an attempt again after the backoff', async () => {
-      const testKind = await kit.startKind();
-      await kit.enqueueKeyed(testKind, 'key');
-      kit.store.rejectWith('append', new TypeError('rejected'));
-      await testKind.lastAttempt().answer({outcome: 'attempt-succeeded'});
-      kit.store.rejectWith('append', undefined);
-
-      await kit.clock.advance(5_000);
-
-      expect(testKind.changes.at(-1)).toMatchObject({state: 'succeeded'});
     });
   });
 
@@ -363,7 +271,7 @@ describe('createOutbox storage failures', () => {
       ).toEqual([]);
     });
 
-    it('counts the operation as succeeded once its final snapshot is stored', async () => {
+    it('keeps running, and counts the operation as ended once its final snapshot is stored', async () => {
       const testKind = await kit.startKind();
       await kit.enqueueKeyed(testKind, 'key');
       const holdResult = kit.outbox.hold('key');
@@ -373,24 +281,14 @@ describe('createOutbox storage failures', () => {
       await testKind.lastAttempt().answer({outcome: 'attempt-succeeded'});
 
       expect(await holdResult).toMatchObject({outcome: 'operation-succeeded', operation: {state: 'succeeded'}});
+      expect(kit.outbox.isStarted()).toBe(true);
       expect(kit.outbox.findByCorrelationKey('key')).toEqual({outcome: 'operation-not-found'});
       expect(testKind.changes.at(-1)).toMatchObject({state: 'succeeded'});
-      expect(kit.store.history('operation-1').at(-1)).toMatchObject({state: 'succeeded'});
+      expect(await kit.enqueueKeyed(testKind, 'next')).toMatchObject({outcome: 'operation-queued'});
+      expect(testKind.attemptedTexts()).toEqual(['key', 'next']);
     });
 
-    it('counts the operation as deleted once its final snapshot is stored', async () => {
-      const testKind = await kit.startKind();
-      kit.outbox.pause();
-      await kit.enqueueKeyed(testKind, 'key');
-      kit.store.fail('remove', true);
-
-      expect(await kit.outbox.delete('key')).toMatchObject({outcome: 'operation-deleted'});
-
-      expect(kit.outbox.findByCorrelationKey('key')).toEqual({outcome: 'operation-not-found'});
-      expect(testKind.changes.at(-1)).toMatchObject({state: 'deleted'});
-    });
-
-    it('logs the name of the error, and does not try to delete again', async () => {
+    it('logs a warning once, with the name of the error only', async () => {
       const testKind = await kit.startKind();
       await kit.enqueueKeyed(testKind, 'key');
       kit.store.rejectWith('remove', new RangeError('contains secret'));
@@ -401,38 +299,8 @@ describe('createOutbox storage failures', () => {
       expect(kit.logger.entriesOf('Operation not deleted')).toEqual([
         {level: 'warn', message: 'Operation not deleted', attributes: {errorName: 'RangeError'}},
       ]);
+      expect(kit.logger.entriesOf('Stopped by a failed save')).toEqual([]);
       expect(JSON.stringify(kit.logger.entries)).not.toContain('secret');
-      expect(
-        kit.store.calls.filter(({method}) => {
-          return method === 'remove';
-        }),
-      ).toHaveLength(1);
-    });
-
-    it('does not slow down the next attempts', async () => {
-      const testKind = await kit.startKind();
-      await kit.enqueueKeyed(testKind, 'first');
-      kit.store.fail('remove', true);
-      await testKind.lastAttempt().answer({outcome: 'attempt-succeeded'});
-
-      await kit.enqueueKeyed(testKind, 'second');
-
-      expect(testKind.attempts).toHaveLength(2);
-    });
-
-    it('does not reuse a snapshot number when the key is enqueued again', async () => {
-      const testKind = await kit.startKind();
-      await kit.enqueueKeyed(testKind, 'key');
-      kit.store.fail('remove', true);
-      await testKind.lastAttempt().answer({outcome: 'attempt-succeeded'});
-
-      await kit.enqueueKeyed(testKind, 'key');
-
-      expect(
-        kit.store.history('operation-2').map(({seq}) => {
-          return seq;
-        }),
-      ).toEqual([1, 2]);
     });
 
     it('deletes what the failed delete left behind when the outbox starts again', async () => {
@@ -444,12 +312,10 @@ describe('createOutbox storage failures', () => {
       await kit.outbox.stop();
       expect(kit.store.operationIds()).toEqual(['operation-1']);
 
-      const restarted = createOutbox(kit.dependencies);
-      restarted.register(testKind.kind);
+      await kit.start();
 
-      expect(await restarted.start()).toEqual({outcome: 'outbox-started'});
       expect(kit.store.operationIds()).toEqual([]);
-      expect(restarted.findByCorrelationKey('key')).toEqual({outcome: 'operation-not-found'});
+      expect(kit.outbox.findByCorrelationKey('key')).toEqual({outcome: 'operation-not-found'});
       expect(kit.logger.entriesOf('Operations loaded').at(-1)?.attributes).toEqual({count: 0, quarantinedCount: 1});
       expect(testKind.attempts).toHaveLength(1);
     });
@@ -465,6 +331,27 @@ describe('createOutbox storage failures', () => {
 
       expect(await kit.outbox.start()).toEqual({outcome: 'outbox-started'});
       expect(kit.store.operationIds()).toEqual([]);
+    });
+  });
+
+  describe('starting again after a failed save', () => {
+    it('loads from the store, and retries the attempt that was running', async () => {
+      const testKind = await kit.startKind();
+      await kit.enqueueKeyed(testKind, 'key');
+      kit.store.fail('append', true);
+      await testKind.lastAttempt().answer({outcome: 'attempt-succeeded'});
+      kit.store.fail('append', false);
+
+      expect(await kit.outbox.start()).toEqual({outcome: 'outbox-started'});
+      await kit.clock.settle();
+
+      expect(kit.triggersOf('operation-1')).toEqual([
+        'operation-queued',
+        'attempt-started',
+        'attempt-interrupted',
+        'attempt-started',
+      ]);
+      expect(testKind.lastAttempt().operation).toMatchObject({id: 'operation-1', attempts: 2});
     });
   });
 });

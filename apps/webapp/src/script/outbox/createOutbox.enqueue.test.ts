@@ -318,17 +318,6 @@ describe('createOutbox enqueue', () => {
       expect(await notStarted.handle.enqueue({payload: {text: 'hi'}})).toEqual({outcome: 'outbox-not-started'});
     });
 
-    it('answers storage-failed and keeps nothing when the store fails', async () => {
-      kit.store.fail('append', true);
-
-      expect(await testKind.handle.enqueue({payload: {text: 'hi'}, correlationKey: 'key'})).toEqual({
-        outcome: 'storage-failed',
-        errorName: 'TestFailure',
-      });
-      expect(kit.outbox.findByCorrelationKey('key')).toEqual({outcome: 'operation-not-found'});
-      expect(testKind.changes).toEqual([]);
-    });
-
     it('answers storage-full and keeps nothing when the quota is reached', async () => {
       kit.store.fill(true);
 
@@ -477,27 +466,6 @@ describe('createOutbox enqueue', () => {
         outcome: 'operation-versioned',
         operation: {state: 'queued'},
       });
-    });
-
-    it('answers storage-failed and keeps the version it had when the store fails', async () => {
-      await testKind.handle.enqueue({payload: {text: 'v1'}, correlationKey: 'key'});
-      kit.store.fail('append', true);
-
-      expect(await testKind.handle.enqueue({payload: {text: 'v2'}, correlationKey: 'key'})).toEqual({
-        outcome: 'storage-failed',
-        errorName: 'TestFailure',
-      });
-      expect(testKind.operation('key').payload).toEqual({text: 'v1'});
-    });
-
-    it('answers storage-full and keeps the version it had when the quota is reached', async () => {
-      await testKind.handle.enqueue({payload: {text: 'v1'}, correlationKey: 'key'});
-      kit.store.fill(true);
-
-      expect(await testKind.handle.enqueue({payload: {text: 'v2'}, correlationKey: 'key'})).toEqual({
-        outcome: 'storage-full',
-      });
-      expect(testKind.operation('key').payload).toEqual({text: 'v1'});
     });
 
     it('refuses an invalid payload without changing the operation', async () => {

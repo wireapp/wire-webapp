@@ -106,7 +106,7 @@ export function createOutbox(dependencies: OutboxDependencies): Outbox {
     outboxState = {state: 'starting'};
     // The registrations are complete at `start`, so they are logged here: the names of the kinds only
     logger.info('register', {kinds: [...kinds.keys()]});
-    const engine = createEngine(kinds, dependencies);
+    const engine = createEngine(kinds, dependencies, forgetStoppedEngine);
     const loadResult = await engine.load();
     if (!isOutcome('outbox-started')(loadResult)) {
       outboxState = {state: 'idle'};
@@ -119,6 +119,16 @@ export function createOutbox(dependencies: OutboxDependencies): Outbox {
       logged('resume', resume());
     }
     return loadResult;
+  }
+
+  /**
+   * A failed save has stopped the started engine. While loading, `start` itself answers the failure. The wish to run
+   * stays for the next `start`.
+   */
+  function forgetStoppedEngine(): void {
+    if (isInState('started')(outboxState)) {
+      outboxState = {state: 'idle'};
+    }
   }
 
   function pause(): Outcome<'outbox-paused'> | RememberedUntilStart {

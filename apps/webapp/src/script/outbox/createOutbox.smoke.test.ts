@@ -207,13 +207,17 @@ describe('createOutbox smoke', () => {
     expect(testKind.lastAttempt().operation).toMatchObject({id: 'stored-operation', attempts: 2});
   });
 
-  it('answers a store failure and leaves the operation as it was', async () => {
+  it('stops at a failed save, and loads what was stored when started again', async () => {
     const testKind = kit.registerKind();
     await kit.start({run: false});
     await kit.enqueue(testKind, {correlationKey: 'key'});
     kit.store.fail('append', true);
 
     expect(await kit.outbox.hold('key')).toEqual({outcome: 'storage-failed', errorName: 'TestFailure'});
+    expect(await kit.outbox.hold('key')).toEqual({outcome: 'outbox-not-started'});
+    kit.store.fail('append', false);
+    await kit.start({run: false});
+
     expect(kit.operation('key').state).toBe('queued');
     expect(kit.store.history('operation-1')).toHaveLength(1);
   });

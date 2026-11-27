@@ -283,16 +283,23 @@ export type OutboxDependencies = {
 // Interfaces
 
 export type KindHandle<Payload> = {
-  /** A new operation, or a version of the one with the same correlation key; waits for a running attempt */
+  /**
+   * A new operation, or a version of the one with the same correlation key; waits for a running attempt. A new
+   * operation that doesn't fit the store is refused `storage-full`, and the outbox keeps running.
+   */
   enqueue: (request: EnqueueRequest<Payload>) => Promise<EnqueueOutcome<Payload>>;
   /** Only operations of this kind */
   find: (correlationKey: string) => FindOutcome<Payload>;
 };
 
+/**
+ * A failed save stops the outbox: the call whose save failed answers it, the commands waiting on an attempt answer
+ * it too, and later calls answer `outbox-not-started`, as after `stop`.
+ */
 export type Outbox = {
   /** Kinds are registered before `start`, or after `stop` for the next `start` */
   register: <Payload>(kind: Kind<Payload>) => RegisterOutcome<Payload>;
-  /** After a storage failure, `start` may be called again */
+  /** Loads from storage; after a failed save stopped the outbox, `start` may be called again */
   start: () => Promise<StartOutcome>;
   pause: () => void;
   /** Also resets the backoff */

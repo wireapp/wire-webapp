@@ -114,22 +114,6 @@ describe('createOutbox commands', () => {
 
       expect(await notStartedKit.outbox.hold('key')).toEqual({outcome: 'outbox-not-started'});
     });
-
-    it('answers storage-failed and leaves the operation queued when the store fails', async () => {
-      await enqueue('key');
-      kit.store.fail('append', true);
-
-      expect(await kit.outbox.hold('key')).toEqual({outcome: 'storage-failed', errorName: 'TestFailure'});
-      expect(kit.operation('key').state).toBe('queued');
-    });
-
-    it('answers storage-full and leaves the operation queued when the quota is reached', async () => {
-      await enqueue('key');
-      kit.store.fill(true);
-
-      expect(await kit.outbox.hold('key')).toEqual({outcome: 'storage-full'});
-      expect(kit.operation('key').state).toBe('queued');
-    });
   });
 
   describe('release', () => {
@@ -185,22 +169,6 @@ describe('createOutbox commands', () => {
       const notStartedKit = createOutboxTestKit();
 
       expect(await notStartedKit.outbox.release('key')).toEqual({outcome: 'outbox-not-started'});
-    });
-
-    it('answers storage-failed and leaves the operation on hold when the store fails', async () => {
-      await putInState('on-hold');
-      kit.store.fail('append', true);
-
-      expect(await kit.outbox.release('key')).toEqual({outcome: 'storage-failed', errorName: 'TestFailure'});
-      expect(kit.operation('key').state).toBe('on-hold');
-    });
-
-    it('answers storage-full and leaves the operation on hold when the quota is reached', async () => {
-      await putInState('on-hold');
-      kit.store.fill(true);
-
-      expect(await kit.outbox.release('key')).toEqual({outcome: 'storage-full'});
-      expect(kit.operation('key').state).toBe('on-hold');
     });
   });
 
@@ -259,15 +227,6 @@ describe('createOutbox commands', () => {
       const notStartedKit = createOutboxTestKit();
 
       expect(await notStartedKit.outbox.deadLetter('key')).toEqual({outcome: 'outbox-not-started'});
-    });
-
-    it('answers storage-failed, keeps the operation and leaves the attempt running when it cannot be stored', async () => {
-      await putInState('in-progress');
-      kit.store.fail('append', true);
-
-      expect(await kit.outbox.deadLetter('key')).toEqual({outcome: 'storage-failed', errorName: 'TestFailure'});
-      expect(kit.operation('key').state).toBe('in-progress');
-      expect(testKind.lastAttempt().signal.aborted).toBe(false);
     });
   });
 
@@ -344,40 +303,6 @@ describe('createOutbox commands', () => {
       const notStartedKit = createOutboxTestKit();
 
       expect(await notStartedKit.outbox.delete('key')).toEqual({outcome: 'outbox-not-started'});
-    });
-
-    it('answers storage-failed and keeps the operation when the final snapshot cannot be stored', async () => {
-      await enqueue('key');
-      kit.store.fail('append', true);
-
-      expect(await kit.outbox.delete('key')).toEqual({outcome: 'storage-failed', errorName: 'TestFailure'});
-      expect(kit.operation('key').state).toBe('queued');
-    });
-
-    it('answers storage-full and keeps the operation when the quota is reached', async () => {
-      await enqueue('key');
-      kit.store.fill(true);
-
-      expect(await kit.outbox.delete('key')).toEqual({outcome: 'storage-full'});
-      expect(kit.operation('key').state).toBe('queued');
-    });
-
-    it('leaves the attempt running when the final snapshot cannot be stored', async () => {
-      await putInState('in-progress');
-      kit.store.fail('append', true);
-
-      await kit.outbox.delete('key');
-
-      expect(testKind.lastAttempt().signal.aborted).toBe(false);
-    });
-
-    it('answers operation-deleted once the final snapshot is stored, although deleting the snapshots failed', async () => {
-      await enqueue('key');
-      kit.store.fail('remove', true);
-
-      expect(await kit.outbox.delete('key')).toMatchObject({outcome: 'operation-deleted'});
-      expect(kit.outbox.findByCorrelationKey('key')).toEqual({outcome: 'operation-not-found'});
-      expect(kit.store.history('operation-1').at(-1)).toMatchObject({state: 'deleted'});
     });
 
     it('lets the key be used again by a new operation', async () => {
