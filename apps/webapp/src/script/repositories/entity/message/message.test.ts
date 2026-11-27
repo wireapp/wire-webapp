@@ -65,6 +65,7 @@ describe('Message', () => {
       [StatusType.SENT, true, true],
       [StatusType.DELIVERED, true, true],
       [StatusType.FAILED, true, false],
+      [StatusType.FEDERATION_ERROR, true, false],
       [StatusType.SENDING, true, false],
       [StatusType.FAILED, false, false],
       [StatusType.SENT, false, false],

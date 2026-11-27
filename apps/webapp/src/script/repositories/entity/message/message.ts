@@ -472,9 +472,7 @@ export class Message {
    * @param isOffline the app knows it is offline, with the outbox on
    */
   isChangeRefusedOffline(isOffline: boolean): boolean {
-    const status = this.status();
-    const isInOutbox = status === StatusType.SENDING || status === StatusType.FAILED;
-    return isOffline && !isInOutbox;
+    return isOffline && this.sendingState() === 'sent';
   }
 
   /**
