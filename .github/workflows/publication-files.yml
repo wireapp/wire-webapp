@@ -1,0 +1,42 @@
+---
+name: Release publication files
+
+on:
+  pull_request:
+    branches: [main, release/*, maintenance/*]
+    paths:
+      - publication/**
+      - .github/workflows/publication-files.yml
+  merge_group:
+    branches: [main, release/*, maintenance/*]
+
+concurrency:
+  group: publication-files-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions: {}
+
+env:
+  RM_COMPONENT: webapp
+
+jobs:
+  publication-files:
+    runs-on: ubuntu-26.04
+    name: Release publication files
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Check the compatibility file
+        uses: wireapp/wire-rm-actions/compatibility@9ff2112f54a312a66c579f6c815614e736e9791b
+
+      - name: Check the release declaration
+        uses: wireapp/wire-rm-actions/release-declaration@9ff2112f54a312a66c579f6c815614e736e9791b
+        with:
+          file: publication/declaration.json
+          component: ${{ env.RM_COMPONENT }}

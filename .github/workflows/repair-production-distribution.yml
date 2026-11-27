@@ -100,8 +100,9 @@ jobs:
     needs: validate_repair
     if: ${{ needs.validate_repair.result == 'success' }}
     permissions:
-      actions: read
-      contents: read
+      actions: read # Download the exact distribution context of the release run.
+      contents: read # Fetch the immutable Production tag and the distribution tooling.
+      id-token: write # Log in to Quay and declare the release to the release managers.
     uses: ./.github/workflows/publish-production-distribution.yml
     with:
       production_tag: ${{ needs.validate_repair.outputs.production_tag }}
@@ -109,8 +110,6 @@ jobs:
       source_run_id: ${{ inputs.source_run_id }}
       distribution_artifact_name: ${{ inputs.distribution_artifact_name }}
     secrets:
-      WEBTEAM_QUAY_USERNAME: ${{ secrets.WEBTEAM_QUAY_USERNAME }}
-      WEBTEAM_QUAY_PASSWORD: ${{ secrets.WEBTEAM_QUAY_PASSWORD }}
       CHARTS_WEBAPP_AUTOMATION_AWS_ACCESS_KEY_ID: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_ACCESS_KEY_ID }}
       CHARTS_WEBAPP_AUTOMATION_AWS_SECRET_ACCESS_KEY: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_SECRET_ACCESS_KEY }}
       WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN: ${{ secrets.WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN }}

@@ -1,0 +1,71 @@
+{
+  "schemaVersion": "wire.component-release/v1alpha2",
+  "component": "webapp",
+  "version": "1.4.0",
+  "summary": "Release 1.4.0, the next release after 1.3.0: Shared Drive bulk actions with progress, restore and permanent delete, PDF previews in an overlay with a card menu, the meeting preparation modal, Desktop log downloads with structured logging, and fixes around login, notifications and conversation creation. The Helm chart is now also published on quay.io/wire/charts/stable with the application version; see the chart notes before upgrading.",
+  "upgrade_from": ">=1.3.0",
+  "changes": [
+    {
+      "kind": "added",
+      "description": "Shared Drive: bulk actions report their progress, bulk restore and permanent delete keep running when the view leaves the Bin, one bulk action at a time until its outcome settles (WPB-29990, WPB-30228, WPB-30322).",
+      "breaking": false,
+      "links": ["https://github.com/wireapp/wire-webapp/compare/v1.3.0...v1.4.0"]
+    },
+    {
+      "kind": "added",
+      "description": "PDF files open in an overlay with the shared viewer, thumbnails and a card action menu; quoted PDF attachments stay compact (WPB-29908).",
+      "breaking": false,
+      "links": ["https://github.com/wireapp/wire-webapp/compare/v1.3.0...v1.4.0"]
+    },
+    {
+      "kind": "added",
+      "description": "Meetings: preparation modal available across views, meeting type in the creation payload, reminder notification diagnostics.",
+      "breaking": false,
+      "links": ["https://github.com/wireapp/wire-webapp/compare/v1.3.0...v1.4.0"]
+    },
+    {
+      "kind": "added",
+      "description": "Desktop: log downloads from the settings and structured logging when the Desktop app supports it; browser logging is composed at the build entrypoints.",
+      "breaking": false,
+      "links": ["https://github.com/wireapp/wire-webapp/compare/v1.3.0...v1.4.0"]
+    },
+    {
+      "kind": "changed",
+      "description": "Existing Shared Drives stay available during team offboarding; the team Cells status is set to DISABLED explicitly; pending onboarding status shown.",
+      "breaking": false,
+      "links": ["https://github.com/wireapp/wire-webapp/compare/v1.3.0...v1.4.0"]
+    },
+    {
+      "kind": "changed",
+      "description": "MLS: recovery of missing message references (WPB-23357), core-crypto 11, upgrade prompt when the browser lacks JSPI (WPB-30036).",
+      "breaking": false,
+      "links": ["https://github.com/wireapp/wire-webapp/compare/v1.3.0...v1.4.0"]
+    },
+    {
+      "kind": "fixed",
+      "description": "Login shows a retryable error when local storage fails; duplicate conversation creation is prevented; in-app notifications stay visible after setting the status to away.",
+      "breaking": false,
+      "links": ["https://github.com/wireapp/wire-webapp/compare/v1.3.0...v1.4.0"]
+    },
+    {
+      "kind": "fixed",
+      "description": "Video player crash in folders (WPB-30038), asset download of multipart message replies (WPB-30056), call timer reset, file size metadata normalized, double scrollbar on settings pages, message details and folders empty states.",
+      "breaking": false,
+      "links": ["https://github.com/wireapp/wire-webapp/compare/v1.3.0...v1.4.0"]
+    },
+    {
+      "kind": "changed",
+      "description": "Internal: native TypeScript 7 builds, camelCase file names, the legacy WebSocket lifecycle removed, gzip and deflate response compression.",
+      "breaking": false,
+      "links": ["https://github.com/wireapp/wire-webapp/compare/v1.3.0...v1.4.0"]
+    },
+    {
+      "kind": "changed",
+      "description": "The Helm chart is published on quay.io/wire/charts/stable as webapp X.Y.Z, with appVersion X.Y.Z and the image quay.io/wire/webapp:X.Y.Z; pre-releases go to quay.io/wire/charts/dev.",
+      "breaking": false,
+      "links": ["https://github.com/wireapp/wire-webapp/compare/v1.3.0...v1.4.0"]
+    }
+  ],
+  "migrations": [],
+  "configuration": []
+}

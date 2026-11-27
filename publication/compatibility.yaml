@@ -1,0 +1,41 @@
+providesApis: []
+
+consumesApis:
+  - api: wire-server/client-api
+    versions: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
+    class: mandatory
+    reason: Backend API, highest common version negotiated at start; meetings need version 17.
+
+dependsOn:
+  - component: coturn
+    range: '>=5.6.0'
+    class: optional
+    reason: Calling media relay, servers given by the backend calls config.
+  - component: sftd
+    range: '*'
+    class: optional
+    reason: Conference calls, servers given by the backend calls config; no version negotiated by the webapp.
+  - component: wire-drive
+    range: '>=5.0.3'
+    class: optional
+    reason: File features when FEATURE_ENABLE_CELLS is set; no version negotiated by the webapp.
+  - platform: kubernetes
+    range: '>=1.24.0'
+  - platform: ingress-nginx
+    range: '*'
+    class: alternative
+    reason: routing.mode nginx.
+  - platform: gateway-api
+    range: '>=1.5.0'
+    class: alternative
+    reason: routing.mode envoy or migration.
+  - platform: cert-manager
+    range: '*'
+    class: optional
+    reason: TLS certificate when tls.useCertManager is set.
+  - platform: external-dns
+    range: '*'
+    class: optional
+    reason: Weighted DNS records in routing.mode migration.
+
+includes: []
