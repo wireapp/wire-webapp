@@ -21,8 +21,8 @@ import {render} from '@testing-library/react';
 
 import {Availability} from '@wireapp/protocol-messaging';
 
-import {User} from '../../../repositories/entity/User';
-import {TeamState} from '../../../repositories/team/TeamState';
+import {User} from '../../../repositories/entity/user';
+import {TeamState} from '../../../repositories/team/teamState';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

@@ -22,7 +22,7 @@ import {amplify} from 'amplify';
 
 import {useActiveWindowState} from '../../../../hooks/useActiveWindow';
 import {useKeyPressAndHold} from '../../../../hooks/useKeyPressAndHold/useKeyPressAndHold';
-import {CallingViewMode, CallState} from '../../../../repositories/calling/CallState';
+import {CallingViewMode, CallState} from '../../../../repositories/calling/callState';
 import {EventName} from '../../../../repositories/tracking/eventName';
 import {KEY} from '../../../../util/keyboardUtil';
 import {WebAppEvents} from '../../../../webAppEvents';

@@ -13,7 +13,7 @@ Wire's internal configuration copy tool.
 
 ### Setup
 
-Run `npx just configure-webapp` from the repository root. The command reads [`apps/webapp/.copyconfigrc.js`](../../apps/webapp/.copyconfigrc.js), which follows the [cosmiconfig standard](https://github.com/davidtheclark/cosmiconfig#cosmiconfig) and uses [`CopyConfigOptions.mts`](./CopyConfigOptions.mts).
+Run `npx just configure-webapp` from the repository root. The command reads [`apps/webapp/.copyconfigrc.js`](../../apps/webapp/.copyconfigrc.js), which follows the [cosmiconfig standard](https://github.com/davidtheclark/cosmiconfig#cosmiconfig) and uses [`copyConfigOptions.mts`](./copyConfigOptions.mts).
 
 **Note**: the `files` parameter needs to be specified, all other are optional.
 

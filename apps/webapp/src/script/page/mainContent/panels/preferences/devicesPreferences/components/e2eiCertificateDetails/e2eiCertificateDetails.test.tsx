@@ -24,7 +24,7 @@ import {container} from 'tsyringe';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {task} from 'true-myth';
 
-import {User} from '../../../../../../../repositories/entity/User';
+import {User} from '../../../../../../../repositories/entity/user';
 import {UserState} from '../../../../../../../repositories/user/userState';
 import {withTheme} from '../../../../../../../auth/util/test/testUtil';
 import {E2EIHandler, MLSStatuses, WireIdentity} from '../../../../../../../e2eIdentity';
@@ -35,7 +35,7 @@ import {
 } from '../../../../../../testSupport/rootContextTestSupport';
 import {Core} from '../../../../../../../service/coreSingleton';
 import {createCoreTestFixture} from '../../../../../../../util/test/createCoreTestFixture';
-import {generateAPIConversation} from '../../../../../../../../../test/helper/ConversationGenerator';
+import {generateAPIConversation} from '../../../../../../../../../test/helper/conversationGenerator';
 
 import {E2EICertificateDetails} from './e2eiCertificateDetails';
 import {translateForTest} from '../../../../../../../util/test/translateForTest';

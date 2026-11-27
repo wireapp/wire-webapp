@@ -21,9 +21,9 @@ import {GenericMessageType} from '../core/conversation';
 
 import {GenericMessage, LegalHoldStatus, Text} from '@wireapp/protocol-messaging';
 
-import {CryptographyMapper} from '../repositories/cryptography/CryptographyMapper';
-import {ClientEvent} from '../repositories/event/Client';
-import {createMessageAddEvent} from '../../../test/helper/EventGenerator';
+import {CryptographyMapper} from '../repositories/cryptography/cryptographyMapper';
+import {ClientEvent} from '../repositories/event/client';
+import {createMessageAddEvent} from '../../../test/helper/eventGenerator';
 import {createUuid} from '../util/uuid';
 
 import * as LegalHoldEvaluator from './legalHoldEvaluator';

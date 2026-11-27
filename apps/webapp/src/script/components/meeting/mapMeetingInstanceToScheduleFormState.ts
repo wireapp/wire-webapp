@@ -24,7 +24,7 @@ import type {ScheduleMeetingFormState} from './scheduleMeetingModal/scheduleMeet
 import {getEditAnchorMeetingInstance} from './selectors/getMeetingInstancesInRange';
 import type {MeetingInstance} from './types/meetingInstance';
 
-import type {User} from '../../repositories/entity/User';
+import type {User} from '../../repositories/entity/user';
 
 /**
  * Builds edit-form state from the selected list row.

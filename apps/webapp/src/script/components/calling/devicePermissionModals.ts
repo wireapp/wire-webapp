@@ -19,11 +19,11 @@
 
 import {amplify} from 'amplify';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import type {Translate} from '../../util/localizerUtil';
 import {WebAppEvents} from '../../webAppEvents';
-import {PrimaryModal} from '../Modals/PrimaryModal';
-import type {PrimaryModalTranslatedMessage} from '../Modals/PrimaryModal/PrimaryModalTypes';
+import {PrimaryModal} from '../modals/primaryModal';
+import type {PrimaryModalTranslatedMessage} from '../modals/primaryModal/primaryModalTypes';
 
 type ModalFocusContext = {
   container?: HTMLElement;

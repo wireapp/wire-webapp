@@ -22,8 +22,8 @@ import {CONVERSATION_PROTOCOL} from '../../../../apiClient/team/feature/featureL
 import {task} from 'true-myth';
 
 import {meetingSubmitErrors} from '../../meetingSubmitErrors';
-import type {ConversationRepository} from '../../../../repositories/conversation/ConversationRepository';
-import {Conversation} from '../../../../repositories/entity/Conversation';
+import type {ConversationRepository} from '../../../../repositories/conversation/conversationRepository';
+import {Conversation} from '../../../../repositories/entity/conversation';
 import {translateForTest} from '../../../../util/test/translateForTest';
 import {unwrapErr} from '../../../../util/test/resultTestSupport';
 

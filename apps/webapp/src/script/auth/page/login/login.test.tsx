@@ -21,7 +21,7 @@ import {act, fireEvent, render, waitFor, screen} from '@testing-library/react';
 import {ClientType} from '../../../apiClient/client/clientType';
 import {BackendError} from '../../../apiClient/http/backendError';
 import {BackendErrorLabel} from '../../../apiClient/http/backendErrorLabel';
-import {Runtime} from '../../../commons/util/Runtime';
+import {Runtime} from '../../../commons/util/runtime';
 import {TypeUtil} from '../../../commons/util';
 import {StatusCodes} from 'http-status-codes';
 import {Provider} from 'react-redux';
@@ -30,7 +30,7 @@ import {HashRouter as Router, Route, Routes} from 'react-router';
 import {Login} from './login';
 import * as authHelpers from '../../util/helpers';
 
-import {Config, Configuration} from '../../../Config';
+import {Config, Configuration} from '../../../config';
 import {configureStore} from '../../configureStore';
 import {actionRoot} from '../../module/action';
 import {AuthActionCreator} from '../../module/action/creator';

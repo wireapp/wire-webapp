@@ -53,10 +53,10 @@ import type {
 } from './meetingPrepTypes';
 import {meetingPrepDeviceKinds, meetingPrepMediaKinds, meetingPrepPreviewErrors} from './meetingPrepTypes';
 
-import {Config} from '../../../Config';
+import {Config} from '../../../config';
 import {InputLevel} from '../../../page/mainContent/panels/preferences/avPreferences/inputLevel';
 import {useApplicationContext} from '../../../page/rootProvider';
-import type {User} from '../../../repositories/entity/User';
+import type {User} from '../../../repositories/entity/user';
 import {useMediaDevicesStore} from '../../../repositories/media/useMediaDevicesStore';
 import {CloseIcon} from '../../../uiKit/dataDisplay/icon/closeIcon';
 import {Loading} from '../../../uiKit/dataDisplay/loading/loading';

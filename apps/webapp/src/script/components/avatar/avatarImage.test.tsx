@@ -22,8 +22,8 @@ import {render, waitFor} from '@testing-library/react';
 import {AVATAR_SIZE} from './';
 import {AssetRemoteData} from '../../repositories/assets/assetRemoteData';
 import {AssetRepository} from '../../repositories/assets/assetRepository';
-import {User} from '../../repositories/entity/User';
-import {viewportObserver} from '../../util/DOM/viewportObserver';
+import {User} from '../../repositories/entity/user';
+import {viewportObserver} from '../../util/dom/viewportObserver';
 
 import {AvatarImage} from './avatarImage';
 import {translateForTest} from '../../util/test/translateForTest';

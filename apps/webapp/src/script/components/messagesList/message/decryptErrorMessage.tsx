@@ -24,7 +24,7 @@ import {isNan, isNonEmptyString} from '@sindresorhus/is';
 
 import {messageBodyWrapper} from './contentMessage/contentMessage.styles';
 
-import {Config} from '../../../Config';
+import {Config} from '../../../config';
 import {MotionDuration} from '../../../motion/motionDuration';
 import {FormattedId} from '../../../page/mainContent/panels/preferences/devicesPreferences/components/formattedId';
 import {useApplicationContext} from '../../../page/rootProvider';

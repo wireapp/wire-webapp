@@ -7,7 +7,7 @@ import type {BuildMetadata} from './configuration/buildMetadata';
 import type {ClientConfig} from './configuration/client.config';
 import type {ServerConfig} from './configuration/server.config';
 
-import {Server} from './Server';
+import {Server} from './server';
 
 type HttpResponse = {
   readonly body: string;

@@ -32,7 +32,7 @@ import {QualifiedOTRRecipients} from '../../../apiClient/conversation/otrRecipie
 import {QualifiedUserClients} from '../../../apiClient/conversation/qualifiedUserClients';
 import {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import {QualifiedUserPreKeyBundleMap} from '../../../apiClient/user/userPreKeyBundleMap';
-import {uuidToBytes} from '../../../commons/util/StringUtil';
+import {uuidToBytes} from '../../../commons/util/stringUtil';
 import type {EncryptionResult, ProteusService} from '../../messagingProtocols/proteus';
 import {isQualifiedIdArray} from '../../util';
 

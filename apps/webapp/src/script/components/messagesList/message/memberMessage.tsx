@@ -25,7 +25,7 @@ import {ConnectedMessage} from './memberMessage/connectedMessage';
 import {MessageContent} from './memberMessage/messageContent';
 import {MessageTime} from './messageTime';
 
-import {Config} from '../../../Config';
+import {Config} from '../../../config';
 import {SystemMessageType} from '../../../message/systemMessageType';
 import {useApplicationContext} from '../../../page/rootProvider';
 import {
@@ -33,7 +33,7 @@ import {
   groupCreationHeaderSenderNameMarkerStart,
   MemberMessage as MemberMessageEntity,
 } from '../../../repositories/entity/message/memberMessage';
-import {User} from '../../../repositories/entity/User';
+import {User} from '../../../repositories/entity/user';
 import {CollectionIcon} from '../../../uiKit/dataDisplay/icon/collectionIcon';
 import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';
 import {Link, LinkVariant} from '../../../uiKit/typography/link/link';

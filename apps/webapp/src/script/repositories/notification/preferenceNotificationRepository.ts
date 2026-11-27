@@ -1,0 +1,160 @@
+/*
+ * Wire
+ * Copyright (C) 2019 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {isTruthy, isUndefined} from '@sindresorhus/is';
+import {amplify} from 'amplify';
+import ko from 'knockout';
+import {groupBy} from 'underscore';
+
+import {ClientType} from '../../apiClient/client/clientType';
+import {UserEvent, USER_EVENT} from '../../apiClient/event/userEvent';
+import type {QualifiedId} from '../../apiClient/user/qualifiedId';
+import {matchQualifiedIds} from '../../util/qualifiedId';
+import {loadValue, resetStoreValue, storeValue} from '../../util/storageUtil';
+import {WebAppEvents} from '../../webAppEvents';
+import type {ClientEntity} from '../client/clientEntity';
+import type {User} from '../entity/user';
+import {PropertiesRepository} from '../properties/propertiesRepository';
+
+export type ClientNotificationData = {
+  domain?: string;
+  id: string;
+  model: string;
+  time: string;
+  type: ClientType;
+};
+export interface Notification {
+  data: ClientNotificationData | boolean;
+  type: string;
+}
+
+interface GroupedNotifications {
+  notification: Notification[];
+  type: string;
+}
+type PreferenceNotificationRepositoryConfig = {
+  NOTIFICATION_TYPES: {NEW_CLIENT: string; READ_RECEIPTS_CHANGED: string};
+  STORAGE_KEY: string;
+};
+
+/**
+ * Take care of storing and keeping track of all the notifications relative to the user preferences (read receipts config, active devices ...)
+ */
+export class PreferenceNotificationRepository {
+  public readonly notifications: ko.ObservableArray<Notification>;
+
+  static get CONFIG(): PreferenceNotificationRepositoryConfig {
+    return {
+      NOTIFICATION_TYPES: {
+        NEW_CLIENT: 'new-client',
+        READ_RECEIPTS_CHANGED: 'read-receipt-changed',
+      },
+      STORAGE_KEY: 'preferences_notifications',
+    };
+  }
+
+  /**
+   * @param selfUser an observable that contains the self user
+   */
+  constructor(selfUser: ko.Subscribable<User | undefined>) {
+    const notificationsStorageKey = PreferenceNotificationRepository.CONFIG.STORAGE_KEY;
+    const storedNotifications = loadValue<string>(notificationsStorageKey);
+    this.notifications = ko.observableArray(isTruthy(storedNotifications) ? JSON.parse(storedNotifications) : []);
+    this.notifications.subscribe(notifications => {
+      return notifications.length > 0
+        ? storeValue(notificationsStorageKey, JSON.stringify(notifications))
+        : resetStoreValue(notificationsStorageKey);
+    });
+
+    amplify.subscribe(WebAppEvents.USER.CLIENT_ADDED, (user: QualifiedId, clientEntity?: ClientEntity) => {
+      const currentSelfUser = selfUser();
+      const shouldNotifyClientAdded =
+        !isUndefined(clientEntity) &&
+        !clientEntity.isLegalHold() &&
+        !isUndefined(currentSelfUser) &&
+        matchQualifiedIds(user, currentSelfUser);
+      if (shouldNotifyClientAdded) {
+        const {id, domain, type, time, model} = clientEntity;
+        this.notifications.push({
+          data: {
+            domain: domain ?? undefined,
+            id: id ?? '',
+            model: model ?? '',
+            time: time ?? '',
+            type: type ?? ClientType.PERMANENT,
+          },
+          type: PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.NEW_CLIENT,
+        });
+      }
+    });
+    amplify.subscribe(WebAppEvents.USER.CLIENT_REMOVED, (user: QualifiedId, clientId: string) => {
+      const currentSelfUser = selfUser();
+      if (!isUndefined(currentSelfUser) && matchQualifiedIds(user, currentSelfUser)) {
+        this.onClientRemove(user.id, clientId, user.domain ?? null);
+      }
+    });
+    amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent);
+  }
+
+  getNotifications(): GroupedNotifications[] {
+    const notificationPriorities = [
+      PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.NEW_CLIENT,
+      PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.READ_RECEIPTS_CHANGED,
+    ];
+    const prio = (item: GroupedNotifications): number => {
+      return notificationPriorities.indexOf(item.type);
+    };
+    const notifications = this.notifications.removeAll();
+    const groupedNotifications = groupBy(notifications, notification => {
+      return notification.type;
+    });
+    return Object.entries(groupedNotifications)
+      .map(([type, notification]) => {
+        return {notification, type};
+      })
+      .toSorted((firstNotification, secondNotification) => {
+        return prio(firstNotification) - prio(secondNotification);
+      });
+  }
+
+  onClientRemove(_userId: string, clientId: string, domain: string | null): void {
+    this.notifications.remove(({data: clientEntity}) => {
+      if (typeof clientEntity === 'boolean') {
+        return false;
+      }
+      const isExpectedId = matchQualifiedIds(
+        {domain: clientEntity.domain ?? null, id: clientEntity.id},
+        {domain, id: clientId},
+      );
+      return isExpectedId && clientEntity.type === ClientType.PERMANENT;
+    });
+  }
+
+  readonly onUserEvent = (event: UserEvent & {value?: string}): void => {
+    if (event.type === USER_EVENT.PROPERTIES_DELETE || event.type === USER_EVENT.PROPERTIES_SET) {
+      if (event.key === PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key) {
+        const defaultValue = isTruthy(PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.defaultValue);
+        this.notifications.push({
+          data: isUndefined(event.value) ? defaultValue : isTruthy(event.value),
+          type: PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.READ_RECEIPTS_CHANGED,
+        });
+      }
+    }
+  };
+}

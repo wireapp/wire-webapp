@@ -17,13 +17,13 @@
  *
  */
 import {getGrid, updateVideoGrid} from './videoGridHandler';
-import {Call} from './Call';
+import {Call} from './call';
 import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
 import {buildMediaDevicesHandler} from '../../auth/util/test/testUtil';
-import {User} from '../entity/User';
+import {User} from '../entity/user';
 import {createUuid} from '../../util/uuid';
-import {Conversation} from '../entity/Conversation';
-import {Participant} from './Participant';
+import {Conversation} from '../entity/conversation';
+import {Participant} from './participant';
 import {translateForTest} from '../../util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
 

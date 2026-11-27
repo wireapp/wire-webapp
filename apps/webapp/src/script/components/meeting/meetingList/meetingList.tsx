@@ -40,7 +40,7 @@ import {useLoadMoreMeetingListItems} from './useLoadMoreMeetingListItems';
 import {useMeetingListVirtualizer, type UseMeetingListVirtualizer} from './useMeetingListVirtualizer';
 
 import {useApplicationContext} from '../../../page/rootProvider';
-import type {User} from '../../../repositories/entity/User';
+import type {User} from '../../../repositories/entity/user';
 import {Loading} from '../../../uiKit/dataDisplay/loading/loading';
 import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';
 import {TIME_IN_MILLIS} from '../../../util/timeUtil';

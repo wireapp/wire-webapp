@@ -22,7 +22,7 @@ import {Fragment, type FunctionComponent} from 'react';
 import {CollectionItem} from './collectionItem';
 
 import {FadingScrollbar} from '../../../../components/fadingScrollbar';
-import {Conversation} from '../../../../repositories/entity/Conversation';
+import {Conversation} from '../../../../repositories/entity/conversation';
 import {ContentMessage} from '../../../../repositories/entity/message/contentMessage';
 import {useKoSubscribableChildren} from '../../../../util/componentUtil';
 import {formatLocale, isThisYear, isToday} from '../../../../util/timeUtil';

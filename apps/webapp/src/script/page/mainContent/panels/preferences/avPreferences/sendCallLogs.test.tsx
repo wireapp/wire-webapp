@@ -22,8 +22,8 @@ import {task} from 'true-myth';
 import {ThemeProvider} from '../../../../../uiKit/identity/theme/theme';
 import {act, fireEvent, render, screen} from '@testing-library/react';
 
-import {PrimaryModal} from '../../../../../components/Modals/PrimaryModal';
-import type {CallingRepository} from '../../../../../repositories/calling/CallingRepository';
+import {PrimaryModal} from '../../../../../components/modals/primaryModal';
+import type {CallingRepository} from '../../../../../repositories/calling/callingRepository';
 import {useCallLogsUploadSettings} from '../../../../../repositories/calling/callLogsUploadSettings';
 import {CallLogsErrorStatus, createMockCallLogsService} from '../../../../../repositories/calling/callLogsService';
 import {
@@ -32,7 +32,7 @@ import {
 } from '../../../../testSupport/rootContextTestSupport';
 import {translateForTest} from '../../../../../util/test/translateForTest';
 
-import {Config} from '../../../../../Config';
+import {Config} from '../../../../../config';
 import {UserState} from '../../../../../repositories/user/userState';
 
 import {SendCallLogs} from './sendCallLogs';

@@ -1,0 +1,187 @@
+/*
+ * Wire
+ * Copyright (C) 2025 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {amplify} from 'amplify';
+import {container} from 'tsyringe';
+
+import {useCreateConversationModal} from './useCreateConversationModal';
+
+import {ADD_PERMISSION, GROUP_CONVERSATION_TYPE} from '../../../../apiClient/conversation/conversation';
+import {RECEIPT_MODE} from '../../../../apiClient/conversation/data/conversationReceiptModeUpdateData';
+import {mapToConversationProtocol} from '../../../../apiClient/team/feature/featureList.helper';
+import {CONVERSATION_PROTOCOL} from '../../../../apiClient/team/feature/featureList.types';
+import {isNonFederatingBackendsError} from '../../../../core/errors';
+import {useSidebarStore, SidebarTabs} from '../../../../page/leftSidebar/panels/conversations/useSidebarStore';
+import {useApplicationContext} from '../../../../page/rootProvider';
+import {ACCESS_STATE, type TEAM as TEAMType2} from '../../../../repositories/conversation/accessState';
+import {
+  toggleFeature,
+  teamPermissionsForAccessState,
+  ACCESS_TYPES,
+  ACCESS_MODES,
+} from '../../../../repositories/conversation/conversationAccessPermission';
+import {TeamState} from '../../../../repositories/team/teamState';
+import {generateConversationUrl} from '../../../../router/routeGenerator';
+import {createNavigateKeyboard, createNavigate} from '../../../../router/routerBindings';
+import {useKoSubscribableChildren} from '../../../../util/componentUtil';
+import {isKeyboardEvent} from '../../../../util/keyboardUtil';
+import {WebAppEvents} from '../../../../webAppEvents';
+import {PrimaryModal} from '../../primaryModal';
+import {ConversationAccess, ConversationCreationStep, ConversationType} from '../types';
+import {NonFederatingParticipantsModalCopy} from '../utils';
+
+type UseCreateConversationResult = {
+  isSubmitting: boolean;
+  onSubmit: (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent> | React.KeyboardEvent<HTMLInputElement>,
+  ) => Promise<void>;
+};
+export const useCreateConversation = (
+  nonFederatingParticipantsModalCopy: NonFederatingParticipantsModalCopy,
+): UseCreateConversationResult => {
+  const {mainViewModel, translate} = useApplicationContext();
+  const {
+    conversationName,
+    hideModal,
+    showModal,
+    isSubmitting,
+    setIsSubmitting,
+    selectedContacts,
+    setConversationName,
+    setConversationCreationStep,
+    isCellsEnabled,
+    isReadReceiptsEnabled,
+    isServicesEnabled,
+    isGuestsEnabled,
+    conversationType,
+    access: conversationAccess,
+    moderator,
+  } = useCreateConversationModal();
+  const sidebarStore = useSidebarStore();
+  const setCurrentSidebarTab = sidebarStore.setCurrentTab;
+  const contentViewModel = mainViewModel.content;
+  const conversationRepository = contentViewModel.repositories.conversation;
+  const teamState = container.resolve(TeamState);
+  const {isTeam, isMLSEnabled} = useKoSubscribableChildren(teamState, ['isTeam', 'isMLSEnabled']);
+
+  const defaultProtocol: CONVERSATION_PROTOCOL | undefined = isMLSEnabled
+    ? mapToConversationProtocol(teamState.teamFeatures()?.mls?.config.defaultProtocol)
+    : CONVERSATION_PROTOCOL.PROTEUS;
+
+  // Read receipts are temorarily disabled for MLS groups and channels until it is supported
+  const isGroupWithReadReceiptsEnabled = defaultProtocol !== CONVERSATION_PROTOCOL.MLS && isReadReceiptsEnabled;
+
+  const getAccessState = (): TEAMType2 => {
+    let access = ACCESS_STATE.TEAM.TEAM_ONLY;
+    if (isGuestsEnabled) {
+      access = toggleFeature(teamPermissionsForAccessState(ACCESS_STATE.TEAM.GUEST_FEATURES), access);
+    }
+
+    if (conversationAccess === ConversationAccess.Public && conversationType === ConversationType.Channel) {
+      access = toggleFeature(ACCESS_MODES.LINK, access);
+    }
+
+    if (isServicesEnabled) {
+      access = toggleFeature(ACCESS_TYPES.SERVICE, access);
+    }
+
+    return access;
+  };
+
+  const showParticipantsListEditModal = (conversationName: string, backendString: string): void => {
+    PrimaryModal.show(
+      PrimaryModal.type.MULTI_ACTIONS,
+      {
+        preventClose: true,
+        primaryAction: {
+          text: nonFederatingParticipantsModalCopy.editParticipantsButtonText,
+          action: () => {
+            setConversationName(conversationName);
+            showModal();
+            setConversationCreationStep(ConversationCreationStep.ParticipantsSelection);
+          },
+        },
+        secondaryAction: {
+          text: nonFederatingParticipantsModalCopy.leaveButtonText,
+        },
+        text: {
+          translatedMessage: nonFederatingParticipantsModalCopy.getTranslatedMessage(backendString),
+          title: nonFederatingParticipantsModalCopy.titleText,
+        },
+      },
+      undefined,
+      translate,
+    );
+  };
+
+  const handleException = (error: unknown, conversationName: string): void => {
+    if (isNonFederatingBackendsError(error)) {
+      hideModal();
+
+      const backendString = error.backends.join(', and ');
+      showParticipantsListEditModal(conversationName, backendString);
+    }
+  };
+
+  const onSubmit = async (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent> | React.KeyboardEvent<HTMLInputElement>,
+  ): Promise<void> => {
+    if (useCreateConversationModal.getState().isSubmitting) {
+      return;
+    }
+    setIsSubmitting(true);
+
+    try {
+      const conversation = await conversationRepository.createGroupConversation(
+        selectedContacts,
+        conversationName,
+        isTeam ? getAccessState() : undefined,
+        {
+          add_permission: moderator === ADD_PERMISSION.ADMINS ? ADD_PERMISSION.ADMINS : ADD_PERMISSION.EVERYONE,
+          protocol: defaultProtocol,
+          receipt_mode: isGroupWithReadReceiptsEnabled ? RECEIPT_MODE.ON : RECEIPT_MODE.OFF,
+          cells: isCellsEnabled,
+          group_conv_type:
+            conversationType === ConversationType.Channel
+              ? GROUP_CONVERSATION_TYPE.CHANNEL
+              : GROUP_CONVERSATION_TYPE.GROUP_CONVERSATION,
+        },
+      );
+
+      setCurrentSidebarTab(SidebarTabs.RECENT);
+
+      if (isKeyboardEvent(event)) {
+        createNavigateKeyboard(generateConversationUrl(conversation.qualifiedId), true)(event);
+      } else {
+        createNavigate(generateConversationUrl(conversation.qualifiedId))(event);
+      }
+    } catch (error: unknown) {
+      handleException(error, conversationName);
+      amplify.publish(WebAppEvents.CONVERSATION.SHOW, undefined, {});
+    } finally {
+      hideModal();
+      setIsSubmitting(false);
+    }
+  };
+
+  return {
+    isSubmitting,
+    onSubmit,
+  };
+};

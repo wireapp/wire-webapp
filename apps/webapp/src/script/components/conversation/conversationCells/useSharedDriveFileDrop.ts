@@ -24,7 +24,7 @@ import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {getSharedDriveDropRejectionFeedback, handleSharedDriveDroppedFiles} from './sharedDriveDrop';
 import type {SharedDriveUploadController} from './sharedDriveUploadController';
 
-import {Config} from '../../../Config';
+import {Config} from '../../../config';
 import {allowsAllFiles, hasAllowedExtension} from '../../../util/fileTypeUtil';
 import type {Translate} from '../../../util/localizerUtil';
 import {showFileDropzoneErrorModal} from '../useFilesUploadDropzone/showFileDropzoneErrorModal/showFileDropzoneErrorModal';

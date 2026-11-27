@@ -42,14 +42,14 @@ import {CONVERSATION_TYPE} from '../../../../apiClient/conversation/conversation
 import {CONVERSATION_PROTOCOL} from '../../../../apiClient/team/feature/featureList.types';
 import ko from 'knockout';
 
-import {CallState} from '../../../../repositories/calling/CallState';
+import {CallState} from '../../../../repositories/calling/callState';
 import {
   ConversationLabel,
   ConversationLabelRepository,
-} from '../../../../repositories/conversation/ConversationLabelRepository';
-import {ConversationState} from '../../../../repositories/conversation/ConversationState';
-import {Conversation} from '../../../../repositories/entity/Conversation';
-import {User} from '../../../../repositories/entity/User';
+} from '../../../../repositories/conversation/conversationLabelRepository';
+import {ConversationState} from '../../../../repositories/conversation/conversationState';
+import {Conversation} from '../../../../repositories/entity/conversation';
+import {User} from '../../../../repositories/entity/user';
 import {translateForTest} from '../../../../util/test/translateForTest';
 import {
   createRootContextValueForTest,

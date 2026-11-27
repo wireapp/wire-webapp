@@ -22,7 +22,7 @@ import {Task, task} from 'true-myth';
 import {meetingConversationSyncErrors, type MeetingConversationSyncError} from './meetingConversationSync';
 
 import type {QualifiedId} from '../../apiClient/user/qualifiedId';
-import type {ConversationRepository} from '../../repositories/conversation/ConversationRepository';
+import type {ConversationRepository} from '../../repositories/conversation/conversationRepository';
 
 export type LeaveMeetingConversationError =
   typeof meetingConversationSyncErrors.conversationNotFound | typeof meetingConversationSyncErrors.leaveFailed;

@@ -22,7 +22,7 @@ import type {FunctionComponent} from 'react';
 import cx from 'classnames';
 
 import {useApplicationContext} from '../../../../page/rootProvider';
-import type {User} from '../../../../repositories/entity/User';
+import type {User} from '../../../../repositories/entity/user';
 import {useKoSubscribableChildren} from '../../../../util/componentUtil';
 
 interface NoDevicesFoundProps {

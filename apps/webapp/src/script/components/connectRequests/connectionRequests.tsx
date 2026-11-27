@@ -25,8 +25,8 @@ import {container} from 'tsyringe';
 import {SidebarTabs, useSidebarStore} from '../../page/leftSidebar/panels/conversations/useSidebarStore';
 import {useApplicationContext} from '../../page/rootProvider';
 import {useAppMainState, ViewType} from '../../page/state';
-import {User} from '../../repositories/entity/User';
-import {TeamState} from '../../repositories/team/TeamState';
+import {User} from '../../repositories/entity/user';
+import {TeamState} from '../../repositories/team/teamState';
 import {UserState} from '../../repositories/user/userState';
 import {Button, ButtonVariant} from '../../uiKit/inputs/button/button';
 import {IconButton, IconButtonVariant} from '../../uiKit/inputs/iconButton/iconButton';
@@ -34,7 +34,7 @@ import {useMatchMedia} from '../../uiKit/layout/matchMedia/matchMedia';
 import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {Avatar, AVATAR_SIZE} from '../avatar';
 import {UserClassifiedBar} from '../classifiedBar/classifiedBar';
-import {UnverifiedUserWarning} from '../Modals/UserModal';
+import {UnverifiedUserWarning} from '../modals/userModal';
 import {UserName} from '../userName';
 
 interface ConnectRequestsProps {

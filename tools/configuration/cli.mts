@@ -22,8 +22,8 @@ import {cosmiconfig} from 'cosmiconfig';
 import logdown from 'logdown';
 import {noop} from 'noop-esm';
 
-import {CopyConfig} from './CopyConfig.mts';
-import type {CopyConfigOptions} from './CopyConfigOptions.mts';
+import {CopyConfig} from './copyConfig.mts';
+import type {CopyConfigOptions} from './copyConfigOptions.mts';
 
 async function runCopyConfigCommand(): Promise<void> {
   try {

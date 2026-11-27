@@ -25,10 +25,10 @@ import {DeviceSelect} from './deviceSelect';
 import {InputLevel} from './inputLevel';
 
 import * as Icon from '../../../../../components/icon';
-import {Config} from '../../../../../Config';
-import {MediaDevicesHandler} from '../../../../../repositories/media/MediaDevicesHandler';
-import {MediaStreamHandler} from '../../../../../repositories/media/MediaStreamHandler';
-import {MediaType} from '../../../../../repositories/media/MediaType';
+import {Config} from '../../../../../config';
+import {MediaDevicesHandler} from '../../../../../repositories/media/mediaDevicesHandler';
+import {MediaStreamHandler} from '../../../../../repositories/media/mediaStreamHandler';
+import {MediaType} from '../../../../../repositories/media/mediaType';
 import {useMediaDevicesStore} from '../../../../../repositories/media/useMediaDevicesStore';
 import {getLogger} from '../../../../../util/logger';
 import {useApplicationContext} from '../../../../rootProvider';

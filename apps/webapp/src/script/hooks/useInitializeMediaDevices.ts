@@ -19,8 +19,8 @@
 
 import {useCallback, useEffect, useState} from 'react';
 
-import {MediaDevicesHandler} from '../repositories/media/MediaDevicesHandler';
-import {MediaStreamHandler} from '../repositories/media/MediaStreamHandler';
+import {MediaDevicesHandler} from '../repositories/media/mediaDevicesHandler';
+import {MediaStreamHandler} from '../repositories/media/mediaStreamHandler';
 import {getLogger} from '../util/logger';
 
 const logger = getLogger('useInitializeMediaDevices');

@@ -20,8 +20,8 @@
 import {ContextMenuEntry, showContextMenu} from './contextMenu';
 
 import {PlusIcon} from '../components/icon';
-import type {ConversationLabelRepository} from '../repositories/conversation/ConversationLabelRepository';
-import type {Conversation} from '../repositories/entity/Conversation';
+import type {ConversationLabelRepository} from '../repositories/conversation/conversationLabelRepository';
+import type {Conversation} from '../repositories/entity/conversation';
 
 type LabelContextMenuCopy = {
   readonly newFolder: string;

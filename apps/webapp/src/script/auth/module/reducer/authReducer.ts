@@ -23,7 +23,7 @@ import {ClientType} from '../../../apiClient/client/clientType';
 import {OAuthClient} from '../../../apiClient/oauth/oAuthClient';
 import type {TeamData} from '../../../apiClient/team/team/teamData';
 import type {UserAsset} from '../../../apiClient/user/userAsset';
-import {Config} from '../../../Config';
+import {Config} from '../../../config';
 import {AUTH_ACTION, AppActions, USER_ACTION} from '../action/creator/';
 
 export interface RegistrationDataState {

@@ -27,11 +27,11 @@ import {backendErrorLink, warning} from './contentMessage/warnings/warnings.styl
 import {MessageTime} from './messageTime';
 import {useMessageFocusedTabIndex} from './util';
 
-import {Config} from '../../../Config';
+import {Config} from '../../../config';
 import {AddUsersFailure, AddUsersFailureReasons} from '../../../core/conversation';
 import {useApplicationContext} from '../../../page/rootProvider';
 import {FailedToAddUsersMessage as FailedToAddUsersMessageEntity} from '../../../repositories/entity/message/failedToAddUsersMessage';
-import {User} from '../../../repositories/entity/User';
+import {User} from '../../../repositories/entity/user';
 import {UserState} from '../../../repositories/user/userState';
 import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';
 import {Link, LinkVariant} from '../../../uiKit/typography/link/link';

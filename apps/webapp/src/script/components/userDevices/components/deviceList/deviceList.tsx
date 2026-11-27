@@ -21,11 +21,11 @@ import type {FunctionComponent} from 'react';
 
 import cx from 'classnames';
 
-import {Config} from '../../../../Config';
+import {Config} from '../../../../config';
 import {WireIdentity} from '../../../../e2eIdentity';
 import {useApplicationContext} from '../../../../page/rootProvider';
-import type {ClientEntity} from '../../../../repositories/client/ClientEntity';
-import type {User} from '../../../../repositories/entity/User';
+import type {ClientEntity} from '../../../../repositories/client/clientEntity';
+import type {User} from '../../../../repositories/entity/user';
 import {useKoSubscribableChildren} from '../../../../util/componentUtil';
 import {DeviceCard} from '../deviceCard';
 

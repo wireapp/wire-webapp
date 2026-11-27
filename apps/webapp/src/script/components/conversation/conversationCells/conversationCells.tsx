@@ -63,11 +63,11 @@ import {useRefreshCellsState} from './useRefreshCellsState/useRefreshCellsState'
 import {useSharedDriveFileDrop} from './useSharedDriveFileDrop';
 
 import {CONVERSATION_CELLS_STATE} from '../../../apiClient/conversation/conversation';
-import {Config} from '../../../Config';
+import {Config} from '../../../config';
 import {useApplicationContext} from '../../../page/rootProvider';
 import {CellsRepository} from '../../../repositories/cells/cellsRepository';
-import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
-import {Conversation} from '../../../repositories/entity/Conversation';
+import {ConversationRepository} from '../../../repositories/conversation/conversationRepository';
+import {Conversation} from '../../../repositories/entity/conversation';
 import {UserRepository} from '../../../repositories/user/userRepository';
 import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';

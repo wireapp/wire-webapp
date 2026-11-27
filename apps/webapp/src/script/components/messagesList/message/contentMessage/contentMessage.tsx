@@ -39,11 +39,11 @@ import {createRelativeTimestampFormatter, useRelativeTimestamp} from '../../../.
 import {EphemeralStatusType} from '../../../../message/ephemeralStatusType';
 import {StatusType} from '../../../../message/statusType';
 import {useApplicationContext} from '../../../../page/rootProvider';
-import {Conversation} from '../../../../repositories/entity/Conversation';
+import {Conversation} from '../../../../repositories/entity/conversation';
 import {CompositeMessage} from '../../../../repositories/entity/message/compositeMessage';
 import {ContentMessage} from '../../../../repositories/entity/message/contentMessage';
 import type {FileAsset as FileAssetType} from '../../../../repositories/entity/message/fileAsset';
-import type {User} from '../../../../repositories/entity/User';
+import type {User} from '../../../../repositories/entity/user';
 import {ContextMenuEntry} from '../../../../ui/contextMenu';
 import {OutlineCheck} from '../../../../uiKit/dataDisplay/icon/outlineCheck';
 import {useKoSubscribableChildren} from '../../../../util/componentUtil';

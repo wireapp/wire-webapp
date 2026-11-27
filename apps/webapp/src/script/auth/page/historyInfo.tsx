@@ -28,7 +28,7 @@ import {Page} from './page';
 
 import {ClientType} from '../../apiClient/client/clientType';
 import type {RegisteredClient} from '../../apiClient/client/registeredClient';
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {useApplicationContext} from '../../page/rootProvider';
 import {Button} from '../../uiKit/inputs/button/button';
 import {ContainerXS} from '../../uiKit/layout/container/container';

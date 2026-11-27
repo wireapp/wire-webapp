@@ -21,8 +21,8 @@ import {render, type RenderResult} from '@testing-library/react';
 
 import {CONVERSATION_CELLS_STATE} from '../../../apiClient/conversation/conversation';
 
-import {Conversation} from '../../../repositories/entity/Conversation';
-import {Config} from '../../../Config';
+import {Conversation} from '../../../repositories/entity/conversation';
+import {Config} from '../../../config';
 import {translateForTest} from '../../../util/test/translateForTest';
 import {
   createRootContextValueForTest,

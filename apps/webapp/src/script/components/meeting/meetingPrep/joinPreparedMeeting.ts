@@ -18,14 +18,14 @@
  */
 
 import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
-import {Config} from '../../../Config';
+import {Config} from '../../../config';
 import {
   showCallNotEstablishedModal,
   type NoInternetCallGuardCopy,
 } from '../../../hooks/useNoInternetCallGuard/useNoInternetCallGuard';
 import type {CallMediaChoice} from '../../../repositories/calling/callMediaChoice';
 import type {Translate} from '../../../util/localizerUtil';
-import {PrimaryModal} from '../../Modals/PrimaryModal';
+import {PrimaryModal} from '../../modals/primaryModal';
 import {joinMeetingCall, type JoinMeetingCallDeps} from '../joinMeetingCall';
 import {handleJoinMeetingCallResult} from '../useJoinMeetingCall';
 

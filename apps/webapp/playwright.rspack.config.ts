@@ -22,7 +22,7 @@ import {resolve} from 'node:path';
 const internalBuildPort = 4173;
 const publicBuildPort = 4174;
 const developmentBuildPort = 4175;
-const smokeTestDirectory = resolve(__dirname, 'test/rspack-smoke');
+const smokeTestDirectory = resolve(__dirname, 'test/rspackSmoke');
 const smokeTestOutputDirectory = resolve(__dirname, 'test-results/rspack-smoke');
 const smokeReportDirectory = resolve(__dirname, 'playwright-report/rspack-smoke');
 
@@ -51,7 +51,7 @@ function createBuildProjectOptions(
 
 export default defineConfig({
   testDir: smokeTestDirectory,
-  testMatch: ['**/browser-smoke.ts', '**/origin-private-file-system-browser-smoke.ts'],
+  testMatch: ['**/browserSmoke.ts', '**/originPrivateFileSystemBrowserSmoke.ts'],
   tsconfig: resolve(__dirname, 'tsconfig.playwright.json'),
   fullyParallel: true,
   forbidOnly: process.env.CI === 'true',
@@ -68,7 +68,7 @@ export default defineConfig({
   projects: [
     {
       ...createBuildProjectOptions('development', developmentBuildPort),
-      testMatch: '**/origin-private-file-system-browser-smoke.ts',
+      testMatch: '**/originPrivateFileSystemBrowserSmoke.ts',
       grep: /loads the native persistence worker/,
     },
     createBuildProjectOptions('internal', internalBuildPort),
@@ -76,7 +76,7 @@ export default defineConfig({
   ],
   webServer: [
     {
-      command: `node test/rspack-smoke/server.ts --variant development --port ${developmentBuildPort}`,
+      command: `node test/rspackSmoke/server.ts --variant development --port ${developmentBuildPort}`,
       cwd: __dirname,
       url: `http://127.0.0.1:${developmentBuildPort}/`,
       reuseExistingServer: false,
@@ -85,7 +85,7 @@ export default defineConfig({
       stderr: 'pipe',
     },
     {
-      command: `node test/rspack-smoke/server.ts --variant internal --port ${internalBuildPort}`,
+      command: `node test/rspackSmoke/server.ts --variant internal --port ${internalBuildPort}`,
       cwd: __dirname,
       url: `http://127.0.0.1:${internalBuildPort}/`,
       reuseExistingServer: false,
@@ -94,7 +94,7 @@ export default defineConfig({
       stderr: 'pipe',
     },
     {
-      command: `node test/rspack-smoke/server.ts --variant public --port ${publicBuildPort}`,
+      command: `node test/rspackSmoke/server.ts --variant public --port ${publicBuildPort}`,
       cwd: __dirname,
       url: `http://127.0.0.1:${publicBuildPort}/`,
       reuseExistingServer: false,

@@ -23,9 +23,9 @@ import {create} from 'zustand';
 
 import {TYPE} from './warningsTypes';
 
-import {PrimaryModal} from '../../components/Modals/PrimaryModal';
-import {Config} from '../../Config';
-import {AppPermissionState} from '../../repositories/notification/AppPermissionState';
+import {PrimaryModal} from '../../components/modals/primaryModal';
+import {Config} from '../../config';
+import {AppPermissionState} from '../../repositories/notification/appPermissionState';
 import type {Substitutions, TranslationKey} from '../../util/localizerUtil';
 import {safeWindowOpen} from '../../util/sanitizationUtil';
 import {WebAppEvents} from '../../webAppEvents';

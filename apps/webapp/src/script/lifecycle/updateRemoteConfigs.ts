@@ -21,7 +21,7 @@ import {isUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
 import type {BackendFeatures} from '../apiClient/apiClient';
-import {Config} from '../Config';
+import {Config} from '../config';
 import {TaskParams} from '../core/util/recurringTaskScheduler';
 import {Core} from '../service/coreSingleton';
 import {getLogger} from '../util/logger';

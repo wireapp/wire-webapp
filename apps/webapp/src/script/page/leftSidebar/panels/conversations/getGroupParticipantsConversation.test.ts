@@ -17,7 +17,7 @@
  *
  */
 
-import {ConversationRepository} from '../../../../repositories/conversation/ConversationRepository';
+import {ConversationRepository} from '../../../../repositories/conversation/conversationRepository';
 import {SearchRepository} from '../../../../repositories/search/searchRepository';
 
 import {getGroupParticipantsConversations} from './getGroupParticipantsConversation';

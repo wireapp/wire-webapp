@@ -29,7 +29,7 @@ import {DiagnosticStatusIcon as StatusIcon} from './troubleshooting/diagnosticSt
 import * as styles from './troubleshooting/troubleshooting.styles';
 
 import * as Icon from '../../../../components/icon';
-import {Config} from '../../../../Config';
+import {Config} from '../../../../config';
 import {getScanResults, scanTransports} from '../../../../repositories/troubleshooter/scanResults';
 import type {
   TroubleshooterRepository,

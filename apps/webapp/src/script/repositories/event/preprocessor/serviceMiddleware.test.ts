@@ -1,0 +1,151 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {ConversationRepository} from '../../conversation/conversationRepository';
+import {EventBuilder} from '../../conversation/eventBuilder';
+import {Conversation} from '../../entity/conversation';
+import {User} from '../../entity/user';
+import {UserRepository} from '../../user/userRepository';
+import {createUuid} from '../../../util/uuid';
+
+import {ServiceMiddleware} from './serviceMiddleware';
+import {UserType} from '../../../apiClient/user/user';
+import {translateForTest} from '../../../util/test/translateForTest';
+import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
+
+function buildServiceMiddleware(): readonly [
+  ServiceMiddleware,
+  {
+    readonly conversationRepository: jest.Mocked<ConversationRepository>;
+    readonly userRepository: jest.Mocked<UserRepository>;
+    readonly selfUser: User;
+  },
+] {
+  const selfUser = new User(createUuid(), '', translateForTest);
+  const conversationRepository = {getConversationById: jest.fn()} as unknown as jest.Mocked<ConversationRepository>;
+  const userRepository = {getUsersById: jest.fn()} as unknown as jest.Mocked<UserRepository>;
+
+  return [
+    new ServiceMiddleware(conversationRepository, userRepository, selfUser),
+    {conversationRepository, userRepository, selfUser},
+  ] as const;
+}
+
+describe('ServiceMiddleware', () => {
+  const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+
+  describe('processEvent', () => {
+    describe('conversation.member-join events', () => {
+      it.each(['services', 'apps'] as const)('adds meta when %s are present in the event', async serviceType => {
+        const [serviceMiddleware, {userRepository, selfUser}] = buildServiceMiddleware();
+        const event = EventBuilder.buildMemberJoin(conversation, selfUser.qualifiedId, []);
+
+        const service = new User('', '', translateForTest);
+        if (serviceType === 'services') service.isService = true;
+        else service.type = UserType.APP;
+
+        const userEntities = [new User('', '', translateForTest), service];
+        userRepository.getUsersById.mockResolvedValue(userEntities);
+
+        const decoratedEvent: any = await serviceMiddleware.processEvent(event);
+        expect(decoratedEvent.data.has_service).toBe(true);
+      });
+
+      it('adds meta if I was added to a conversation including a service', async () => {
+        const [serviceMiddleware, {conversationRepository, userRepository, selfUser}] = buildServiceMiddleware();
+        const event = EventBuilder.buildMemberJoin(conversation, selfUser.qualifiedId, [selfUser.qualifiedId]);
+
+        conversationRepository.getConversationById.mockResolvedValue(conversation);
+        const service = new User('', '', translateForTest);
+        service.isService = true;
+        const userEntities = [new User('', '', translateForTest), service];
+
+        userRepository.getUsersById.mockResolvedValue(userEntities);
+
+        const decoratedEvent: any = await serviceMiddleware.processEvent(event);
+        expect(decoratedEvent.data.has_service).toBe(true);
+      });
+
+      it('does not modify events not containing any service', async () => {
+        const [serviceMiddleware, {userRepository, selfUser}] = buildServiceMiddleware();
+        const event = EventBuilder.buildMemberJoin(conversation, selfUser.qualifiedId, []);
+        userRepository.getUsersById.mockResolvedValue([
+          new User('', '', translateForTest),
+          new User('', '', translateForTest),
+        ]);
+
+        const decoratedEvent: any = await serviceMiddleware.processEvent(event);
+        expect(decoratedEvent.data.has_service).not.toBeDefined();
+      });
+
+      it('adds meta when services are present in the event with qualified user ids', async () => {
+        const [serviceMiddleware, {userRepository, selfUser}] = buildServiceMiddleware();
+        const event = EventBuilder.buildMemberJoin(conversation, selfUser.qualifiedId, []);
+
+        const service = new User('', '', translateForTest);
+        service.isService = true;
+        const userEntities = [new User('', '', translateForTest), service];
+        userRepository.getUsersById.mockResolvedValue(userEntities);
+
+        const decoratedEvent: any = await serviceMiddleware.processEvent(event);
+        expect(decoratedEvent.data.has_service).toBe(true);
+      });
+    });
+
+    describe('conversation.one2one-creation events', () => {
+      it.each(['services', 'apps'] as const)('adds meta when %s are present in the event', async serviceType => {
+        const [serviceMiddleware, {userRepository, selfUser}] = buildServiceMiddleware();
+        const event = EventBuilder.buildMemberJoin(conversation, selfUser.qualifiedId, []);
+
+        const service = new User('', '', translateForTest);
+        if (serviceType === 'services') service.isService = true;
+        else if (serviceType === 'apps') service.type = UserType.APP;
+
+        const userEntities = [new User('', '', translateForTest), service];
+        userRepository.getUsersById.mockResolvedValue(userEntities);
+
+        const decoratedEvent: any = await serviceMiddleware.processEvent(event);
+        expect(decoratedEvent.data.has_service).toBe(true);
+      });
+
+      it('does not modify events not containing any service', async () => {
+        const [serviceMiddleware, {userRepository, selfUser}] = buildServiceMiddleware();
+        const event = EventBuilder.buildMemberJoin(conversation, selfUser.qualifiedId, []);
+
+        userRepository.getUsersById.mockResolvedValue([]);
+
+        const decoratedEvent: any = await serviceMiddleware.processEvent(event);
+        expect(decoratedEvent.data.has_service).not.toBeDefined();
+      });
+
+      it('adds meta when services are present in the event with qualified user ids', async () => {
+        const [serviceMiddleware, {userRepository}] = buildServiceMiddleware();
+        const event = EventBuilder.build1to1Creation(conversation);
+
+        const service = new User('', '', translateForTest);
+        service.isService = true;
+        const userEntities = [new User('', '', translateForTest), service];
+        userRepository.getUsersById.mockResolvedValue(userEntities);
+
+        const decoratedEvent: any = await serviceMiddleware.processEvent(event);
+        expect(decoratedEvent.data.has_service).toBe(true);
+      });
+    });
+  });
+});

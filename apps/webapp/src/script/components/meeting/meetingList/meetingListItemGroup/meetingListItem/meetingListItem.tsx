@@ -38,7 +38,7 @@ import {MeetingParticipants} from './meetingParticipants/meetingParticipants';
 import {MeetingStatus} from './meetingStatus/meetingStatus';
 
 import {useApplicationContext} from '../../../../../page/rootProvider';
-import type {User} from '../../../../../repositories/entity/User';
+import type {User} from '../../../../../repositories/entity/user';
 import {CalendarIcon} from '../../../../../uiKit/dataDisplay/icon/calendarIcon';
 import {useMeetingPrepModal} from '../../../meetingPrep/useMeetingPrepModal';
 import {SCHEDULE_MEETING_RECURRENCE_TRANSLATION_KEYS} from '../../../scheduleMeetingModal/scheduleMeetingRecurrence';

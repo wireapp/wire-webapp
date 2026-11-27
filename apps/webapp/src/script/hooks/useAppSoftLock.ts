@@ -20,8 +20,8 @@
 import {useCallback, useEffect, useState} from 'react';
 
 import {E2EIHandler, E2EIDeviceStatus} from '../e2eIdentity';
-import {CallingRepository} from '../repositories/calling/CallingRepository';
-import {NotificationRepository} from '../repositories/notification/NotificationRepository';
+import {CallingRepository} from '../repositories/calling/callingRepository';
+import {NotificationRepository} from '../repositories/notification/notificationRepository';
 
 type AppSoftLockState = {softLockEnabled: boolean};
 

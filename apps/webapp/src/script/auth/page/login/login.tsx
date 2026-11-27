@@ -33,9 +33,9 @@ import type {ConversationJoinData} from '../../../apiClient/conversation/data/co
 import {BackendError} from '../../../apiClient/http/backendError';
 import {BackendErrorLabel, SyntheticErrorLabel} from '../../../apiClient/http/backendErrorLabel';
 import {UrlUtil} from '../../../commons/util';
-import {Runtime} from '../../../commons/util/Runtime';
+import {Runtime} from '../../../commons/util/runtime';
 import {LogoFullIcon} from '../../../components/icon';
-import {Config} from '../../../Config';
+import {Config} from '../../../config';
 import {useApplicationContext} from '../../../page/rootProvider';
 import {Loading} from '../../../uiKit/dataDisplay/loading/loading';
 import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';

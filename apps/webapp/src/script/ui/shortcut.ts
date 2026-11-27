@@ -23,7 +23,7 @@ import {bind, releaseKey} from 'keyboardjs';
 
 import {ShortcutType} from './shortcutType';
 
-import {Runtime} from '../commons/util/Runtime';
+import {Runtime} from '../commons/util/runtime';
 import {capitalizeFirstChar, includesString} from '../util/stringUtil';
 import {WebAppEvents} from '../webAppEvents';
 

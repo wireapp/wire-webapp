@@ -17,8 +17,8 @@
  *
  */
 
-import {Runtime} from '../commons/util/Runtime';
-import {Config} from '../Config';
+import {Runtime} from '../commons/util/runtime';
+import {Config} from '../config';
 
 export const isDetachedCallingFeatureEnabled = (): boolean => {
   if (!Config.getConfig().FEATURE.ENABLE_DETACHED_CALLING_WINDOW) {

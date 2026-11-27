@@ -23,7 +23,7 @@ import {meetingPrepMediaKinds, meetingPrepPreviewErrors, type RequestMeetingPrep
 
 import {MediaError} from '../../../error/mediaError';
 import {NoAudioInputError} from '../../../error/noAudioInputError';
-import type {MediaStreamHandler} from '../../../repositories/media/MediaStreamHandler';
+import type {MediaStreamHandler} from '../../../repositories/media/mediaStreamHandler';
 
 export const createMeetingPrepPreview = (
   streamHandler: MediaStreamHandler,

@@ -23,8 +23,8 @@ import {AssetRemoteData} from './assetRemoteData';
 
 import {QualifiedId} from '../../apiClient/user/qualifiedId';
 import type {UserAsset as APIClientUserAsset} from '../../apiClient/user/userAsset';
-import type {User} from '../entity/User';
-import type {ServiceEntity} from '../integration/ServiceEntity';
+import type {User} from '../entity/user';
+import type {ServiceEntity} from '../integration/serviceEntity';
 
 export type MappedAsset = Record<string, AssetRemoteData>;
 

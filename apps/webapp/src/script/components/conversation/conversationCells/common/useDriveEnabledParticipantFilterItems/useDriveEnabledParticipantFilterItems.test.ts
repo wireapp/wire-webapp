@@ -17,9 +17,9 @@
  *
  */
 
-import type {ConversationRepository} from '../../../../../repositories/conversation/ConversationRepository';
-import type {Conversation} from '../../../../../repositories/entity/Conversation';
-import {User} from '../../../../../repositories/entity/User';
+import type {ConversationRepository} from '../../../../../repositories/conversation/conversationRepository';
+import type {Conversation} from '../../../../../repositories/entity/conversation';
+import {User} from '../../../../../repositories/entity/user';
 
 import {getDriveEnabledParticipants} from './useDriveEnabledParticipantFilterItems';
 import {translateForTest} from '../../../../../util/test/translateForTest';

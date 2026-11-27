@@ -20,13 +20,13 @@
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {buildFileDataMessage} from '../../core/conversation/message/messageBuilder';
-import {CryptographyMapper} from '../cryptography/CryptographyMapper';
-import {EventMapper} from '../conversation/EventMapper';
-import {ClientEvent} from '../event/Client';
+import {CryptographyMapper} from '../cryptography/cryptographyMapper';
+import {EventMapper} from '../conversation/eventMapper';
+import {ClientEvent} from '../event/client';
 import {requireValueForTest} from '../../page/testSupport/rootContextTestSupport';
 import {createCoreTestFixture} from '../../util/test/createCoreTestFixture';
 import {translateForTest} from '../../util/test/translateForTest';
-import {createMessageAddEvent} from '../../../../test/helper/EventGenerator';
+import {createMessageAddEvent} from '../../../../test/helper/eventGenerator';
 
 describe('PDF preview message mapping', () => {
   it('restores independent preview encryption data through protobuf and event mapping', async () => {

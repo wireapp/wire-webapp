@@ -22,8 +22,8 @@ import React from 'react';
 import {CSSObject} from '@emotion/serialize';
 import {objectKeys} from 'ts-extras';
 
-import {ACCENT_ID} from '../../Config';
-import {User} from '../../repositories/entity/User';
+import {ACCENT_ID} from '../../config';
+import {User} from '../../repositories/entity/user';
 import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {CSS_SQUARE} from '../../util/cssMixin';
 import {useApplicationContext} from '../rootProvider';

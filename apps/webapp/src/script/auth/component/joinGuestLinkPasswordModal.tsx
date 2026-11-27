@@ -22,7 +22,7 @@ import {FormEvent, useState, type FunctionComponent} from 'react';
 import {isNonEmptyString} from '@sindresorhus/is';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {useApplicationContext} from '../../page/rootProvider';
 import {COLOR} from '../../uiKit/identity/colors/colors';
 import {Button} from '../../uiKit/inputs/button/button';

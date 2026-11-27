@@ -30,7 +30,7 @@ import {Page} from './page';
 
 import {UrlUtil} from '../../commons/util';
 import {LogoFullIcon} from '../../components/icon';
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {useSingleInstance} from '../../hooks/useSingleInstance';
 import '../../localization/localizer';
 import {useApplicationContext} from '../../page/rootProvider';

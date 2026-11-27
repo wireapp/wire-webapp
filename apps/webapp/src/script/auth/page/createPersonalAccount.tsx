@@ -24,7 +24,7 @@ import {useNavigate} from 'react-router';
 import {styles} from './createPersonalAccount.styles';
 import {Page} from './page';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {useApplicationContext} from '../../page/rootProvider';
 import {FlexBox} from '../../uiKit/layout/flexBox/flexBox';
 import {AccountForm} from '../component/accountForm';

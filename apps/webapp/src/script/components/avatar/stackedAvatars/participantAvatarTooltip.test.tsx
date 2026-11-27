@@ -21,7 +21,7 @@ import {act, fireEvent, render, screen, waitFor, type RenderResult} from '@testi
 import {ThemeProvider} from '../../../uiKit/identity/theme/theme';
 
 import {AVATAR_SIZE} from '..';
-import {User} from '../../../repositories/entity/User';
+import {User} from '../../../repositories/entity/user';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

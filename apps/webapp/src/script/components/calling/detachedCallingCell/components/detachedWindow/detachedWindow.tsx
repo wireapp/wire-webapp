@@ -28,7 +28,7 @@ import {container} from 'tsyringe';
 
 import '../../../../../../style/default.less';
 import {useActiveWindow} from '../../../../../hooks/useActiveWindow';
-import {CallState} from '../../../../../repositories/calling/CallState';
+import {CallState} from '../../../../../repositories/calling/callState';
 import {THEME_ID} from '../../../../../uiKit/identity/theme/theme';
 import {StyledApp} from '../../../../../uiKit/layout/styledApp/styledApp';
 import {useKoSubscribableChildren} from '../../../../../util/componentUtil';

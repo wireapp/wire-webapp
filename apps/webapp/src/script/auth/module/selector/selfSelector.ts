@@ -19,7 +19,7 @@
 
 import type {Self} from '../../../apiClient/self/self';
 import {UserType} from '../../../apiClient/user/user';
-import {Config} from '../../../Config';
+import {Config} from '../../../config';
 import type {RootState} from '../reducer';
 
 type ConsentMap = Record<number, number>;

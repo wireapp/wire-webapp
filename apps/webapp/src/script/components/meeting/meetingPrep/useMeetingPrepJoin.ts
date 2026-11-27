@@ -27,7 +27,7 @@ import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import {useNoInternetCallGuard} from '../../../hooks/useNoInternetCallGuard/useNoInternetCallGuard';
 import {useApplicationContext, useMainViewModel} from '../../../page/rootProvider';
 import type {CallMediaChoice} from '../../../repositories/calling/callMediaChoice';
-import {ConversationState} from '../../../repositories/conversation/ConversationState';
+import {ConversationState} from '../../../repositories/conversation/conversationState';
 
 export const useMeetingPrepJoin = (): ((
   qualifiedConversationId: QualifiedId,

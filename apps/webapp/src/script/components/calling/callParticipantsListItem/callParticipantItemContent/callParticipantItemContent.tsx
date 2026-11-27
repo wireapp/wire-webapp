@@ -29,7 +29,7 @@ import {
 } from './callParticipantItemContent.styles';
 
 import {useApplicationContext} from '../../../../page/rootProvider';
-import {User} from '../../../../repositories/entity/User';
+import {User} from '../../../../repositories/entity/user';
 import {TabIndex} from '../../../../uiKit/utils/enums';
 import {capitalizeFirstChar} from '../../../../util/stringUtil';
 import * as Icon from '../../../icon';

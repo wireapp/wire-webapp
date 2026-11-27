@@ -20,7 +20,7 @@
 import {isNonEmptyString} from '@sindresorhus/is';
 
 import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
-import {Config} from '../../../../Config';
+import {Config} from '../../../../config';
 import {useApplicationContext} from '../../../../page/rootProvider';
 import {CellsRepository} from '../../../../repositories/cells/cellsRepository';
 import {getFileExtension, trimFileExtension, formatBytes} from '../../../../util/util';

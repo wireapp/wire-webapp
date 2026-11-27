@@ -24,7 +24,7 @@ import {
 } from './meetingAction.styles';
 import {MEETING_ACTION_TRANSLATION_KEYS} from './meetingActionTranslationKeys';
 
-import type {User} from '../../../../../../repositories/entity/User';
+import type {User} from '../../../../../../repositories/entity/user';
 import type {ContextMenuEntry} from '../../../../../../ui/contextMenu';
 import {CallIcon} from '../../../../../../uiKit/dataDisplay/icon/callIcon';
 import {EditIcon} from '../../../../../../uiKit/dataDisplay/icon/editIcon';

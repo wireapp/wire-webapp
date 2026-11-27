@@ -1,0 +1,181 @@
+/*
+ * Wire
+ * Copyright (C) 2022 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {FC, useCallback, useRef, useState} from 'react';
+
+import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
+
+import {QualifiedId} from '../../../apiClient/user/qualifiedId';
+import {ReactionType} from '../../../core/conversation';
+import {MessageRepository} from '../../../repositories/conversation/messageRepository';
+import {Conversation} from '../../../repositories/entity/conversation';
+import {ContentMessage} from '../../../repositories/entity/message/contentMessage';
+import {TabIndex} from '../../../uiKit/utils/enums';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {isTabKey} from '../../../util/keyboardUtil';
+import type {Translate} from '../../../util/localizerUtil';
+import {DownloadButton} from '../../messagesList/message/contentMessage/messageActions/downloadButton';
+import {useMessageActionsState} from '../../messagesList/message/contentMessage/messageActions/messageActions.state';
+import {
+  getActionsMenuCSS,
+  getIconCSS,
+  messageActionsMenuButton,
+} from '../../messagesList/message/contentMessage/messageActions/messageActions.styles';
+import {MessageReactions} from '../../messagesList/message/contentMessage/messageActions/messageReactions/messageReactions';
+import {ReplyButton} from '../../messagesList/message/contentMessage/messageActions/replyButton';
+
+interface DetailViewModalFooterProps {
+  messageEntity: ContentMessage;
+  conversationEntity: Conversation;
+  onReplyClick: (conversation: Conversation, message: ContentMessage) => void;
+  onDownloadClick: (message: ContentMessage) => void;
+  messageRepository: MessageRepository;
+  selfId: QualifiedId;
+  fireAndForgetInvoker: FireAndForgetInvoker;
+  translate: Translate;
+}
+
+const MESSAGE_REPLY_ID = 'do-reply-fullscreen-picture';
+const MESSAGE_DOWNLOAD_ID = 'do-download-fullscreen-picture';
+
+const DetailViewModalFooter: FC<DetailViewModalFooterProps> = ({
+  messageEntity,
+  conversationEntity,
+  onReplyClick,
+  onDownloadClick,
+  messageRepository,
+  selfId,
+  fireAndForgetInvoker,
+  translate,
+}) => {
+  const {isSelfUserRemoved} = useKoSubscribableChildren(conversationEntity, ['isSelfUserRemoved']);
+  const [currentMsgActionName, setCurrentMsgAction] = useState('');
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const isMsgReactable = messageEntity.isReactable();
+  const handleReactionClick = (reaction: ReactionType): void => {
+    if (!messageEntity.isContent()) {
+      return;
+    }
+    fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+      await messageRepository.toggleReaction(conversationEntity, messageEntity, reaction, selfId);
+    });
+  };
+  const {handleMenuOpen} = useMessageActionsState();
+  const resetActionMenuStates = useCallback(() => {
+    setCurrentMsgAction('');
+    handleMenuOpen(false);
+  }, [handleMenuOpen]);
+
+  const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLButtonElement>) => {
+    if (isTabKey(event)) {
+      setCurrentMsgAction('');
+    }
+  }, []);
+
+  const toggleActiveMenu = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement> | React.KeyboardEvent<HTMLButtonElement>) => {
+      const selectedMsgActionName = event.currentTarget.dataset.uieName;
+      handleMenuOpen(false);
+      if (currentMsgActionName === selectedMsgActionName) {
+        // reset on double click
+        setCurrentMsgAction('');
+      } else if (selectedMsgActionName !== undefined && selectedMsgActionName !== '') {
+        setCurrentMsgAction(selectedMsgActionName);
+      }
+    },
+    [currentMsgActionName, handleMenuOpen],
+  );
+
+  const handleMessageReply = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      toggleActiveMenu(event);
+      onReplyClick(conversationEntity, messageEntity);
+    },
+    [conversationEntity, messageEntity, onReplyClick, toggleActiveMenu],
+  );
+
+  const handleAssetDownload = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      toggleActiveMenu(event);
+      onDownloadClick(messageEntity);
+    },
+    [messageEntity, onDownloadClick, toggleActiveMenu],
+  );
+
+  return (
+    <footer className="detail-view-footer">
+      {isMsgReactable && !isSelfUserRemoved && (
+        <div ref={wrapperRef} style={{display: 'flex'}}>
+          <MessageReactions
+            translate={translate}
+            messageFocusedTabIndex={TabIndex.FOCUSABLE}
+            currentMsgActionName={currentMsgActionName}
+            handleCurrentMsgAction={setCurrentMsgAction}
+            resetActionMenuStates={resetActionMenuStates}
+            wrapperRef={wrapperRef}
+            handleReactionClick={handleReactionClick}
+            toggleActiveMenu={toggleActiveMenu}
+            handleKeyDown={handleKeyDown}
+          />
+          {messageEntity.isReplyable() && !isSelfUserRemoved && (
+            <ReplyButton
+              translate={translate}
+              actionId={MESSAGE_REPLY_ID}
+              currentMsgActionName={currentMsgActionName}
+              messageFocusedTabIndex={TabIndex.FOCUSABLE}
+              onReplyClick={handleMessageReply}
+              onKeyPress={handleKeyDown}
+            />
+          )}
+          {messageEntity.isDownloadable() && (
+            <DownloadButton
+              translate={translate}
+              actionId={MESSAGE_DOWNLOAD_ID}
+              messageFocusedTabIndex={TabIndex.FOCUSABLE}
+              onDownloadClick={handleAssetDownload}
+              onKeyPress={handleKeyDown}
+              css={{
+                ...messageActionsMenuButton(),
+                ...getIconCSS,
+                ...getActionsMenuCSS(currentMsgActionName === MESSAGE_DOWNLOAD_ID),
+              }}
+            >
+              <span className="icon-download" />
+            </DownloadButton>
+          )}
+        </div>
+      )}
+      {messageEntity.isDownloadable() && !isMsgReactable && (
+        <DownloadButton
+          translate={translate}
+          actionId={MESSAGE_DOWNLOAD_ID}
+          messageFocusedTabIndex={TabIndex.FOCUSABLE}
+          onDownloadClick={handleAssetDownload}
+          onKeyPress={handleKeyDown}
+          className="detail-view-action-button"
+        >
+          <span className="icon-download" />
+          <span>{translate('conversationContextMenuDownload')}</span>
+        </DownloadButton>
+      )}
+    </footer>
+  );
+};
+
+export {DetailViewModalFooter};

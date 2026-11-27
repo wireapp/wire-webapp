@@ -22,7 +22,7 @@ import React, {type FunctionComponent} from 'react';
 import {container} from 'tsyringe';
 
 import {RECEIPT_MODE} from '../../../../../apiClient/conversation/data/conversationReceiptModeUpdateData';
-import {Config} from '../../../../../Config';
+import {Config} from '../../../../../config';
 import {PropertiesRepository} from '../../../../../repositories/properties/propertiesRepository';
 import {AppLockRepository} from '../../../../../repositories/user/appLockRepository';
 import {AppLockState} from '../../../../../repositories/user/appLockState';

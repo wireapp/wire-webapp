@@ -21,7 +21,7 @@ import {isUndefined} from '@sindresorhus/is';
 import {Maybe} from 'true-myth';
 import {arrayIncludes} from 'ts-extras';
 
-import {Config} from '../../../../Config';
+import {Config} from '../../../../config';
 import type {RootContextValue} from '../../../../page/rootProvider';
 import {isValidCellsNodePath} from '../../conversationCells/common/cellsNodeNameValidator';
 

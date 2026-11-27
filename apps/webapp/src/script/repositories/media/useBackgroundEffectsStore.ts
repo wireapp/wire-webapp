@@ -27,7 +27,7 @@ import {
   BackgroundEffectSelection,
   DEFAULT_BACKGROUND_EFFECT,
   DEFAULT_BUILTIN_BACKGROUND_ID,
-} from './VideoBackgroundEffects';
+} from './videoBackgroundEffects';
 
 export interface RenderMetrics extends Metrics {
   budget: number;

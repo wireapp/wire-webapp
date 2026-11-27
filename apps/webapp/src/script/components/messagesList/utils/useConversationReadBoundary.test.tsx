@@ -20,7 +20,7 @@
 import {act, renderHook} from '@testing-library/react';
 import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
 
-import {Conversation} from '../../../repositories/entity/Conversation';
+import {Conversation} from '../../../repositories/entity/conversation';
 import {Message} from '../../../repositories/entity/message/message';
 import {translateForTest} from '../../../util/test/translateForTest';
 

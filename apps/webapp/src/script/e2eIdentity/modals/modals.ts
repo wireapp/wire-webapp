@@ -20,15 +20,15 @@
 import {isUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
-import {PrimaryModal} from '../../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../../components/modals/primaryModal';
 import {
   ModalOptions,
   PrimaryModalTranslatedComponent,
   PrimaryModalTranslatedTranslation,
   PrimaryModalTranslatedValue,
   PrimaryModalType,
-} from '../../components/Modals/PrimaryModal/PrimaryModalTypes';
-import {Config} from '../../Config';
+} from '../../components/modals/primaryModal/primaryModalTypes';
+import {Config} from '../../config';
 import type {Translate, TranslationKey} from '../../util/localizerUtil';
 import {WebAppEvents} from '../../webAppEvents';
 

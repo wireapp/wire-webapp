@@ -17,7 +17,7 @@
  *
  */
 
-import {Config} from '../Config';
+import {Config} from '../config';
 
 import {canUseMeetings} from './canUseMeetings';
 

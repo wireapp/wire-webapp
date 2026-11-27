@@ -17,7 +17,7 @@
  *
  */
 
-import type {User} from '../../../repositories/entity/User';
+import type {User} from '../../../repositories/entity/user';
 import type {TranslationKey} from '../../../util/localizerUtil';
 import type {MeetingPasswordErrorKey} from '../shared/validation/meetingPasswordValidation';
 

@@ -26,8 +26,8 @@ import {MessageTime} from './messageTime';
 
 import {useApplicationContext} from '../../../page/rootProvider';
 import {DeleteMessage as DeleteMessageEntity} from '../../../repositories/entity/message/deleteMessage';
-import {User} from '../../../repositories/entity/User';
-import {ServiceEntity} from '../../../repositories/integration/ServiceEntity';
+import {User} from '../../../repositories/entity/user';
+import {ServiceEntity} from '../../../repositories/integration/serviceEntity';
 import {formatTimeShort, fromUnixTime, TIME_IN_MILLIS} from '../../../util/timeUtil';
 
 interface DeleteMessageProps {

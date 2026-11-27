@@ -21,7 +21,7 @@ import {render, type RenderResult} from '@testing-library/react';
 import {noop} from 'noop-esm';
 
 import {pendingOnboardingStatusFeatureToggleName} from '../../../../featureToggles/startupFeatureToggleNames';
-import {User} from '../../../../repositories/entity/User';
+import {User} from '../../../../repositories/entity/user';
 import {translateForTest} from '../../../../util/test/translateForTest';
 import {
   createRootContextValueForTest,

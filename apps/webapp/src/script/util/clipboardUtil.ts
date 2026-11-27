@@ -17,7 +17,7 @@
  *
  */
 
-import {Runtime} from '../commons/util/Runtime';
+import {Runtime} from '../commons/util/runtime';
 
 export function copyText(text: string): Promise<void> {
   if (Runtime.isSupportingClipboard()) {

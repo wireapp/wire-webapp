@@ -21,7 +21,7 @@ import {ReactElement} from 'react';
 
 import {render, type RenderResult} from '@testing-library/react';
 
-import {User} from '../../repositories/entity/User';
+import {User} from '../../repositories/entity/user';
 import {RootProvider} from '../../page/rootProvider';
 import {translateForTest} from '../../util/test/translateForTest';
 import {createRootContextValueForTest} from '../../page/testSupport/rootContextTestSupport';

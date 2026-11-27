@@ -31,11 +31,11 @@ import {useOutsideInputClick} from './useOutsideInputClick/useOutsideInputClick'
 
 import type {RootContextValue} from '../../../page/rootProvider';
 import {CellsRepository} from '../../../repositories/cells/cellsRepository';
-import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
-import {MessageRepository, type OutgoingQuote} from '../../../repositories/conversation/MessageRepository';
-import {Conversation} from '../../../repositories/entity/Conversation';
+import {ConversationRepository} from '../../../repositories/conversation/conversationRepository';
+import {MessageRepository, type OutgoingQuote} from '../../../repositories/conversation/messageRepository';
+import {Conversation} from '../../../repositories/entity/conversation';
 import {ContentMessage} from '../../../repositories/entity/message/contentMessage';
-import {EventRepository} from '../../../repositories/event/EventRepository';
+import {EventRepository} from '../../../repositories/event/eventRepository';
 import {StorageRepository} from '../../../repositories/storage';
 import {WebAppEvents} from '../../../webAppEvents';
 import type {DraftState} from '../common/draftState/draftState';

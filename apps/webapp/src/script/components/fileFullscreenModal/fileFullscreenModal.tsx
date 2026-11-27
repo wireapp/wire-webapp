@@ -29,7 +29,7 @@ import {ImageFileView} from './imageFileView/imageFileView';
 import {NoPreviewAvailable} from './noPreviewAvailable/noPreviewAvailable';
 import {PDFViewer} from './pdfViewer/pdfViewer';
 
-import type {Conversation} from '../../repositories/entity/Conversation';
+import type {Conversation} from '../../repositories/entity/conversation';
 import {isFileEditable} from '../../util/fileTypeUtil';
 import type {FileType} from '../../util/getFileTypeFromExtension/fileType';
 import {getFileTypeFromExtension} from '../../util/getFileTypeFromExtension/getFileTypeFromExtension';

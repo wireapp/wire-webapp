@@ -26,7 +26,7 @@ import {
   teamCreationWrapperCss,
 } from './conversationHistory.styles';
 
-import {Config} from '../../../Config';
+import {Config} from '../../../config';
 import {Button} from '../../../uiKit/inputs/button/button';
 import {Text} from '../../../uiKit/typography/text/text';
 import {handleKeyDown, KEY} from '../../../util/keyboardUtil';

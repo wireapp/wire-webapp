@@ -1,0 +1,125 @@
+/*
+ * Wire
+ * Copyright (C) 2025 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {useEffect, type FunctionComponent} from 'react';
+
+import {container} from 'tsyringe';
+
+import {CONVERSATION_PROTOCOL} from '../../../../apiClient/team/feature/featureList.types';
+import {Config} from '../../../../config';
+import {useApplicationContext} from '../../../../page/rootProvider';
+import {TeamState} from '../../../../repositories/team/teamState';
+import {useKoSubscribableChildren} from '../../../../util/componentUtil';
+import {checkAppsFeatureAvailability} from '../../../../util/featureUtil';
+import {AppsDisabledNote} from '../../../note/appsDisabledNote/appsDisabledNote';
+import {InfoToggle} from '../../../toggle/infoToggle';
+import {useCreateConversationModal} from '../hooks/useCreateConversationModal';
+import {getSharedDrivePermissionHint} from '../utils';
+
+export const Preference: FunctionComponent = () => {
+  const {translate} = useApplicationContext();
+  const {
+    isCellsEnabled,
+    isGuestsEnabled,
+    isReadReceiptsEnabled,
+    setIsCellsEnabled,
+    setIsGuestsEnabled,
+    setIsReadReceiptsEnabled,
+    isServicesEnabled,
+    setIsServicesEnabled,
+  } = useCreateConversationModal();
+
+  const teamState = container.resolve(TeamState);
+
+  const {
+    isCellsEnabled: isCellsEnabledForTeam,
+    isMLSEnabled,
+    isAppsEnabled,
+  } = useKoSubscribableChildren(teamState, ['isCellsEnabled', 'isMLSEnabled', 'isAppsEnabled']);
+  const isCellsEnabledForEnvironment = Config.getConfig().FEATURE.ENABLE_CELLS;
+  const isCellsOptionEnabled = isCellsEnabledForEnvironment && isCellsEnabledForTeam;
+
+  const defaultProtocol = isMLSEnabled
+    ? (teamState.teamFeatures()?.mls?.config.defaultProtocol ?? CONVERSATION_PROTOCOL.PROTEUS)
+    : CONVERSATION_PROTOCOL.PROTEUS;
+
+  // Read receipts are temorarily disabled for MLS groups and channels until it is supported
+  const areReadReceiptsEnabled = defaultProtocol !== CONVERSATION_PROTOCOL.MLS;
+
+  const isAppsFeatureAvailable = checkAppsFeatureAvailability({
+    protocol: defaultProtocol,
+    isAppsEnabled,
+  });
+
+  useEffect(() => {
+    if (!isAppsFeatureAvailable && isServicesEnabled) {
+      setIsServicesEnabled(false);
+    }
+  }, [isAppsFeatureAvailable, isServicesEnabled, setIsServicesEnabled]);
+
+  return (
+    <>
+      <InfoToggle
+        className="modal-style"
+        isChecked={isGuestsEnabled}
+        setIsChecked={setIsGuestsEnabled}
+        isDisabled={false}
+        info={translate('guestRoomToggleInfoExtended')}
+        name={translate('guestOptionsTitle')}
+        dataUieName="read-receipts"
+      />
+
+      <InfoToggle
+        className="modal-style"
+        dataUieName="info-toggle-services"
+        info={translate('appsRoomToggleInfoExtended')}
+        setIsChecked={setIsServicesEnabled}
+        isDisabled={!isAppsFeatureAvailable}
+        name={translate('appsOptionsTitle')}
+        isChecked={isServicesEnabled && isAppsFeatureAvailable}
+        footer={!isAppsFeatureAvailable && <AppsDisabledNote />}
+      />
+
+      {areReadReceiptsEnabled && (
+        <InfoToggle
+          className="modal-style"
+          dataUieName="read-receipts"
+          info={translate('readReceiptsToggleInfo')}
+          isChecked={isReadReceiptsEnabled}
+          setIsChecked={setIsReadReceiptsEnabled}
+          isDisabled={false}
+          name={translate('readReceiptsToggleName')}
+        />
+      )}
+
+      {isCellsOptionEnabled && (
+        <InfoToggle
+          className="modal-style info-toggle--no-separator"
+          dataUieName="cells"
+          isChecked={isCellsEnabled}
+          setIsChecked={setIsCellsEnabled}
+          isDisabled={false}
+          name={translate('modalCreateGroupCellsToggleHeading')}
+          info={translate('modalCreateGroupCellsToggleInfo')}
+          adminHintForShareDrive={getSharedDrivePermissionHint(translate)}
+        />
+      )}
+    </>
+  );
+};

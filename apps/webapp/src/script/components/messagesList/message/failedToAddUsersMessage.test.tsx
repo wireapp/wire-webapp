@@ -27,7 +27,7 @@ import {THEME_ID} from '../../../uiKit/identity/theme/theme';
 import de from '../../../../i18n/de-DE.json';
 import en from '../../../../i18n/en-US.json';
 import {FailedToAddUsersMessage as FailedToAddUsersMessageEntity} from '../../../repositories/entity/message/failedToAddUsersMessage';
-import {User} from '../../../repositories/entity/User';
+import {User} from '../../../repositories/entity/user';
 import {UserState} from '../../../repositories/user/userState';
 import {generateQualifiedIds} from '../../../auth/util/test/testUtil';
 import {

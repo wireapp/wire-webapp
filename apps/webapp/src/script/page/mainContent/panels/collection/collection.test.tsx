@@ -22,14 +22,14 @@ import {noop} from 'noop-esm';
 import {container} from 'tsyringe';
 
 import {AssetRepository} from '../../../../repositories/assets/assetRepository';
-import {MessageRepository} from '../../../../repositories/conversation/MessageRepository';
-import {Conversation} from '../../../../repositories/entity/Conversation';
+import {MessageRepository} from '../../../../repositories/conversation/messageRepository';
+import {Conversation} from '../../../../repositories/entity/conversation';
 import {ContentMessage} from '../../../../repositories/entity/message/contentMessage';
 import {FileAsset} from '../../../../repositories/entity/message/fileAsset';
 import {LinkPreview} from '../../../../repositories/entity/message/linkPreview';
 import {MediumImage} from '../../../../repositories/entity/message/mediumImage';
 import {Text} from '../../../../repositories/entity/message/text';
-import {User} from '../../../../repositories/entity/User';
+import {User} from '../../../../repositories/entity/user';
 import {withTheme, withThemeAndRootContext} from '../../../../auth/util/test/testUtil';
 import {MessageCategory} from '../../../../message/messageCategory';
 import {
@@ -43,7 +43,7 @@ import {Collection} from './collection';
 import {FullSearch} from './fullSearch';
 import {CONVERSATION_PROTOCOL} from '../../../../apiClient/team/feature/featureList.types';
 import {CONVERSATION_CELLS_STATE} from '../../../../apiClient/conversation/conversation';
-import {Config} from '../../../../Config';
+import {Config} from '../../../../config';
 import {driveOffboardingFeatureToggleName} from '../../../../featureToggles/startupFeatureToggleNames';
 
 jest.mock('./collectionDetails', () => {

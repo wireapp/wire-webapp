@@ -28,18 +28,18 @@ import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '../../webAppEvents';
 
 import {entities} from '../../../../test/api/payloads';
-import {TestFactory} from '../../../../test/helper/TestFactory';
-import {generateAPIUser} from '../../../../test/helper/UserGenerator';
+import {TestFactory} from '../../../../test/helper/testFactory';
+import {generateAPIUser} from '../../../../test/helper/userGenerator';
 
 import {AssetRepository} from '../assets/assetRepository';
 import {ClientRepository} from '../client';
-import {ClientMapper} from '../client/ClientMapper';
+import {ClientMapper} from '../client/clientMapper';
 import {ConnectionEntity} from '../connection/connectionEntity';
-import {User} from '../entity/User';
-import {EventRepository} from '../event/EventRepository';
+import {User} from '../entity/user';
+import {EventRepository} from '../event/eventRepository';
 import {PropertiesRepository} from '../properties/propertiesRepository';
-import {SelfService} from '../self/SelfService';
-import {TeamState} from '../team/TeamState';
+import {SelfService} from '../self/selfService';
+import {TeamState} from '../team/teamState';
 import type {UserRecord} from '../storage';
 import type {Translate} from '../../util/localizerUtil';
 import {matchQualifiedIds} from '../../util/qualifiedId';

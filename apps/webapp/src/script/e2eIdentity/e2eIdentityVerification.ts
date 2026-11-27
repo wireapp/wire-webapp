@@ -28,7 +28,7 @@ import type {QualifiedId} from '../apiClient/user/qualifiedId';
 import type {ConversationService} from '../core/conversation';
 import {DeviceIdentity, type E2EIServiceExternal} from '../core/messagingProtocols/mls';
 import {StringifiedQualifiedId, stringifyQualifiedId} from '../core/util/qualifiedIdUtil';
-import {ConversationState} from '../repositories/conversation/ConversationState';
+import {ConversationState} from '../repositories/conversation/conversationState';
 import {Core} from '../service/coreSingleton';
 import {base64ToArray} from '../util/util';
 

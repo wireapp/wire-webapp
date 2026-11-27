@@ -27,7 +27,7 @@ import {type Translate} from '../../util/localizerUtil';
 import {getLogger, Logger} from '../../util/logger';
 import '../../viewModel/bindings/commonBindings';
 import {MappedAsset, mapProfileAssets, updateUserEntityAssets} from '../assets/assetMapper';
-import {User} from '../entity/User';
+import {User} from '../entity/user';
 import {UserRecord} from '../storage';
 
 export class UserMapper {

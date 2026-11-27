@@ -19,7 +19,7 @@
 
 import {isNonEmptyArray, isNonEmptyString} from '@sindresorhus/is';
 
-import {Config, Configuration} from '../Config';
+import {Config, Configuration} from '../config';
 
 const redactedValuePrefixLength = 3;
 const loggedUserIdentifierPrefixLength = 8;

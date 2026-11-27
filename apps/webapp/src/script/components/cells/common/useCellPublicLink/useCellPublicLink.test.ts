@@ -29,7 +29,7 @@ import {useCellPublicLink} from './useCellPublicLink';
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import type {RestShareLink} from 'cells-sdk-ts';
 
-jest.mock('../../../../Config', () => {
+jest.mock('../../../../config', () => {
   return {
     Config: {
       getConfig: () => {

@@ -26,8 +26,8 @@ import {WebAppEvents} from '../../webAppEvents';
 
 import en from '../../../i18n/en-US.json';
 import type {ClientRepository} from '../../repositories/client';
-import {User} from '../../repositories/entity/User/User';
-import {TeamState} from '../../repositories/team/TeamState';
+import {User} from '../../repositories/entity/user/user';
+import {TeamState} from '../../repositories/team/teamState';
 import {AppLockCrypto, AppLockRepository} from '../../repositories/user/appLockRepository';
 import {AppLockState} from '../../repositories/user/appLockState';
 import {UserState} from '../../repositories/user/userState';

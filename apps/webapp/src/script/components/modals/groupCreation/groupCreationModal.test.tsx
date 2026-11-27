@@ -1,0 +1,148 @@
+import {CONVERSATION_PROTOCOL, FEATURE_STATUS} from '../../../apiClient/team/feature/featureList.types';
+import {TeamState} from '../../../repositories/team/teamState';
+import ko from 'knockout';
+import {GroupCreationModal} from './groupCreationModal';
+import {act, getByRole} from '@testing-library/react';
+import {UserState} from '../../../repositories/user/userState';
+import {User} from '../../../repositories/entity/user';
+import {amplify} from 'amplify';
+import {WebAppEvents} from '../../../webAppEvents';
+import {mountComponent} from '../../../auth/util/test/testUtil';
+import {mockStoreFactory} from '../../../auth/util/test/mockStoreFactory';
+import {initialRootState} from '../../../auth/module/reducer';
+import {TypeUtil} from '../../../commons/util';
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
+import {translateForTest} from '../../../util/test/translateForTest';
+import {createRootContextValueForTest} from '../../../page/testSupport/rootContextTestSupport';
+import {RootProvider} from '../../../page/rootProvider';
+import type {MainViewModel} from '../../../viewModel/mainViewModel';
+
+type TeamStateDateSet = {
+  isAppsEnabled: boolean;
+  isMLSEnabled: boolean;
+  defaultProtocol: CONVERSATION_PROTOCOL;
+  expectedAppsEnabled: boolean;
+};
+
+describe('GroupCreationModal', () => {
+  it.each<TeamStateDateSet>([
+    // PROTEUS
+    {
+      defaultProtocol: CONVERSATION_PROTOCOL.PROTEUS,
+      isAppsEnabled: true,
+      isMLSEnabled: false,
+      expectedAppsEnabled: true,
+    },
+    {
+      defaultProtocol: CONVERSATION_PROTOCOL.PROTEUS,
+      isAppsEnabled: false,
+      isMLSEnabled: false,
+      expectedAppsEnabled: true,
+    },
+
+    // MLS
+    {
+      defaultProtocol: CONVERSATION_PROTOCOL.MLS,
+      isAppsEnabled: false,
+      isMLSEnabled: true,
+      expectedAppsEnabled: false,
+    },
+    {
+      defaultProtocol: CONVERSATION_PROTOCOL.MLS,
+      isAppsEnabled: true,
+      isMLSEnabled: true,
+      expectedAppsEnabled: true,
+    },
+  ])(
+    'should result in expectedAppsEnabled=$expectedAppsEnabled when { protocol: $defaultProtocol, appsEnabled: $isAppsEnabled, whitelisted: $hasWhitelistedServices, mlsEnabled: $isMLSEnabled }',
+    ({isAppsEnabled, isMLSEnabled, defaultProtocol, expectedAppsEnabled}) => {
+      // Arrange
+      const mockUser = new User('user-id', 'test-domain.wire.com', translateForTest);
+
+      const mockUserState: UserState = {
+        self: ko.observable(mockUser),
+        users: ko.observableArray<User>([]),
+        connectedUsers: ko.pureComputed(() => {
+          return [] as User[];
+        }),
+        connectRequests: ko.pureComputed(() => {
+          return [] as User[];
+        }),
+      };
+
+      const mockTeamState: TypeUtil.RecursivePartial<TeamState> = {
+        isMLSEnabled: ko.pureComputed(() => {
+          return isMLSEnabled;
+        }),
+        isAppsEnabled: ko.pureComputed(() => {
+          return isAppsEnabled;
+        }),
+        isTeam: ko.pureComputed(() => {
+          return true;
+        }),
+        teamFeatures: ko.observable({
+          mls: {
+            config: {
+              defaultProtocol,
+              supportedProtocols: [defaultProtocol],
+              defaultCipherSuite: 1,
+              allowedCipherSuites: [1],
+              protocolToggleUsers: ['protocolToggleUsers'],
+            },
+            status: FEATURE_STATUS.ENABLED,
+          },
+        }),
+      };
+
+      const mockRootContext = {
+        mainViewModel: {
+          content: {
+            repositories: {
+              conversation: {},
+              search: {},
+              team: {},
+            },
+          },
+        },
+      };
+      const rootContextValue = createRootContextValueForTest({
+        translate: translateForTest,
+        mainViewModel: mockRootContext.mainViewModel as unknown as MainViewModel,
+        clock: createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
+      });
+
+      // Act
+      const {getByTestId} = mountComponent(
+        <RootProvider value={rootContextValue}>
+          <GroupCreationModal userState={mockUserState} teamState={mockTeamState as TeamState} />
+        </RootProvider>,
+        mockStoreFactory()({
+          ...initialRootState,
+          authState: {
+            account: {
+              email: '',
+              name: '',
+              password: '',
+            },
+          },
+        }),
+      );
+
+      act(() => {
+        amplify.publish(WebAppEvents.CONVERSATION.CREATE_GROUP, 'test-event', null);
+      });
+
+      // Assert
+      const servicesToggleContainer = getByTestId('info-toggle-services');
+      const servicesCheckbox = getByRole(servicesToggleContainer, 'checkbox');
+
+      if (expectedAppsEnabled) {
+        expect(servicesCheckbox).toBeEnabled();
+        expect(servicesToggleContainer).not.toHaveTextContent('appsNotEnabledNoteTitle');
+      } else {
+        expect(servicesCheckbox).toBeDisabled();
+        expect(servicesToggleContainer).toHaveTextContent('appsNotEnabledNoteTitle');
+      }
+    },
+  );
+});

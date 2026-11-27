@@ -19,7 +19,7 @@
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 
-import {BackgroundSource} from '../../VideoBackgroundEffects';
+import {BackgroundSource} from '../../videoBackgroundEffects';
 import {getSafeLogger} from '../helper/logger';
 
 const opaqueAlphaChannel = 255;

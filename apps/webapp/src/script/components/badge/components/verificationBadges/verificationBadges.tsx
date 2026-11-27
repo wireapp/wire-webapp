@@ -29,10 +29,10 @@ import {MLSStatuses, WireIdentity} from '../../../../e2eIdentity/e2eIdentityVeri
 import {useUserIdentity} from '../../../../hooks/useDeviceIdentities';
 import {RootContextValue, useApplicationContext} from '../../../../page/rootProvider';
 import {ClientEntity} from '../../../../repositories/client';
-import {ConversationVerificationState} from '../../../../repositories/conversation/ConversationVerificationState';
-import {checkUserHandle} from '../../../../repositories/conversation/ConversationVerificationStateHandler';
-import {Conversation} from '../../../../repositories/entity/Conversation';
-import {User} from '../../../../repositories/entity/User';
+import {ConversationVerificationState} from '../../../../repositories/conversation/conversationVerificationState';
+import {checkUserHandle} from '../../../../repositories/conversation/conversationVerificationStateHandler';
+import {Conversation} from '../../../../repositories/entity/conversation';
+import {User} from '../../../../repositories/entity/user';
 import {UserState} from '../../../../repositories/user/userState';
 import {CertificateExpiredIcon} from '../../../../uiKit/dataDisplay/icon/certificateExpired';
 import {CertificateRevoked} from '../../../../uiKit/dataDisplay/icon/certificateRevoked';

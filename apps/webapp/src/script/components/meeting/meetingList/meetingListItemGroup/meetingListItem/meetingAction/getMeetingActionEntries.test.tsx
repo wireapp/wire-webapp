@@ -21,7 +21,7 @@ import type {MeetingInstance} from '../../../../types/meetingInstance';
 import type {MeetingSeries} from '../../../../types/meetingSeries';
 import {getMeetingActionEntries} from './getMeetingActionEntries';
 import {MEETING_ACTION_TRANSLATION_KEYS} from './meetingActionTranslationKeys';
-import {User} from '../../../../../../repositories/entity/User';
+import {User} from '../../../../../../repositories/entity/user';
 import {translateForTest} from '../../../../../../util/test/translateForTest';
 import type {ContextMenuEntry} from '../../../../../../ui/contextMenu';
 

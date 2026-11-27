@@ -21,7 +21,7 @@ import React, {type FunctionComponent} from 'react';
 
 import {FormattedMessage} from 'react-intl';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {useApplicationContext} from '../../page/rootProvider';
 import {COLOR} from '../../uiKit/identity/colors/colors';
 import {Button} from '../../uiKit/inputs/button/button';

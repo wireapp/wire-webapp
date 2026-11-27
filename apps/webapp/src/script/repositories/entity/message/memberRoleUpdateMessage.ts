@@ -21,7 +21,7 @@ import {SystemMessage} from './systemMessage';
 
 import {SystemMessageType} from '../../../message/systemMessageType';
 import {Translate} from '../../../util/localizerUtil';
-import {ClientEvent} from '../../event/Client';
+import {ClientEvent} from '../../event/client';
 
 export class MemberRoleUpdateMessage extends SystemMessage {
   constructor(translate: Translate) {

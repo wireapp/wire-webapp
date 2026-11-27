@@ -26,7 +26,7 @@ import {CancelError, DifferentAccountError, IncompatiblePlatformError, InvalidMe
 import {preprocessConversations, preprocessEvents, preprocessUsers} from './recordPreprocessors';
 
 import {getLogger} from '../../util/logger';
-import {User} from '../entity/User';
+import {User} from '../entity/user';
 import type {ConversationRecord, EventRecord, UserRecord} from '../storage';
 import {StorageSchemata} from '../storage/storageSchemata';
 

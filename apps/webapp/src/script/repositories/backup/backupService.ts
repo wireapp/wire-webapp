@@ -23,7 +23,7 @@ import DexieBatch from 'dexie-batch';
 import {container} from 'tsyringe';
 
 import {Logger, getLogger} from '../../util/logger';
-import {CONVERSATION} from '../event/Client';
+import {CONVERSATION} from '../event/client';
 import {StorageService, type EventRecord} from '../storage';
 
 type BackupTables = readonly [

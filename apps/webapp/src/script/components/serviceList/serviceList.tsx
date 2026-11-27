@@ -24,7 +24,7 @@ import cx from 'classnames';
 import {ServiceListItem} from './components/serviceListItem';
 
 import {useApplicationContext} from '../../page/rootProvider';
-import type {ServiceEntity} from '../../repositories/integration/ServiceEntity';
+import type {ServiceEntity} from '../../repositories/integration/serviceEntity';
 
 enum MODE {
   COMPACT = 'ServiceList.MODE.COMPACT',

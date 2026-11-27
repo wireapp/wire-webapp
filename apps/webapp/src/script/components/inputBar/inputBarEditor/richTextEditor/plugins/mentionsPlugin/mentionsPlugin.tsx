@@ -28,7 +28,7 @@ import * as ReactDOM from 'react-dom';
 
 import {MentionSuggestionsItem} from './mentionSuggestionsItem';
 
-import {User} from '../../../../../../repositories/entity/User';
+import {User} from '../../../../../../repositories/entity/user';
 import {FadingScrollbar} from '../../../../../fadingScrollbar';
 import {IgnoreOutsideClickWrapper} from '../../../../util/clickHandlers';
 import {$createMentionNode} from '../../nodes/mentionNode';

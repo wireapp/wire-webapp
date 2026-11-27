@@ -29,7 +29,7 @@ import {RestrictedAudio} from './restrictedAudio/restrictedAudio';
 import {AssetTransferState} from '../../../../../../repositories/assets/assetTransferState';
 import type {ContentMessage} from '../../../../../../repositories/entity/message/contentMessage';
 import type {FileAsset} from '../../../../../../repositories/entity/message/fileAsset';
-import {TeamState} from '../../../../../../repositories/team/TeamState';
+import {TeamState} from '../../../../../../repositories/team/teamState';
 import {useKoSubscribableChildren} from '../../../../../../util/componentUtil';
 import {getLogger} from '../../../../../../util/logger';
 import {formatSeconds} from '../../../../../../util/timeUtil';

@@ -28,7 +28,7 @@ import {Page} from './page';
 
 import type {ChangePassword} from '../../apiClient/self/changePassword';
 import {ValidationUtil} from '../../commons/util';
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {useApplicationContext} from '../../page/rootProvider';
 import {Button} from '../../uiKit/inputs/button/button';
 import {Form} from '../../uiKit/inputs/form/form';

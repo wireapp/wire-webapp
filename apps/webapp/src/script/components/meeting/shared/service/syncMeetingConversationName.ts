@@ -20,8 +20,8 @@
 import {task, type Task} from 'true-myth';
 
 import type {QualifiedId} from '../../../../apiClient/user/qualifiedId';
-import type {ConversationRepository} from '../../../../repositories/conversation/ConversationRepository';
-import {isMeetingConversation} from '../../../../repositories/conversation/ConversationSelectors';
+import type {ConversationRepository} from '../../../../repositories/conversation/conversationRepository';
+import {isMeetingConversation} from '../../../../repositories/conversation/conversationSelectors';
 import {meetingSubmitErrors, type MeetingSubmitErrors} from '../../meetingSubmitErrors';
 
 export type SyncMeetingConversationNameParams = {

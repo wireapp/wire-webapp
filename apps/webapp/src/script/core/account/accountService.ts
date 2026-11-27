@@ -19,7 +19,7 @@
 
 import {CallConfigData} from '../../apiClient/account/callConfigData';
 import {APIClient} from '../../apiClient/apiClient';
-import {Runtime} from '../../commons/util/Runtime';
+import {Runtime} from '../../commons/util/runtime';
 
 const firefoxIceCandidateLimit = 3;
 

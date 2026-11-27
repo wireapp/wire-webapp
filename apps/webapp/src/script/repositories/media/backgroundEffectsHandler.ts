@@ -32,7 +32,7 @@ import {
   DEFAULT_BACKGROUND_EFFECT,
   DEFAULT_BUILTIN_BACKGROUND_ID,
   loadBackgroundSource,
-} from './VideoBackgroundEffects';
+} from './videoBackgroundEffects';
 
 import {getStorage} from '../../util/localStorage';
 import {getLogger, Logger} from '../../util/logger';

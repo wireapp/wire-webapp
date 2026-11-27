@@ -73,7 +73,7 @@ const ignores = [
   '!apps/server/configuration/server.config.ts',
   '!**/*.config.test.*',
   '!**/*.config.spec.*',
-  'apps/server/bin/copy_server_assets.js',
+  'apps/server/bin/copyServerAssets.js',
   'apps/server/dist/',
   'apps/server/build/',
   '**/lib/',
@@ -706,10 +706,10 @@ const productionConfigs = [
   },
   {
     files: [
-      'apps/webapp/src/script/components/Modals/PrimaryModal/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/Modals/LeaveGroupAdminModal/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/Modals/QualityFeedbackModal/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/Modals/DetailViewModal/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/modals/primaryModal/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/modals/leaveGroupAdminModal/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/modals/qualityFeedbackModal/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/modals/detailViewModal/**/*.{ts,tsx}',
     ],
     rules: {
       'no-restricted-imports': [
@@ -779,9 +779,9 @@ const productionConfigs = [
       'apps/webapp/src/script/components/messagesList/virtualizedMessagesList/virtualizedMessagesList.tsx',
       'apps/webapp/src/script/components/messagesList/virtualizedMessagesList/useLoadMessages.ts',
       'apps/webapp/src/script/components/messagesList/utils/useLoadConversation.ts',
-      'apps/webapp/src/script/components/Modals/FileHistoryModal/FileVersionItem.tsx',
-      'apps/webapp/src/script/components/Modals/FileHistoryModal/hooks/useFileVersions.ts',
-      'apps/webapp/src/script/components/Modals/DetailViewModal/DetailViewModalFooter.tsx',
+      'apps/webapp/src/script/components/modals/fileHistoryModal/fileVersionItem.tsx',
+      'apps/webapp/src/script/components/modals/fileHistoryModal/hooks/useFileVersions.ts',
+      'apps/webapp/src/script/components/modals/detailViewModal/detailViewModalFooter.tsx',
       'apps/webapp/src/script/components/userSearchableList/userSearchableList.tsx',
       'apps/webapp/src/script/components/calling/callingCell/callingCell.tsx',
       'apps/webapp/src/script/components/calling/callingOverlayContainer.tsx',
@@ -1008,9 +1008,9 @@ const config = [
     // These adapters intentionally consume legacy event and reaction shapes for stored-data compatibility.
     files: [
       'apps/webapp/src/script/message/messageHasher.ts',
-      'apps/webapp/src/script/repositories/conversation/EventBuilder/EventBuilder.ts',
-      'apps/webapp/src/script/repositories/conversation/EventMapper.ts',
-      'apps/webapp/src/script/repositories/event/EventService.ts',
+      'apps/webapp/src/script/repositories/conversation/eventBuilder/eventBuilder.ts',
+      'apps/webapp/src/script/repositories/conversation/eventMapper.ts',
+      'apps/webapp/src/script/repositories/event/eventService.ts',
       'apps/webapp/src/script/util/reactionUtil.ts',
     ],
     rules: {
@@ -1128,7 +1128,7 @@ const config = [
   },
   {
     files: jestTestFilePatterns,
-    ignores: ['apps/webapp/test/e2e_tests/**'],
+    ignores: ['apps/webapp/test/e2eTests/**'],
     plugins: {
       jest: jestPlugin,
     },

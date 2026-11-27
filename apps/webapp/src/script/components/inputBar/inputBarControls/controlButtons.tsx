@@ -31,8 +31,8 @@ import {MessageTimerButton} from './messageTimerButton/messageTimerButton';
 import {PingButton} from './pingButton/pingButton';
 
 import {CONVERSATION_CELLS_STATE} from '../../../apiClient/conversation/conversation';
-import {Config} from '../../../Config';
-import {Conversation} from '../../../repositories/entity/Conversation';
+import {Config} from '../../../config';
+import {Conversation} from '../../../repositories/entity/conversation';
 import {FormatSeparator} from '../common/formatSeparator/formatSeparator';
 
 interface ControlButtonsProps {

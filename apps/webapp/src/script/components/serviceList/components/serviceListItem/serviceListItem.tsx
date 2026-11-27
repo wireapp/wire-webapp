@@ -20,7 +20,7 @@
 import type {FunctionComponent} from 'react';
 
 import {useApplicationContext} from '../../../../page/rootProvider';
-import {ServiceEntity} from '../../../../repositories/integration/ServiceEntity';
+import {ServiceEntity} from '../../../../repositories/integration/serviceEntity';
 import {TabIndex} from '../../../../uiKit/utils/enums';
 import {useKoSubscribableChildren} from '../../../../util/componentUtil';
 import {handleKeyDown, KEY} from '../../../../util/keyboardUtil';

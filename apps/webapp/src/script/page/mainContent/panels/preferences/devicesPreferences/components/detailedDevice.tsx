@@ -24,7 +24,7 @@ import {ProteusDeviceDetails} from './proteusDeviceDetails';
 
 import {DeviceVerificationBadges} from '../../../../../../components/badge';
 import {E2EIHandler, WireIdentity} from '../../../../../../e2eIdentity';
-import {ClientEntity} from '../../../../../../repositories/client/ClientEntity';
+import {ClientEntity} from '../../../../../../repositories/client/clientEntity';
 
 export interface DeviceProps {
   device: ClientEntity;

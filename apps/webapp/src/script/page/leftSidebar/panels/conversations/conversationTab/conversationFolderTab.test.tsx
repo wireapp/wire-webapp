@@ -21,21 +21,21 @@ import {render} from '@testing-library/react';
 import {noop} from 'noop-esm';
 
 import * as Icon from '../../../../../components/icon';
-import {createLabel, LabelType} from '../../../../../repositories/conversation/ConversationLabelRepository';
-import {Conversation} from '../../../../../repositories/entity/Conversation';
+import {createLabel, LabelType} from '../../../../../repositories/conversation/conversationLabelRepository';
+import {Conversation} from '../../../../../repositories/entity/conversation';
 import {translateForTest} from '../../../../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from '../../../../testSupport/rootContextTestSupport';
-import {TestFactory} from '../../../../../../../test/helper/TestFactory';
+import {TestFactory} from '../../../../../../../test/helper/testFactory';
 
 import {ConversationFolderTab} from './conversationFolderTab';
 
 import {SidebarTabs} from '../useSidebarStore';
 import {CONVERSATION_PROTOCOL} from '../../../../../apiClient/team/feature/featureList.types';
 import type {JSX} from '@emotion/react/jsx-runtime';
-import type {ConversationRepository} from '../../../../../repositories/conversation/ConversationRepository';
+import type {ConversationRepository} from '../../../../../repositories/conversation/conversationRepository';
 
 type GetPropsResult = Promise<{
   props: {

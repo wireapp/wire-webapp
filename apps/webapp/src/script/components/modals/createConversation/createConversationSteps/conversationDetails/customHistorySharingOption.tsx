@@ -1,0 +1,57 @@
+/*
+ * Wire
+ * Copyright (C) 2025 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import type {FunctionComponent} from 'react';
+
+import {
+  customHistorySharingOptionContainerCss,
+  customHistorySharingOptionLeftSectionCss,
+  customHistorySharingOptionIconCss,
+} from './conversationDetails.styles';
+import {UpgradeBadge} from './upgradeBadge';
+
+import {ChevronIcon} from '../../../../../uiKit/dataDisplay/icon/chevronIcon';
+import {Option} from '../../../../../uiKit/inputs/select/select';
+import {FlexBox} from '../../../../../uiKit/layout/flexBox/flexBox';
+import {useCreateConversationModal} from '../../hooks/useCreateConversationModal';
+import {ChatHistory} from '../../types';
+
+interface ChatHistorySharingOptionProps {
+  option: Option;
+  isPremiumUser: boolean;
+}
+
+export const CustomHistorySharingOption: FunctionComponent<ChatHistorySharingOptionProps> = ({
+  option,
+  isPremiumUser,
+}: ChatHistorySharingOptionProps) => {
+  const {chatHistory} = useCreateConversationModal();
+
+  return (
+    <FlexBox css={customHistorySharingOptionContainerCss}>
+      {option.label}
+      {option.value === ChatHistory.Custom && chatHistory !== ChatHistory.Custom && (
+        <FlexBox css={customHistorySharingOptionLeftSectionCss}>
+          {!isPremiumUser && <UpgradeBadge />}
+          <ChevronIcon css={customHistorySharingOptionIconCss} />
+        </FlexBox>
+      )}
+    </FlexBox>
+  );
+};

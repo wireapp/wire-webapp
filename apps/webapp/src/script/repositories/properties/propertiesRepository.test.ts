@@ -19,8 +19,8 @@
 
 import {objectHasOwn} from 'ts-extras';
 
-import {User} from '../entity/User';
-import type {SelfService} from '../self/SelfService';
+import {User} from '../entity/user';
+import type {SelfService} from '../self/selfService';
 import type {APIClient} from '../../service/apiClientSingleton';
 import {translateForTest} from '../../util/test/translateForTest';
 

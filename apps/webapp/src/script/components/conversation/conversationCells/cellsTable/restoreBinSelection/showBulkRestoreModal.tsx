@@ -21,7 +21,7 @@ import type {RestoreTarget} from './resolveRestoreTargets';
 
 import type {RootContextValue} from '../../../../../page/rootProvider';
 import type {CellNode} from '../../../../../types/cellNode';
-import {PrimaryModal} from '../../../../Modals/PrimaryModal';
+import {PrimaryModal} from '../../../../modals/primaryModal';
 import {showRestoreNestedNodeModal} from '../cellsTableColumns/cellsTableRowOptions/showRestoreNestedNodeModal/showRestoreNestedNodeModal';
 import {showRestoreRootNodeModal} from '../cellsTableColumns/cellsTableRowOptions/showRestoreRootNodeModal/showRestoreRootNodeModal';
 

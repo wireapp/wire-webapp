@@ -22,7 +22,7 @@ import {ThemeProvider} from '../../../uiKit/identity/theme/theme';
 import {container} from 'tsyringe';
 
 import en from '../../../../i18n/en-US.json';
-import {User} from '../../../repositories/entity/User';
+import {User} from '../../../repositories/entity/user';
 import {UserState} from '../../../repositories/user/userState';
 import {useMeetingPrepModal} from '../meetingPrep/useMeetingPrepModal';
 import {useJoinMeetingCall} from '../useJoinMeetingCall';

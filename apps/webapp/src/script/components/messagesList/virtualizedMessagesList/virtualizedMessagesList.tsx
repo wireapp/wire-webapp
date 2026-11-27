@@ -29,8 +29,8 @@ import {useScrollMessages} from './useScrollMessages';
 
 import {useRoveFocus} from '../../../hooks/useRoveFocus';
 import {useApplicationContext} from '../../../page/rootProvider';
-import {MessageRepository} from '../../../repositories/conversation/MessageRepository';
-import {Conversation} from '../../../repositories/entity/Conversation';
+import {MessageRepository} from '../../../repositories/conversation/messageRepository';
+import {Conversation} from '../../../repositories/entity/conversation';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {MarkerComponent} from '../message/marker';
 import {Message} from '../message/virtualizedMessage';

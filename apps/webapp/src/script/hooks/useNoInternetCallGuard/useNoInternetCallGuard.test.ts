@@ -19,7 +19,7 @@
 
 import {act, renderHook} from '@testing-library/react';
 
-import {PrimaryModal} from '../../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../../components/modals/primaryModal';
 import type {TranslationKey} from '../../util/localizerUtil';
 
 import {useNoInternetCallGuard} from './useNoInternetCallGuard';
@@ -28,7 +28,7 @@ import {useWarningsState} from '../../viewModel/warningsContainer/warningsState'
 import {TYPE} from '../../viewModel/warningsContainer/warningsTypes';
 
 jest.mock('../../viewModel/warningsContainer/warningsState');
-jest.mock('../../components/Modals/PrimaryModal', () => {
+jest.mock('../../components/modals/primaryModal', () => {
   return {
     PrimaryModal: {
       type: {ACKNOWLEDGE: 'ACKNOWLEDGE'},

@@ -29,12 +29,12 @@ import {CallLogsUploadSettings} from './callLogsUploadSettings';
 import {wrapperStyles} from './configToolbar.styles';
 import {openDebugToolbarEventName} from './debugToolbarEvents';
 
-import {Config, Configuration} from '../../Config';
+import {Config, Configuration} from '../../config';
 import {StartupFeatureToggleName, startupFeatureToggleNames} from '../../featureToggles/startupFeatureToggleNames';
 import {updateLocationSearchForStartupFeatureToggle} from '../../featureToggles/startupFeatureToggleQueryParameters';
 import {useClickOutside} from '../../hooks/useClickOutside';
 import {useApplicationContext} from '../../page/rootProvider';
-import {ConversationState} from '../../repositories/conversation/ConversationState';
+import {ConversationState} from '../../repositories/conversation/conversationState';
 import {Button} from '../../uiKit/inputs/button/button';
 import {Input} from '../../uiKit/inputs/input/input';
 import {Switch} from '../../uiKit/inputs/switch/switch';

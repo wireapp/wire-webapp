@@ -23,8 +23,8 @@ import {CONVERSATION_PROTOCOL, FEATURE_STATUS} from '../../apiClient/team/featur
 import {Maybe, task} from 'true-myth';
 import {asyncNoop, noop} from 'noop-esm';
 
-import {ConversationMapper} from '../../repositories/conversation/ConversationMapper';
-import {Conversation} from '../../repositories/entity/Conversation';
+import {ConversationMapper} from '../../repositories/conversation/conversationMapper';
+import {Conversation} from '../../repositories/entity/conversation';
 import {translateForTest} from '../../util/test/translateForTest';
 
 import {canManuallyMigrateConversation, manuallyMigrateConversation} from './manualMigration';

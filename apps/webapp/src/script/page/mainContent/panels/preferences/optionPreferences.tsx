@@ -26,9 +26,9 @@ import {PreferencesSection} from './components/preferencesSection';
 
 import {Theme} from '../../../../components/appContainer/hooks/useTheme';
 import {RadioGroup} from '../../../../components/radio';
-import {Config} from '../../../../Config';
+import {Config} from '../../../../config';
 import {RootFontSize, useRootFontSize} from '../../../../hooks/useRootFontSize';
-import {User} from '../../../../repositories/entity/User';
+import {User} from '../../../../repositories/entity/user';
 import {PropertiesRepository} from '../../../../repositories/properties/propertiesRepository';
 import {PROPERTIES_TYPE} from '../../../../repositories/properties/propertiesType';
 import {Checkbox, CheckboxLabel} from '../../../../uiKit/inputs/checkbox/checkbox';

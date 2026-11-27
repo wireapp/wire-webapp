@@ -31,9 +31,9 @@ import {ClientClassification} from '../../apiClient/client/clientClassification'
 import {useUserIdentity} from '../../hooks/useDeviceIdentities';
 import {useApplicationContext} from '../../page/rootProvider';
 import {ClientRepository, ClientEntity} from '../../repositories/client';
-import {MessageRepository} from '../../repositories/conversation/MessageRepository';
-import {CryptographyRepository} from '../../repositories/cryptography/CryptographyRepository';
-import {User} from '../../repositories/entity/User';
+import {MessageRepository} from '../../repositories/conversation/messageRepository';
+import {CryptographyRepository} from '../../repositories/cryptography/cryptographyRepository';
+import {User} from '../../repositories/entity/user';
 import {partition} from '../../util/arrayUtil';
 import {getLogger} from '../../util/logger';
 import {capitalizeFirstChar} from '../../util/stringUtil';

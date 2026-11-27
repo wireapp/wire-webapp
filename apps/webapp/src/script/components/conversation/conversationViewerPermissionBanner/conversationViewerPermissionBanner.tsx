@@ -25,7 +25,7 @@ import {
   isConversationViewerPermissionBannerDismissed,
 } from './conversationViewerPermissionBannerStorage';
 
-import {Config} from '../../../Config';
+import {Config} from '../../../config';
 import {useApplicationContext} from '../../../page/rootProvider';
 import {CloseIcon} from '../../../uiKit/dataDisplay/icon/closeIcon';
 

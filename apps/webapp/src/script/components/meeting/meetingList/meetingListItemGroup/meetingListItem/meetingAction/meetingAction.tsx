@@ -23,7 +23,7 @@ import {getMeetingActionEntries} from './getMeetingActionEntries';
 import {iconContainerStyle, iconStyles} from './meetingAction.styles';
 
 import {useApplicationContext} from '../../../../../../page/rootProvider';
-import type {User} from '../../../../../../repositories/entity/User';
+import type {User} from '../../../../../../repositories/entity/user';
 import {showContextMenu} from '../../../../../../ui/contextMenu';
 import {MoreIcon} from '../../../../../../uiKit/dataDisplay/icon/moreIcon';
 import {IconButton} from '../../../../../../uiKit/inputs/iconButton/iconButton';

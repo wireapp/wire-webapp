@@ -40,18 +40,18 @@ import {ClientMLSError, ClientMLSErrorLabel} from '../../core/messagingProtocols
 import {pendingOnboardingStatusFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
 import {SidebarTabs, useSidebarStore} from '../../page/leftSidebar/panels/conversations/useSidebarStore';
 import {useApplicationContext} from '../../page/rootProvider';
-import {ACCESS_STATE} from '../../repositories/conversation/AccessState';
-import type {ConversationRoleRepository} from '../../repositories/conversation/ConversationRoleRepository';
-import {ConversationState} from '../../repositories/conversation/ConversationState';
-import {Conversation} from '../../repositories/entity/Conversation';
-import type {User} from '../../repositories/entity/User';
-import {TeamState} from '../../repositories/team/TeamState';
+import {ACCESS_STATE} from '../../repositories/conversation/accessState';
+import type {ConversationRoleRepository} from '../../repositories/conversation/conversationRoleRepository';
+import {ConversationState} from '../../repositories/conversation/conversationState';
+import {Conversation} from '../../repositories/entity/conversation';
+import type {User} from '../../repositories/entity/user';
+import {TeamState} from '../../repositories/team/teamState';
 import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {matchQualifiedIds} from '../../util/qualifiedId';
 import type {ActionsViewModel} from '../../viewModel/actionsViewModel';
 import {WebAppEvents} from '../../webAppEvents';
 import * as Icon from '../icon';
-import {PrimaryModal} from '../Modals/PrimaryModal';
+import {PrimaryModal} from '../modals/primaryModal';
 
 export enum Actions {
   ACCEPT_REQUEST = 'UserActions.ACCEPT_REQUEST',

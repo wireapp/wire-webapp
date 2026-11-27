@@ -19,7 +19,7 @@
 
 import {render} from '@testing-library/react';
 
-import {Config} from '../../../../../Config';
+import {Config} from '../../../../../config';
 import {withThemeAndRootContext} from '../../../../../auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
@@ -27,7 +27,7 @@ import {
 } from '../../../../testSupport/rootContextTestSupport';
 import {setStrings, translate} from '../../../../../util/localizerUtil';
 
-import type {MediaStreamHandler} from '../../../../../repositories/media/MediaStreamHandler';
+import type {MediaStreamHandler} from '../../../../../repositories/media/mediaStreamHandler';
 
 import en from '../../../../../../i18n/en-US.json';
 

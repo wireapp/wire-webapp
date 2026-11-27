@@ -35,7 +35,7 @@ import type {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {runClientVersionCheck} from '../../applicationPeriodicChecks/runClientVersionCheck';
 import {startApplicationPeriodicChecks} from '../../applicationPeriodicChecks/startApplicationPeriodicChecks';
 import {SIGN_OUT_REASON} from '../../auth/signOutReason';
-import {Config, Configuration} from '../../Config';
+import {Config, Configuration} from '../../config';
 import {markAsUnreadFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
 import {StartupFeatureToggleName} from '../../featureToggles/startupFeatureToggles';
 import {useAppSoftLock} from '../../hooks/useAppSoftLock';
@@ -59,9 +59,9 @@ import {MainViewModel} from '../../viewModel/mainViewModel';
 import {WebAppEvents} from '../../webAppEvents';
 import {AppLoader} from '../appLoader/index';
 import {MeetingStoreRoot} from '../meeting/meetingStore/meetingStoreRoot';
-import {LeaveGroupAdminModal} from '../Modals/LeaveGroupAdminModal/LeaveGroupAdminModal';
-import {PrimaryModalComponent} from '../Modals/PrimaryModal/PrimaryModal';
-import {QualityFeedbackModal} from '../Modals/QualityFeedbackModal';
+import {LeaveGroupAdminModal} from '../modals/leaveGroupAdminModal/leaveGroupAdminModal';
+import {PrimaryModalComponent} from '../modals/primaryModal/primaryModal';
+import {QualityFeedbackModal} from '../modals/qualityFeedbackModal';
 
 type AppProps = {
   readonly downloadApplicationLogs: Maybe<ApplicationLogDownload>;

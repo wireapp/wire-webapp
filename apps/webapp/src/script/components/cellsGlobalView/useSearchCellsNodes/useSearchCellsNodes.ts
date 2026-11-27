@@ -27,7 +27,7 @@ import {getConversationsFromNodes} from './getConversationsFromNodes';
 import {getUsersFromNodes} from './getUsersFromNodes';
 
 import {CellsRepository} from '../../../repositories/cells/cellsRepository';
-import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
+import {ConversationRepository} from '../../../repositories/conversation/conversationRepository';
 import {UserRepository} from '../../../repositories/user/userRepository';
 import {getLogger, Logger} from '../../../util/logger';
 import {transformCellsNodes} from '../../cells/common/transformCellsNodes/transformCellsNodes';

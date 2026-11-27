@@ -27,25 +27,25 @@ import {
   type FeatureList,
 } from '../../../apiClient/team/feature/featureList.types';
 import {UserType} from '../../../apiClient/user/user';
-import {Config} from '../../../Config';
+import {Config} from '../../../config';
 import {driveOffboardingFeatureToggleName} from '../../../featureToggles/startupFeatureToggleNames';
 
 import {CellsRepository} from '../../../repositories/cells/cellsRepository';
 import {ConnectionEntity} from '../../../repositories/connection/connectionEntity';
 import {ConnectionRepository} from '../../../repositories/connection/connectionRepository';
-import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
-import {ConversationMapper} from '../../../repositories/conversation/ConversationMapper';
-import {ConversationRoleRepository} from '../../../repositories/conversation/ConversationRoleRepository';
-import {MessageRepository} from '../../../repositories/conversation/MessageRepository';
-import {Conversation} from '../../../repositories/entity/Conversation';
-import {User} from '../../../repositories/entity/User';
-import {IntegrationRepository} from '../../../repositories/integration/IntegrationRepository';
-import {ServiceEntity} from '../../../repositories/integration/ServiceEntity';
+import {ConversationRepository} from '../../../repositories/conversation/conversationRepository';
+import {ConversationMapper} from '../../../repositories/conversation/conversationMapper';
+import {ConversationRoleRepository} from '../../../repositories/conversation/conversationRoleRepository';
+import {MessageRepository} from '../../../repositories/conversation/messageRepository';
+import {Conversation} from '../../../repositories/entity/conversation';
+import {User} from '../../../repositories/entity/user';
+import {IntegrationRepository} from '../../../repositories/integration/integrationRepository';
+import {ServiceEntity} from '../../../repositories/integration/serviceEntity';
 import {SearchRepository} from '../../../repositories/search/searchRepository';
-import {SelfRepository} from '../../../repositories/self/SelfRepository';
-import {TeamEntity} from '../../../repositories/team/TeamEntity';
-import {TeamRepository} from '../../../repositories/team/TeamRepository';
-import {TeamState} from '../../../repositories/team/TeamState';
+import {SelfRepository} from '../../../repositories/self/selfRepository';
+import {TeamEntity} from '../../../repositories/team/teamEntity';
+import {TeamRepository} from '../../../repositories/team/teamRepository';
+import {TeamState} from '../../../repositories/team/teamState';
 import {UserState} from '../../../repositories/user/userState';
 import {
   createRootContextValueForTest,
@@ -58,7 +58,7 @@ import {createUuid} from '../../../util/uuid';
 
 import {ConversationDetails} from './conversationDetails';
 
-import {TestFactory} from '../../../../../test/helper/TestFactory';
+import {TestFactory} from '../../../../../test/helper/testFactory';
 import {ActionsViewModel} from '../../../viewModel/actionsViewModel';
 import {MainViewModel} from '../../../viewModel/mainViewModel';
 import {withThemeAndRootContext} from '../../../auth/util/test/testUtil';

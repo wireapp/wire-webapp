@@ -36,7 +36,7 @@ import {
 import {BackendError} from '../../../../apiClient/http/backendError';
 import {BackendErrorLabel} from '../../../../apiClient/http/backendErrorLabel';
 import {StatusCode} from '../../../../apiClient/http';
-import {TimeInMillis} from '../../../../commons/util/TimeUtil';
+import {TimeInMillis} from '../../../../commons/util/timeUtil';
 import {Decoder} from '../../../../commons/base64/decoder';
 
 import {randomUUID, UUID} from 'crypto';

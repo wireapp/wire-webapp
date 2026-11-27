@@ -28,9 +28,9 @@ import {CallingViewModel} from './callingViewModel';
 import {ContentViewModel} from './contentViewModel';
 import type {MainViewModel, ViewModelRepositories} from './mainViewModel';
 
-import {Runtime} from '../commons/util/Runtime';
-import {PrimaryModal, usePrimaryModalState} from '../components/Modals/PrimaryModal';
-import {Config} from '../Config';
+import {Runtime} from '../commons/util/runtime';
+import {PrimaryModal, usePrimaryModalState} from '../components/modals/primaryModal';
+import {Config} from '../config';
 import {
   getConversationListTab,
   SidebarTabs,
@@ -39,15 +39,15 @@ import {
 import {PanelState} from '../page/rightSidebar';
 import {useAppMainState} from '../page/state';
 import {ContentState, ListState, useAppState} from '../page/useAppState';
-import type {CallingRepository} from '../repositories/calling/CallingRepository';
-import type {ConversationRepository} from '../repositories/conversation/ConversationRepository';
-import {ConversationState} from '../repositories/conversation/ConversationState';
-import type {Conversation} from '../repositories/entity/Conversation';
-import type {User} from '../repositories/entity/User';
+import type {CallingRepository} from '../repositories/calling/callingRepository';
+import type {ConversationRepository} from '../repositories/conversation/conversationRepository';
+import {ConversationState} from '../repositories/conversation/conversationState';
+import type {Conversation} from '../repositories/entity/conversation';
+import type {User} from '../repositories/entity/user';
 import {PropertiesRepository} from '../repositories/properties/propertiesRepository';
 import {SearchRepository} from '../repositories/search/searchRepository';
-import type {TeamRepository} from '../repositories/team/TeamRepository';
-import {TeamState} from '../repositories/team/TeamState';
+import type {TeamRepository} from '../repositories/team/teamRepository';
+import {TeamState} from '../repositories/team/teamState';
 import {UserState} from '../repositories/user/userState';
 import {setHistoryParam} from '../router/router';
 import {showContextMenu} from '../ui/contextMenu';

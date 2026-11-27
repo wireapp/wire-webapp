@@ -33,7 +33,7 @@ import {useScheduleMeetingModal} from './useScheduleMeetingModal';
 
 import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import {useApplicationContext, useMainViewModel} from '../../../page/rootProvider';
-import type {User} from '../../../repositories/entity/User';
+import type {User} from '../../../repositories/entity/user';
 import {mapScheduleFormToMeetingCommand} from '../mapScheduleFormToMeetingCommand';
 import {mapScheduleFormToUpdateMeetingCommand} from '../mapScheduleFormToUpdateMeetingCommand';
 import {useMeetingStore} from '../meetingStore/meetingStoreProvider';

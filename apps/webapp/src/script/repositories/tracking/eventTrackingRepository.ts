@@ -34,7 +34,7 @@ import {UserData} from './userData';
 import {HttpClient, LongRunningRetryDetails} from '../../apiClient/http/httpClient';
 import {WebSocketClient} from '../../apiClient/tcp/webSocketClient';
 import {URLParameter} from '../../auth/urlParameter';
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {APIClient} from '../../service/apiClientSingleton';
 import {
   addAllConsentFeatures,
@@ -54,9 +54,9 @@ import {includesString} from '../../util/stringUtil';
 import {getParameter} from '../../util/urlUtil';
 import {createUuid} from '../../util/uuid';
 import {WebAppEvents} from '../../webAppEvents';
-import type {ContributedSegmentations, MessageRepository} from '../conversation/MessageRepository';
-import {ClientEvent} from '../event/Client';
-import {TeamState} from '../team/TeamState';
+import type {ContributedSegmentations, MessageRepository} from '../conversation/messageRepository';
+import {ClientEvent} from '../event/client';
+import {TeamState} from '../team/teamState';
 import {UserState} from '../user/userState';
 
 const TEAM_SIZE_THRESHOLD_VALUE = 6;

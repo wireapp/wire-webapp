@@ -24,9 +24,9 @@ import cx from 'classnames';
 import {closeWarning, useWarningsState} from './warningsState';
 import {CONFIG, TYPE} from './warningsTypes';
 
-import {Runtime} from '../../commons/util/Runtime';
+import {Runtime} from '../../commons/util/runtime';
 import * as Icon from '../../components/icon';
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {useApplicationContext} from '../../page/rootProvider';
 import {createReactTranslationMarker, renderReactTranslation} from '../../util/localizerUtil/reactLocalizerUtil';
 import type {Translate} from '../../util/localizerUtil/translationTypes';

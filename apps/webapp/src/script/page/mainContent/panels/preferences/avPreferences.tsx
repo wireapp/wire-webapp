@@ -33,11 +33,11 @@ import {useCameraReloadOnCallEnd} from './useCameraReloadOnCallEnd';
 
 import {sendCallLogsFeatureToggleName} from '../../../../featureToggles/startupFeatureToggleNames';
 import {useInitializeMediaDevices} from '../../../../hooks/useInitializeMediaDevices';
-import type {CallingRepository} from '../../../../repositories/calling/CallingRepository';
-import {MediaConstraintsHandler} from '../../../../repositories/media/MediaConstraintsHandler';
-import {MediaDevicesHandler} from '../../../../repositories/media/MediaDevicesHandler';
-import type {MediaDeviceType} from '../../../../repositories/media/MediaDeviceType';
-import {MediaStreamHandler} from '../../../../repositories/media/MediaStreamHandler';
+import type {CallingRepository} from '../../../../repositories/calling/callingRepository';
+import {MediaConstraintsHandler} from '../../../../repositories/media/mediaConstraintsHandler';
+import {MediaDevicesHandler} from '../../../../repositories/media/mediaDevicesHandler';
+import type {MediaDeviceType} from '../../../../repositories/media/mediaDeviceType';
+import {MediaStreamHandler} from '../../../../repositories/media/mediaStreamHandler';
 import type {PropertiesRepository} from '../../../../repositories/properties/propertiesRepository';
 import {useApplicationContext} from '../../../rootProvider';
 

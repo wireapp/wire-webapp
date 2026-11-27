@@ -27,8 +27,8 @@ import {useMeetingParticipants} from './useMeetingParticipants';
 
 import type {QualifiedId} from '../../../../../../apiClient/user/qualifiedId';
 import {useApplicationContext} from '../../../../../../page/rootProvider';
-import type {Conversation} from '../../../../../../repositories/entity/Conversation';
-import type {User} from '../../../../../../repositories/entity/User';
+import type {Conversation} from '../../../../../../repositories/entity/conversation';
+import type {User} from '../../../../../../repositories/entity/user';
 import {matchQualifiedIds} from '../../../../../../util/qualifiedId';
 import {StackedAvatars} from '../../../../../avatar';
 

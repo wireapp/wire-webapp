@@ -26,12 +26,12 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from '../../../testSupport/rootContextTestSupport';
-import {ConversationState} from '../../../../repositories/conversation/ConversationState';
-import {User} from '../../../../repositories/entity/User';
+import {ConversationState} from '../../../../repositories/conversation/conversationState';
+import {User} from '../../../../repositories/entity/user';
 import {SearchRepository} from '../../../../repositories/search/searchRepository';
-import {TeamEntity} from '../../../../repositories/team/TeamEntity';
-import {TeamRepository} from '../../../../repositories/team/TeamRepository';
-import {TeamState} from '../../../../repositories/team/TeamState';
+import {TeamEntity} from '../../../../repositories/team/teamEntity';
+import {TeamRepository} from '../../../../repositories/team/teamRepository';
+import {TeamState} from '../../../../repositories/team/teamState';
 import {UserState} from '../../../../repositories/user/userState';
 import {translateForTest} from '../../../../util/test/translateForTest';
 

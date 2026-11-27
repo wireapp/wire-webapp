@@ -24,7 +24,7 @@ yalc.lock
 /playwright-report/
 /blob-report/
 /playwright/.cache/
-/test/e2e_tests/.env
+/test/e2eTests/.env
 
 apps/server/dist/
 apps/server/build/

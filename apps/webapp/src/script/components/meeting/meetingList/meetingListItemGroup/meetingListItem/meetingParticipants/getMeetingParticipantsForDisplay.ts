@@ -20,7 +20,7 @@
 import {isNullOrUndefined} from '@sindresorhus/is';
 
 import type {QualifiedId} from '../../../../../../apiClient/user/qualifiedId';
-import type {User} from '../../../../../../repositories/entity/User';
+import type {User} from '../../../../../../repositories/entity/user';
 import {matchQualifiedIds} from '../../../../../../util/qualifiedId';
 
 export const getMeetingParticipantsForDisplay = (

@@ -22,11 +22,11 @@ import userEvent from '@testing-library/user-event';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {ConversationRepository} from '../../../../../repositories/conversation/ConversationRepository';
-import {ConversationLabelRepository} from '../../../../../repositories/conversation/ConversationLabelRepository';
-import {User} from '../../../../../repositories/entity/User';
-import {TeamState} from '../../../../../repositories/team/TeamState';
-import {Config} from '../../../../../Config';
+import {ConversationRepository} from '../../../../../repositories/conversation/conversationRepository';
+import {ConversationLabelRepository} from '../../../../../repositories/conversation/conversationLabelRepository';
+import {User} from '../../../../../repositories/entity/user';
+import {TeamState} from '../../../../../repositories/team/teamState';
+import {Config} from '../../../../../config';
 import {Core} from '../../../../../service/coreSingleton';
 import {withThemeAndRootContext} from '../../../../../auth/util/test/testUtil';
 import {

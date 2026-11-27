@@ -20,8 +20,8 @@
 import {fireEvent, render} from '@testing-library/react';
 import ko from 'knockout';
 
-import type {Conversation} from '../../../../repositories/entity/Conversation';
-import {TeamState} from '../../../../repositories/team/TeamState';
+import type {Conversation} from '../../../../repositories/entity/conversation';
+import {TeamState} from '../../../../repositories/team/teamState';
 import {translateForTest} from '../../../../util/test/translateForTest';
 import {
   createRootContextValueForTest,

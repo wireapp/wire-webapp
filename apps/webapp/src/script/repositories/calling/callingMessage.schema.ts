@@ -20,7 +20,7 @@
 import {Maybe, Result, result} from 'true-myth';
 import {z} from 'zod/v3';
 
-import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
+import {CALL_MESSAGE_TYPE} from './enum/callMessageType';
 
 const MAX_IDENTIFIER_LENGTH = 127;
 const MAX_DOMAIN_LENGTH = 253;

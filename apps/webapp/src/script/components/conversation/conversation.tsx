@@ -59,7 +59,7 @@ import {checkFileSharingPermission} from './utils/checkFileSharingPermission';
 import {parseAccountDeepLink} from './utils/parseAccountDeepLink';
 
 import {CONVERSATION_CELLS_STATE} from '../../apiClient/conversation/conversation';
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {UserError} from '../../error/userError';
 import {
   driveBulkActionProgressFeatureToggleName,
@@ -71,18 +71,18 @@ import {MotionDuration} from '../../motion/motionDuration';
 import {RightSidebarParams} from '../../page/appMain';
 import {PanelState} from '../../page/rightSidebar';
 import {useApplicationContext, useMainViewModel} from '../../page/rootProvider';
-import {CallState} from '../../repositories/calling/CallState';
+import {CallState} from '../../repositories/calling/callState';
 import {createCellsRepositoryGateway} from '../../repositories/cells/cellsRepositoryGateway';
 import {createCellsUploadManager} from '../../repositories/cells/upload/manager';
-import {ConversationState} from '../../repositories/conversation/ConversationState';
-import {Conversation as ConversationEntity} from '../../repositories/entity/Conversation';
+import {ConversationState} from '../../repositories/conversation/conversationState';
+import {Conversation as ConversationEntity} from '../../repositories/entity/conversation';
 import {ContentMessage} from '../../repositories/entity/message/contentMessage';
 import {DecryptErrorMessage} from '../../repositories/entity/message/decryptErrorMessage';
 import {MemberMessage} from '../../repositories/entity/message/memberMessage';
 import {Message} from '../../repositories/entity/message/message';
-import {User} from '../../repositories/entity/User';
-import {ServiceEntity} from '../../repositories/integration/ServiceEntity';
-import {TeamState} from '../../repositories/team/TeamState';
+import {User} from '../../repositories/entity/user';
+import {ServiceEntity} from '../../repositories/integration/serviceEntity';
+import {TeamState} from '../../repositories/team/teamState';
 import {useMatchMedia} from '../../uiKit/layout/matchMedia/matchMedia';
 import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {isLastReceivedMessage} from '../../util/conversationMessages';
@@ -98,10 +98,10 @@ import {Giphy} from '../giphy';
 import {InputBar} from '../inputBar';
 import {ElementType, MessageDetails} from '../messagesList/message/contentMessage/asset/textMessageRenderer';
 import {MessageListWrapper} from '../messagesList/messageListWrapper';
-import {showDetailViewModal} from '../Modals/DetailViewModal';
-import {PrimaryModal} from '../Modals/PrimaryModal';
-import {showUserModal} from '../Modals/UserModal';
-import {showWarningModal} from '../Modals/utils/showWarningModal';
+import {showDetailViewModal} from '../modals/detailViewModal';
+import {PrimaryModal} from '../modals/primaryModal';
+import {showUserModal} from '../modals/userModal';
+import {showWarningModal} from '../modals/utils/showWarningModal';
 import {TitleBar} from '../titleBar';
 
 interface ConversationProps {

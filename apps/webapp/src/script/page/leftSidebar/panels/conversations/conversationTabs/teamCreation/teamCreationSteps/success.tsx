@@ -24,7 +24,7 @@ import {amplify} from 'amplify';
 import {StepProps} from './stepProps';
 import {listCss, modalButtonsCss, successStepSubHeaderCss} from './teamCreationSteps.styles';
 
-import {Config} from '../../../../../../../Config';
+import {Config} from '../../../../../../../config';
 import {EventName} from '../../../../../../../repositories/tracking/eventName';
 import {Segmentation} from '../../../../../../../repositories/tracking/segmentation';
 import {Button, ButtonVariant} from '../../../../../../../uiKit/inputs/button/button';

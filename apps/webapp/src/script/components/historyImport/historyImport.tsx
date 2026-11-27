@@ -23,7 +23,7 @@ import {isNonEmptyString} from '@sindresorhus/is';
 
 import {BackupFileUpload} from './backupFileUpload';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {MotionDuration} from '../../motion/motionDuration';
 import {useApplicationContext} from '../../page/rootProvider';
 import {ContentState} from '../../page/useAppState';
@@ -35,13 +35,13 @@ import {
   IncompatibleBackupFormatError,
   InvalidPassword,
 } from '../../repositories/backup/error';
-import {User} from '../../repositories/entity/User';
+import {User} from '../../repositories/entity/user';
 import {Button, ButtonVariant} from '../../uiKit/inputs/button/button';
 import {checkBackupEncryption} from '../../util/backupUtil';
 import {getLogger} from '../../util/logger';
 import {loadFileBuffer} from '../../util/util';
 import * as Icon from '../icon';
-import {PrimaryModal} from '../Modals/PrimaryModal';
+import {PrimaryModal} from '../modals/primaryModal';
 import {ProgressBar} from '../progressBar/progressBar';
 
 export enum HistoryImportState {

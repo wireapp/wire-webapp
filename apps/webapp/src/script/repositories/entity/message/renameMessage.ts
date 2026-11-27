@@ -27,7 +27,7 @@ import {SystemMessageType} from '../../../message/systemMessageType';
 import {type Translate} from '../../../util/localizerUtil';
 import {matchQualifiedIds} from '../../../util/qualifiedId';
 import {UserState} from '../../user/userState';
-import {User} from '../User';
+import {User} from '../user';
 
 export class RenameMessage extends SystemMessage {
   public readonly name: string;

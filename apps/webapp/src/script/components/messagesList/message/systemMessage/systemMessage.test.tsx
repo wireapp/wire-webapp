@@ -30,7 +30,7 @@ import {translateForTest} from '../../../../util/test/translateForTest';
 
 import {SystemMessage} from './systemMessage';
 import {SystemMessageBase} from './systemMessageBase';
-import {Config} from '../../../../Config';
+import {Config} from '../../../../config';
 import {withTheme} from '../../../../auth/util/test/testUtil';
 
 jest.mock('../../../icon', () => {

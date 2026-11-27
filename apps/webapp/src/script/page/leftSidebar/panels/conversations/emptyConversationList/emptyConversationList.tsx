@@ -24,7 +24,7 @@ import {amplify} from 'amplify';
 
 import {button, paragraph, paragraphBold, paragraphGray, seperator, wrapper} from './emptyConversationList.styles';
 
-import {Config} from '../../../../../Config';
+import {Config} from '../../../../../config';
 import {Button, ButtonVariant} from '../../../../../uiKit/inputs/button/button';
 import {Link, LinkVariant} from '../../../../../uiKit/typography/link/link';
 import {WebAppEvents} from '../../../../../webAppEvents';

@@ -29,7 +29,7 @@ import {LanguageState, initialLanguageState, languageReducer} from './languageRe
 import {SelfState, initialSelfState, selfReducer} from './selfReducer';
 
 import type {APIClient} from '../../../apiClient/apiClient';
-import type {Configuration} from '../../../Config';
+import type {Configuration} from '../../../config';
 import type {Account} from '../../../core';
 import type {ActionRoot} from '../action';
 

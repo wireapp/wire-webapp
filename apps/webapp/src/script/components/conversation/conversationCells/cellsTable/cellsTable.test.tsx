@@ -26,11 +26,11 @@ import {noop} from 'noop-esm';
 import {BackendError} from '../../../../apiClient/http/backendError';
 import {StatusCode} from '../../../../apiClient/http';
 import {ThemeProvider, themes, THEME_ID} from '../../../../uiKit/identity/theme/theme';
-import {PrimaryModalComponent} from '../../../Modals/PrimaryModal/PrimaryModal';
+import {PrimaryModalComponent} from '../../../modals/primaryModal/primaryModal';
 import {JobsTaskStatus, RestActionStatus} from 'cells-sdk-ts';
 import {Maybe} from 'true-myth';
 import {CellsRepository} from '../../../../repositories/cells/cellsRepository';
-import type {Conversation} from '../../../../repositories/entity/Conversation';
+import type {Conversation} from '../../../../repositories/entity/conversation';
 import {
   createExecutingFireAndForgetInvokerForTest,
   createRootContextValueForTest,

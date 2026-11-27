@@ -15,13 +15,13 @@
   "include": [
     "playwright.config.ts",
     "playwright.rspack.config.ts",
-    "test/e2e_tests/playwright-globals.d.ts",
-    "test/e2e_tests/**/*.ts",
-    "test/e2e_tests/**/*.tsx",
-    "test/rspack-smoke/browser-smoke.ts",
-    "test/rspack-smoke/origin-private-file-system-browser-smoke.ts",
-    "test/rspack-smoke/rspackSmokeAssetPathResolver.ts",
-    "test/rspack-smoke/server.ts"
+    "test/e2eTests/playwrightGlobals.d.ts",
+    "test/e2eTests/**/*.ts",
+    "test/e2eTests/**/*.tsx",
+    "test/rspackSmoke/browserSmoke.ts",
+    "test/rspackSmoke/originPrivateFileSystemBrowserSmoke.ts",
+    "test/rspackSmoke/rspackSmokeAssetPathResolver.ts",
+    "test/rspackSmoke/server.ts"
   ],
   "exclude": ["node_modules"]
 }

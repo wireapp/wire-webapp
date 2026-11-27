@@ -26,14 +26,14 @@ import {pendingOnboardingStatusFeatureToggleName} from '../../featureToggles/sta
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {PrimaryModalComponent} from '../Modals/PrimaryModal/PrimaryModal';
+import {PrimaryModalComponent} from '../modals/primaryModal/primaryModal';
 import {ConnectionEntity} from '../../repositories/connection/connectionEntity';
-import {ConversationRoleRepository} from '../../repositories/conversation/ConversationRoleRepository';
-import {ConversationState} from '../../repositories/conversation/ConversationState';
-import {Conversation} from '../../repositories/entity/Conversation';
-import {User} from '../../repositories/entity/User';
-import {TeamEntity} from '../../repositories/team/TeamEntity';
-import {TeamState} from '../../repositories/team/TeamState';
+import {ConversationRoleRepository} from '../../repositories/conversation/conversationRoleRepository';
+import {ConversationState} from '../../repositories/conversation/conversationState';
+import {Conversation} from '../../repositories/entity/conversation';
+import {User} from '../../repositories/entity/user';
+import {TeamEntity} from '../../repositories/team/teamEntity';
+import {TeamState} from '../../repositories/team/teamState';
 import {UserState} from '../../repositories/user/userState';
 import {withTheme, withThemeAndRootContext} from '../../auth/util/test/testUtil';
 import {translateForTest} from '../../util/test/translateForTest';

@@ -32,7 +32,7 @@ import {
   startsWith,
   transliterationIndex,
 } from '../../util/stringUtil';
-import type {User} from '../entity/User';
+import type {User} from '../entity/user';
 import {validateHandle} from '../user/userHandleGenerator';
 import type {UserRepository} from '../user/userRepository';
 

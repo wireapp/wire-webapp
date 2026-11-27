@@ -25,7 +25,7 @@ import {conversationIconStyles, conversationListStyles} from './meetingParticipa
 import {getConversationKey} from './participantPickerUtils';
 
 import {useApplicationContext} from '../../../page/rootProvider';
-import type {Conversation} from '../../../repositories/entity/Conversation';
+import type {Conversation} from '../../../repositories/entity/conversation';
 import {ChevronDownIcon} from '../../../uiKit/dataDisplay/icon/chevronDownIcon';
 import {Checkbox, CheckboxLabel} from '../../../uiKit/inputs/checkbox/checkbox';
 import {ChannelAvatar} from '../../avatar/channelAvatar';

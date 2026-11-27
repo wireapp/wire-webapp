@@ -1,0 +1,774 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {isNonEmptyArray, isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
+import {amplify} from 'amplify';
+import {task} from 'true-myth';
+import {isDefined, objectEntries, objectHasOwn} from 'ts-extras';
+import {container} from 'tsyringe';
+import {partition} from 'underscore';
+
+import {Availability} from '@wireapp/protocol-messaging';
+
+import {TeamEntity} from './teamEntity';
+import {TeamMapper} from './teamMapper';
+import {TeamMemberEntity} from './teamMemberEntity';
+import {TeamService} from './teamService';
+import {TeamState} from './teamState';
+
+import {ConversationRolesList} from '../../apiClient/conversation/conversationRole';
+import type {
+  TeamConversationDeleteEvent,
+  TeamDeleteEvent,
+  TeamEvent,
+  TeamFeatureConfigurationUpdateEvent,
+  TeamMemberLeaveEvent,
+} from '../../apiClient/event/teamEvent';
+import {TEAM_EVENT} from '../../apiClient/event/teamEvent';
+import {
+  FEATURE_KEY,
+  FeatureList,
+  CONVERSATION_PROTOCOL,
+  FEATURE_STATUS,
+} from '../../apiClient/team/feature/featureList.types';
+import type {PermissionsData} from '../../apiClient/team/member/permissionsData';
+import type {TeamData} from '../../apiClient/team/team/teamData';
+import {QualifiedId} from '../../apiClient/user/qualifiedId';
+import {UserType} from '../../apiClient/user/user';
+import {TypedEventEmitter} from '../../commons/typedEventEmitter/typedEventEmitter';
+import {Runtime} from '../../commons/util/runtime';
+import {PrimaryModal} from '../../components/modals/primaryModal';
+import {Config} from '../../config';
+import {scheduleRecurringTask, updateRemoteConfigLogger} from '../../lifecycle/updateRemoteConfigs';
+import {getMLSMigrationStatus, MLSMigrationStatus} from '../../mls/mlsMigration/migrationStatus';
+import {APIClient} from '../../service/apiClientSingleton';
+import {Environment} from '../../util/environment';
+import {type Translate} from '../../util/localizerUtil';
+import {getLogger, Logger} from '../../util/logger';
+import {TIME_IN_MILLIS} from '../../util/timeUtil';
+import {loadDataUrl} from '../../util/util';
+import {WebAppEvents} from '../../webAppEvents';
+import {AssetRepository} from '../assets/assetRepository';
+import {User} from '../entity/user';
+import {EventSource} from '../event/eventSource';
+import {NOTIFICATION_HANDLING_STATE} from '../event/notificationHandlingState';
+import {IntegrationMapper} from '../integration/integrationMapper';
+import {ServiceEntity} from '../integration/serviceEntity';
+import {ROLE, ROLE as TEAM_ROLE, roleFromTeamPermissions} from '../user/userPermission';
+import {UserRepository} from '../user/userRepository';
+import {UserState} from '../user/userState';
+
+const teamRefreshIntervalInMinutes = 5;
+const minimumDesktopDownloadPathMinorVersion = 20;
+const minimumDesktopDownloadPathMajorVersion = 3;
+type TeamInitializationResult = {team: TeamEntity | undefined; features: FeatureList; members: QualifiedId[]};
+type UpdatedFeatureConfig = {newFeatureList: FeatureList; prevFeatureList?: FeatureList};
+
+export const HAS_PERSISTED_SUPPORTED_PROTOCOLS = 'HAS_PERSISTED_SUPPORTED_PROTOCOLS';
+
+interface AccountInfo {
+  accentID: number;
+  availability?: Availability.Type;
+  name: string;
+  picture?: string;
+  teamID?: string;
+  teamRole: TEAM_ROLE;
+  userID: string;
+}
+
+type Events = {
+  featureConfigUpdated: {
+    prevFeatureList?: FeatureList;
+    newFeatureList: FeatureList;
+  };
+};
+
+export class TeamRepository extends TypedEventEmitter<Events> {
+  private readonly logger: Logger;
+  private readonly teamMapper: TeamMapper;
+  private readonly userRepository: UserRepository;
+  private readonly assetRepository: AssetRepository;
+  private backendSupportsMLS: boolean | null = null;
+
+  private hasPersistedSupportedProtocols: boolean = localStorage.getItem(HAS_PERSISTED_SUPPORTED_PROTOCOLS) === 'true';
+
+  constructor(
+    userRepository: UserRepository,
+    assetRepository: AssetRepository,
+    private readonly onMemberDetete: () => Promise<void>,
+    readonly teamService: TeamService = new TeamService(),
+    private readonly translate: Translate,
+    private readonly userState = container.resolve(UserState),
+    private readonly teamState = container.resolve(TeamState),
+  ) {
+    super();
+    this.logger = getLogger('TeamRepository');
+
+    this.teamMapper = new TeamMapper();
+    this.assetRepository = assetRepository;
+    this.userRepository = userRepository;
+
+    this.userRepository.getTeamMembersFromUsers = this.getTeamMembersFromUsers;
+
+    amplify.subscribe(WebAppEvents.TEAM.EVENT_FROM_BACKEND, this.onTeamEvent);
+    amplify.subscribe(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, this.updateTeamConfig);
+    amplify.subscribe(WebAppEvents.TEAM.UPDATE_INFO, this.sendAccountInfo.bind(this));
+  }
+
+  getRoleBadge(userId: string): string {
+    return this.teamState.isExternal(userId) ? this.translate('rolePartner') : '';
+  }
+
+  isSelfConnectedTo(userId: string): boolean {
+    return (
+      this.teamState.memberRoles()[userId] !== ROLE.PARTNER ||
+      this.teamState.memberInviters()[userId] === this.userState.self().id
+    );
+  }
+
+  private updatePersistedSupportedProtocols(): void {
+    localStorage.setItem(HAS_PERSISTED_SUPPORTED_PROTOCOLS, 'true');
+  }
+
+  /**
+   * Will init the team configuration and all the team members from the contact list.
+   * @param teamId the Id of the team to init
+   * @param contacts all the contacts the self user has, team members will be deduced from it.
+   */
+  async initTeam(teamId?: string): Promise<TeamInitializationResult> {
+    const team = await this.getTeam();
+    // get the fresh feature config from backend
+    const featureResult = await this.getSafeTeamFeatures(true);
+    const newFeatureList = featureResult?.features ?? this.teamState.teamFeatures() ?? {};
+
+    this.teamState.teamFeatures(newFeatureList);
+    if (featureResult !== undefined) {
+      this.teamState.isTeamFeatureConfigFallback(featureResult.usedDefaults);
+    }
+
+    if (newFeatureList[FEATURE_KEY.MLS]?.config?.supportedProtocols?.includes(CONVERSATION_PROTOCOL.MLS) === true) {
+      this.updatePersistedSupportedProtocols();
+    }
+
+    if (
+      this.hasPersistedSupportedProtocols &&
+      !isNullOrUndefined(newFeatureList?.[FEATURE_KEY.MLS]?.config.supportedProtocols)
+    ) {
+      newFeatureList[FEATURE_KEY.MLS].config.supportedProtocols = [
+        CONVERSATION_PROTOCOL.MLS,
+        CONVERSATION_PROTOCOL.PROTEUS,
+      ];
+    }
+
+    if (!isNonEmptyString(teamId)) {
+      return {team: undefined, features: {}, members: []};
+    }
+    // Subscribe to team members change and update the user role and guest status
+    this.teamState.teamMembers.subscribe(members => {
+      this.userRepository.mapGuestStatus(members);
+      const roles = this.teamState.memberRoles();
+      members.forEach(user => {
+        if (isNonEmptyString(roles[user.id])) {
+          user.teamRole(roles[user.id]);
+        }
+      });
+    });
+
+    const members = await this.loadInitialTeamMembers(teamId);
+    await this.scheduleTeamRefresh();
+    return {team, features: newFeatureList, members};
+  }
+
+  private async updateFeatureConfig(): Promise<UpdatedFeatureConfig> {
+    const prevFeatureList = this.teamState.teamFeatures();
+    const featureResult = await this.getSafeTeamFeatures(false);
+    if (featureResult === undefined) {
+      return {newFeatureList: prevFeatureList ?? {}, prevFeatureList};
+    }
+    const newFeatureList = featureResult.features;
+
+    if (
+      this.hasPersistedSupportedProtocols &&
+      !isNullOrUndefined(prevFeatureList?.[FEATURE_KEY.MLS]?.config.supportedProtocols) &&
+      !isNullOrUndefined(newFeatureList?.[FEATURE_KEY.MLS]?.config.supportedProtocols)
+    ) {
+      prevFeatureList[FEATURE_KEY.MLS].config.supportedProtocols = [
+        CONVERSATION_PROTOCOL.MLS,
+        CONVERSATION_PROTOCOL.PROTEUS,
+      ];
+
+      newFeatureList[FEATURE_KEY.MLS].config.supportedProtocols = [
+        CONVERSATION_PROTOCOL.MLS,
+        CONVERSATION_PROTOCOL.PROTEUS,
+      ];
+    }
+
+    this.teamState.teamFeatures(newFeatureList);
+    this.teamState.isTeamFeatureConfigFallback(false);
+
+    this.emit('featureConfigUpdated', {prevFeatureList, newFeatureList});
+
+    if (
+      prevFeatureList?.[FEATURE_KEY.MLS]?.status === FEATURE_STATUS.DISABLED &&
+      newFeatureList?.[FEATURE_KEY.MLS]?.status === FEATURE_STATUS.ENABLED
+    ) {
+      this.updatePersistedSupportedProtocols();
+      this.showReloadAppModal();
+      void this.scheduleReloadAppModal();
+    }
+
+    return {
+      newFeatureList,
+      prevFeatureList,
+    };
+  }
+
+  private async getSafeTeamFeatures(
+    useDefaultsOnError: boolean,
+  ): Promise<{features: FeatureList; usedDefaults: boolean} | undefined> {
+    const previousFeatures = this.teamState.teamFeatures();
+    const featureResult = await task.tryOrElse(
+      error => {
+        return error;
+      },
+      () => {
+        return this.teamService.getAllTeamFeatures();
+      },
+    );
+    if (featureResult.isErr) {
+      this.logger.error('Failed to load team features', {error: featureResult.error});
+      if (!useDefaultsOnError) {
+        return undefined;
+      }
+      return {
+        features: previousFeatures ?? this.teamService.getDefaultTeamFeatures(),
+        usedDefaults: previousFeatures === undefined || this.teamState.isTeamFeatureConfigFallback(),
+      };
+    }
+    const features = featureResult.value;
+
+    if (typeof features !== 'object' || features === null || Array.isArray(features)) {
+      this.logger.error('Ignoring invalid team feature configuration');
+      return undefined;
+    }
+
+    const appLock = features.appLock;
+    if (
+      this.teamState.isTeam() &&
+      ((appLock?.status !== FEATURE_STATUS.ENABLED && appLock?.status !== FEATURE_STATUS.DISABLED) ||
+        typeof appLock.config?.enforceAppLock !== 'boolean' ||
+        typeof appLock.config.inactivityTimeoutSecs !== 'number' ||
+        !Number.isFinite(appLock.config.inactivityTimeoutSecs))
+    ) {
+      this.logger.error('Ignoring incomplete app lock feature configuration');
+      return undefined;
+    }
+
+    const missingPreviousFeature = objectEntries(previousFeatures ?? {}).some(([key, previousValue]) => {
+      return previousValue !== undefined && features[key] === undefined;
+    });
+    // Compatibility defaults may include optional features the backend never supplied.
+    if (missingPreviousFeature && !this.teamState.isTeamFeatureConfigFallback()) {
+      this.logger.error('Ignoring incomplete team feature configuration');
+      return undefined;
+    }
+
+    return {features, usedDefaults: false};
+  }
+
+  private readonly scheduleTeamRefresh = async (): Promise<void> => {
+    const updateTeam = async (): Promise<void> => {
+      try {
+        updateRemoteConfigLogger.info('Updating team-settings');
+        await this.getTeam();
+        await this.updateFeatureConfig();
+      } catch (error: unknown) {
+        this.logger.error('Failed to update team settings', {error});
+      }
+    };
+
+    // We want to poll the latest team data every time the app is focused and every day
+    await scheduleRecurringTask({
+      every: TIME_IN_MILLIS.DAY,
+      task: updateTeam,
+      key: 'team-refresh',
+      addTaskOnWindowFocusEvent: true,
+    });
+  };
+
+  private showReloadAppModal = (): void => {
+    PrimaryModal.show(
+      PrimaryModal.type.CONFIRM,
+      {
+        primaryAction: {
+          action: () => {
+            return window.location.reload();
+          },
+          text: this.translate('mlsWasEnabledReload'),
+        },
+        text: {
+          translatedMessage: {
+            compatibilityReplacements: [],
+            components: [
+              {
+                kind: 'line-break',
+                legacyTokens: ['<br/>'],
+                markerName: 'br',
+              },
+              {
+                className: '',
+                dataUieName: 'learn-more-mls',
+                href: Config.getConfig().URL.SUPPORT.MLS_LEARN_MORE,
+                kind: 'link',
+                legacyClosingTokens: [],
+                legacyOpeningTokens: [],
+                markerName: 'link',
+                rel: 'nofollow noopener noreferrer',
+                target: '_blank',
+              },
+            ],
+            kind: 'translation',
+            layout: 'default',
+            translationKey: 'mlsWasEnabledDescription',
+            values: [],
+          },
+          title: this.translate('mlsWasEnabledTitle'),
+        },
+      },
+      undefined,
+      this.translate,
+    );
+  };
+
+  private readonly scheduleReloadAppModal = async (): Promise<void> => {
+    // We want to encourage the user to reload every 5 minutes
+    await scheduleRecurringTask({
+      every: TIME_IN_MILLIS.MINUTE * teamRefreshIntervalInMinutes,
+      task: this.showReloadAppModal,
+      key: 'reload-app-modal',
+    });
+  };
+
+  private async getInitialTeamMembers(teamId: string): Promise<TeamMemberEntity[]> {
+    const {members} = await this.teamService.getAllTeamMembers(teamId);
+    return this.teamMapper.mapMembers(members);
+  }
+
+  /**
+   * will load the first 2000 team members in order to fill the initial state of the team
+   * This way a new user won't end up with an empty list of team members
+   * @param teamId
+   */
+  private async loadInitialTeamMembers(teamId: string): Promise<QualifiedId[]> {
+    const teamMembers = await this.getInitialTeamMembers(teamId);
+    this.teamState.memberRoles({});
+    this.teamState.memberInviters({});
+
+    this.updateMemberRoles(teamMembers);
+    return teamMembers
+      .filter(({userId}) => {
+        return userId !== this.userState.self().id;
+      })
+      .map(memberEntity => {
+        return {domain: this.teamState.teamDomain() ?? '', id: memberEntity.userId};
+      });
+  }
+
+  async getTeam(): Promise<TeamEntity> {
+    const teamId = this.userState.self().teamId;
+    const teamData = isNonEmptyString(teamId) && (await this.getTeamById(teamId));
+
+    const teamEntity =
+      teamData !== false && !isNullOrUndefined(teamData)
+        ? this.teamMapper.mapTeamFromObject(teamData, this.teamState.team())
+        : new TeamEntity();
+    this.teamState.team(teamEntity);
+
+    if (isNonEmptyString(teamId)) {
+      await this.getSelfMember(teamId);
+      this.teamState.hasWhitelistedServices(
+        (await this.teamService.getWhitelistedServices(teamId)).services.length > 0,
+      );
+    }
+    // doesn't need to be awaited because it publishes the account info over amplify.
+    this.sendAccountInfo();
+    return teamEntity;
+  }
+
+  async getTeamMember(teamId: string, userId: string): Promise<TeamMemberEntity> {
+    const memberResponse = await this.teamService.getTeamMember(teamId, userId);
+    return this.teamMapper.mapMember(memberResponse);
+  }
+
+  async getSelfMember(teamId: string): Promise<TeamMemberEntity> {
+    const memberEntity = await this.getTeamMember(teamId, this.userState.self().id);
+    if (memberEntity.permissions !== undefined) {
+      this.updateUserRole(this.userState.self(), memberEntity.permissions);
+    }
+    return memberEntity;
+  }
+
+  async conversationHasGuestLinkEnabled(conversationId: string): Promise<boolean> {
+    return this.teamService.conversationHasGuestLink(conversationId);
+  }
+
+  private getTeamMembersFromUsers = async (users: User[]): Promise<void> => {
+    const selfTeamId = this.userState.self().teamId;
+    if (selfTeamId === undefined || selfTeamId === '') {
+      return;
+    }
+    const knownMemberIds = this.teamState.teamMembers().map(member => {
+      return member.id;
+    });
+    const teamUsers = users.filter(user => {
+      return user.teamId === selfTeamId;
+    });
+    const newTeamMembers = teamUsers.filter(user => {
+      return !knownMemberIds.includes(user.id);
+    });
+    const newTeamMemberIds = newTeamMembers.map(({id}) => {
+      return id;
+    });
+    await this.updateTeamMembersByIds(selfTeamId, newTeamMemberIds, true);
+  };
+
+  public async filterRemoteDomainUsers(users: User[]): Promise<User[]> {
+    const isMLS = this.teamState.teamFeatures()?.mls?.config.defaultProtocol === CONVERSATION_PROTOCOL.MLS;
+
+    // IF MLS is enabled, THEN return all users
+    if (isMLS) {
+      return users;
+    }
+
+    const domain = this.userState.self()?.domain ?? this.teamState.teamDomain();
+    const hasFederatedUsers = users.some(user => {
+      return user.domain !== domain;
+    });
+
+    if (this.backendSupportsMLS === null) {
+      const apiClient = container.resolve(APIClient);
+      this.backendSupportsMLS = await apiClient.supportsMLS();
+    }
+
+    // IF the backend does not support MLS, AND there are federated users, THEN return all users
+    if (!this.backendSupportsMLS && hasFederatedUsers) {
+      return users;
+    }
+
+    // IF the backend supports MLS, AND we use the proteus protocol, THEN filter out federated users
+    return users.filter(user => {
+      if (user.domain !== domain) {
+        this.logger.info(`Filtering out user ${user.id} because of domain mismatch, current protocol is not MLS`);
+        return false;
+      }
+      return true;
+    });
+  }
+
+  async filterExternals(users: User[]): Promise<User[]> {
+    const teamId = this.teamState.team()?.id;
+    if (teamId === undefined || teamId === '') {
+      return users;
+    }
+    const userIds = users.map(({id}) => {
+      return id;
+    });
+    const members = await this.teamService.getTeamMembersByIds(teamId, userIds);
+    return members
+      .filter(member => {
+        return roleFromTeamPermissions(member.permissions) !== ROLE.PARTNER;
+      })
+      .map(({user}) => {
+        return users.find(({id}) => {
+          return id === user;
+        });
+      })
+      .filter(isDefined);
+  }
+
+  getTeamConversationRoles(): Promise<ConversationRolesList> {
+    const teamId = this.teamState.team()?.id;
+    if (teamId === undefined) {
+      return Promise.reject(new Error('Team id is not available'));
+    }
+    return this.teamService.getTeamConversationRoles(teamId);
+  }
+
+  async getWhitelistedServices(teamId: string, domain: string): Promise<ServiceEntity[]> {
+    const {services: servicesData} = await this.teamService.getWhitelistedServices(teamId);
+    return IntegrationMapper.mapServicesFromArray(servicesData, domain);
+  }
+
+  /**
+   * Loads the team's apps and collaborators and stores them on the `TeamState`.
+   *
+   * Combines two backend sources into a single deduped list of apps:
+   * - `GET /teams/:tid/apps`: team-owned apps (full `UserType.APP` members of the team)
+   * - `GET /teams/:tid/collaborators`: collaborators (human or app) that are not full team members.
+   *   The collaborators endpoint has no type discriminator, so the resolved user IDs are fetched as
+   *   full profiles and partitioned by `type` to tell apps and humans apart.
+   *
+   * Writes `teamState.teamApps` (team-owned apps ∪ app-type collaborators, deduped by qualifiedId) and
+   * `teamState.teamCollaborators` (human-only collaborators).
+   */
+  async loadTeamAppsAndCollaborators(teamId: string, abortController?: AbortController): Promise<void> {
+    const domain = this.teamState.teamDomain();
+
+    const [appsData, collaborators] = await Promise.all([
+      this.teamService.getApps(teamId, abortController),
+      this.teamService.getCollaborators(teamId, abortController),
+    ]);
+
+    const teamOwnedApps = this.userRepository.userMapper.mapUsersFromJson(appsData, domain);
+
+    const collaboratorIds: QualifiedId[] = collaborators.map(({user}) => {
+      return {domain, id: user};
+    });
+    const resolvedCollaborators = await this.userRepository.getUsersById(collaboratorIds);
+
+    const [humanCollaborators, appCollaborators] = partition(resolvedCollaborators, collaborator => {
+      return collaborator.type === UserType.REGULAR;
+    });
+
+    const mergedApps = [...teamOwnedApps, ...appCollaborators];
+
+    this.teamState.teamApps(mergedApps);
+    this.teamState.teamCollaborators(humanCollaborators);
+  }
+
+  readonly onTeamEvent = async (eventJson: any, source: EventSource): Promise<void> => {
+    if (this.teamState.isTeamDeleted()) {
+      // We don't want to handle any events after the team has been deleted
+      return;
+    }
+
+    const type = eventJson.type;
+
+    this.logger.info(`Team Event: '${type}' (Source: ${source})`);
+
+    switch (type) {
+      case TEAM_EVENT.CONVERSATION_DELETE: {
+        this.onDeleteConversation(eventJson);
+        break;
+      }
+      case TEAM_EVENT.DELETE: {
+        await this.onDelete(eventJson);
+        break;
+      }
+      case TEAM_EVENT.MEMBER_LEAVE: {
+        await this.onMemberLeave(eventJson);
+        break;
+      }
+      case TEAM_EVENT.FEATURE_CONFIG_UPDATE: {
+        await this.onFeatureConfigUpdate(eventJson, source);
+        break;
+      }
+      case TEAM_EVENT.CONVERSATION_CREATE:
+      default: {
+        this.onUnhandled(eventJson);
+      }
+    }
+  };
+
+  async sendAccountInfo(isDesktop: true): Promise<AccountInfo>;
+  async sendAccountInfo(isDesktop?: false): Promise<void>;
+  async sendAccountInfo(isDesktop = Runtime.isDesktopApp()): Promise<AccountInfo | void> {
+    if (isDesktop) {
+      const imageResource = this.teamState.isTeam()
+        ? this.teamState.team().getIconResource(this.teamState.teamDomain())
+        : this.userState.self().previewPictureResource();
+      let imageDataUrl;
+
+      if (!isUndefined(imageResource)) {
+        try {
+          const imageBlob = await this.assetRepository.load(imageResource);
+
+          if (!isUndefined(imageBlob)) {
+            imageDataUrl = await loadDataUrl(imageBlob);
+          }
+        } catch (error: unknown) {
+          this.logger.warn(`Account image could not be loaded`, {error});
+        }
+      }
+
+      const accountInfo: AccountInfo = {
+        accentID: this.userState.self().accent_id(),
+        name: this.teamState.teamName(),
+        picture: imageDataUrl?.toString(),
+        teamID: this.teamState.team().id,
+        teamRole: this.userState.self().teamRole(),
+        userID: this.userState.self().id,
+      };
+
+      const version = Environment.version(true);
+      const [majorVersion, minorVersion] = (isNonEmptyString(version) ? version : '').split('.');
+
+      if (
+        Number(majorVersion) >= minimumDesktopDownloadPathMajorVersion &&
+        Number(minorVersion) >= minimumDesktopDownloadPathMinorVersion
+      ) {
+        accountInfo.availability = this.userState.self().availability();
+      }
+
+      this.logger.info('Publishing account info', {...accountInfo, picture: null});
+      amplify.publish(WebAppEvents.TEAM.INFO, accountInfo);
+      return accountInfo;
+    }
+  }
+
+  async updateTeamMembersByIds(teamId: string, memberIds: string[] = [], append = false): Promise<void> {
+    const members = await this.teamService.getTeamMembersByIds(teamId, memberIds);
+    const mappedMembers = this.teamMapper.mapMembers(members);
+    const selfId = this.userState.self().id;
+    memberIds = mappedMembers
+      .map(member => {
+        return member.userId;
+      })
+      .filter(id => {
+        return id !== selfId;
+      });
+
+    if (!append) {
+      this.teamState.memberRoles({});
+      this.teamState.memberInviters({});
+    }
+
+    this.updateMemberRoles(mappedMembers);
+  }
+
+  async getTeamNameById(teamId: string): Promise<string> {
+    const {name} = await this.getTeamById(teamId);
+    return name;
+  }
+
+  private getTeamById(teamId: string): Promise<TeamData> {
+    return this.teamService.getTeamById(teamId);
+  }
+
+  private async onDelete(eventJson: TeamDeleteEvent | TeamMemberLeaveEvent): Promise<void> {
+    const {team: teamId} = eventJson;
+    if (this.teamState.isTeam() && this.teamState.team().id === teamId) {
+      this.teamState.isTeamDeleted(true);
+      await this.onMemberDetete();
+    }
+  }
+
+  private onDeleteConversation(eventJson: TeamConversationDeleteEvent): void {
+    const {
+      data: {conv: conversationId},
+    } = eventJson;
+    amplify.publish(WebAppEvents.CONVERSATION.DELETE, {domain: '', id: conversationId});
+  }
+
+  private readonly updateTeamConfig = async (handlingNotifications: NOTIFICATION_HANDLING_STATE): Promise<void> => {
+    const shouldFetchConfig = handlingNotifications === NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
+
+    if (shouldFetchConfig) {
+      await this.updateFeatureConfig();
+    }
+  };
+
+  private readonly onFeatureConfigUpdate = async (
+    event: TeamFeatureConfigurationUpdateEvent,
+    source: EventSource,
+  ): Promise<void> => {
+    if (source !== EventSource.WEBSOCKET) {
+      // Ignore notification stream events
+      return;
+    }
+
+    // When we receive a `feature-config.update` event, we will refetch the entire feature config
+    await this.updateFeatureConfig();
+  };
+
+  private async onMemberLeave(eventJson: TeamMemberLeaveEvent): Promise<void> {
+    const {
+      data: {user: userId},
+      team: teamId,
+      time,
+    } = eventJson;
+    const isLocalTeam = this.teamState.team().id === teamId;
+
+    if (isLocalTeam) {
+      const isSelfUser = this.userState.self().id === userId;
+      if (isSelfUser) {
+        return this.onDelete(eventJson);
+      }
+
+      amplify.publish(WebAppEvents.TEAM.MEMBER_LEAVE, teamId, {domain: '', id: userId}, new Date(time).toISOString());
+    }
+  }
+
+  private updateUserRole(user: User, permissions: PermissionsData): void {
+    user.teamRole(roleFromTeamPermissions(permissions));
+  }
+
+  private updateMemberRoles(members: TeamMemberEntity[] = []): void {
+    const memberRoles = members.reduce((accumulator, member) => {
+      accumulator[member.userId] = !isNullOrUndefined(member.permissions)
+        ? roleFromTeamPermissions(member.permissions)
+        : ROLE.INVALID;
+      return accumulator;
+    }, this.teamState.memberRoles());
+
+    const memberInvites = members.reduce((accumulator, member) => {
+      if (isNonEmptyString(member.invitedBy)) {
+        accumulator[member.userId] = member.invitedBy;
+      }
+      return accumulator;
+    }, this.teamState.memberInviters());
+
+    const supportsLegalHold =
+      this.teamState.supportsLegalHold() ||
+      members.some(member => {
+        return objectHasOwn(member, 'legalholdStatus');
+      });
+    this.teamState.supportsLegalHold(supportsLegalHold);
+    this.teamState.memberRoles(memberRoles);
+    this.teamState.memberInviters(memberInvites);
+  }
+
+  private onUnhandled(eventJson: TeamEvent): void {
+    this.logger.info(`Received '${eventJson.type}' event from backend which is not yet handled`, {eventJson});
+  }
+
+  public getTeamSupportedProtocols(): CONVERSATION_PROTOCOL[] {
+    const mlsFeature = this.teamState.teamFeatures()?.mls;
+
+    if (isNullOrUndefined(mlsFeature) || mlsFeature.status === FEATURE_STATUS.DISABLED) {
+      return [CONVERSATION_PROTOCOL.PROTEUS];
+    }
+
+    const teamSupportedProtocols = mlsFeature.config.supportedProtocols;
+
+    if (this.hasPersistedSupportedProtocols && teamSupportedProtocols?.length > 0) {
+      return [...new Set([...teamSupportedProtocols, CONVERSATION_PROTOCOL.MLS])];
+    }
+
+    // For old teams (created on some older backend versions) supportedProtocols field might not exist or be empty,
+    // we fallback to proteus in this case.
+    return isNonEmptyArray(teamSupportedProtocols) ? teamSupportedProtocols : [CONVERSATION_PROTOCOL.PROTEUS];
+  }
+
+  public readonly getTeamMLSMigrationStatus = (): MLSMigrationStatus => {
+    const mlsMigrationFeature = this.teamState.teamFeatures()?.mlsMigration;
+
+    return getMLSMigrationStatus(mlsMigrationFeature);
+  };
+}

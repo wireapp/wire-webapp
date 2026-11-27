@@ -39,10 +39,10 @@ import {
 } from '../../../mls/mlsMigration/manualMigration';
 import {useManualMigrationStore} from '../../../mls/mlsMigration/useManualMigrationStore';
 import {useApplicationContext} from '../../../page/rootProvider';
-import type {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
-import type {Conversation} from '../../../repositories/entity/Conversation';
-import type {User} from '../../../repositories/entity/User';
-import type {TeamState} from '../../../repositories/team/TeamState';
+import type {ConversationRepository} from '../../../repositories/conversation/conversationRepository';
+import type {Conversation} from '../../../repositories/entity/conversation';
+import type {User} from '../../../repositories/entity/user';
+import type {TeamState} from '../../../repositories/team/teamState';
 import {COLOR} from '../../../uiKit/identity/colors/colors';
 import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
@@ -50,7 +50,7 @@ import {errorHandlerStrings} from '../../../util/errorUtil';
 import type {TranslationKey} from '../../../util/localizerUtil';
 import {isAxiosError, isBackendError} from '../../../util/typePredicateUtil';
 import {useIsMounted} from '../../../util/useIsMounted';
-import {ModalComponent} from '../../Modals/ModalComponent';
+import {ModalComponent} from '../../modals/modalComponent';
 
 const REQUIRED_PROTOCOL_ACTIVATIONS = 5;
 

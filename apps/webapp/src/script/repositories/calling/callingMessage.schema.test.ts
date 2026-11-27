@@ -20,7 +20,7 @@
 import assert from 'node:assert';
 
 import {parseSerializedCallingMessage} from './callingMessage.schema';
-import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
+import {CALL_MESSAGE_TYPE} from './enum/callMessageType';
 
 const MAX_MESSAGE_BYTES = 1_048_576;
 

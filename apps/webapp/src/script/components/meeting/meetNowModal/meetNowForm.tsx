@@ -25,7 +25,7 @@ import {meetNowFormLayoutStyles} from './meetNowModal.styles';
 import type {MeetNowFormState} from './meetNowTypes';
 
 import {useApplicationContext} from '../../../page/rootProvider';
-import type {User} from '../../../repositories/entity/User';
+import type {User} from '../../../repositories/entity/user';
 import {CircleCloseIcon} from '../../../uiKit/dataDisplay/icon/circleCloseIcon';
 import {ErrorMessage} from '../../../uiKit/inputs/errorMessage/errorMessage';
 import {Input} from '../../../uiKit/inputs/input/input';

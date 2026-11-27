@@ -23,8 +23,8 @@ import {
   ProteusConversation,
   isMixedConversation,
   isProteusConversation,
-} from '../../../repositories/conversation/ConversationSelectors';
-import {Conversation} from '../../../repositories/entity/Conversation';
+} from '../../../repositories/conversation/conversationSelectors';
+import {Conversation} from '../../../repositories/entity/conversation';
 import {mlsMigrationLogger} from '../mlsMigrationLogger';
 
 interface MigrationInitConversationHandler {

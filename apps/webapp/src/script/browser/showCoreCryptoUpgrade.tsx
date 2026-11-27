@@ -23,7 +23,7 @@ import type {CoreCryptoSupport} from './coreCryptoSupport';
 import {CoreCryptoUpgradeModal} from './coreCryptoUpgradeModal';
 import {renderWithCoreCryptoSupport} from './renderWithCoreCryptoSupport';
 
-import {Config} from '../Config';
+import {Config} from '../config';
 import {setAppLocale} from '../localization/localizer';
 import {translate} from '../util/localizerUtil';
 

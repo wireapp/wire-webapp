@@ -25,12 +25,12 @@ import {StatusCodes} from 'http-status-codes';
 
 import {WebAppEvents} from '../../webAppEvents';
 
-import {PrimaryModal} from '../../components/Modals/PrimaryModal';
-import {Conversation} from '../entity/Conversation';
-import {SelfService} from '../self/SelfService';
-import {TeamService} from '../team/TeamService';
+import {PrimaryModal} from '../../components/modals/primaryModal';
+import {Conversation} from '../entity/conversation';
+import {SelfService} from '../self/selfService';
+import {TeamService} from '../team/teamService';
 import {UserRepository} from '../user/userRepository';
-import {generateUser} from '../../../../test/helper/UserGenerator';
+import {generateUser} from '../../../../test/helper/userGenerator';
 import type {Translate} from '../../util/localizerUtil';
 import {translateForTest} from '../../util/test/translateForTest';
 import {requireValueForTest} from '../../page/testSupport/rootContextTestSupport';
@@ -38,7 +38,7 @@ import {createUuid} from '../../util/uuid';
 
 import {ConnectionEntity} from './connectionEntity';
 import {ConnectionRepository} from './connectionRepository';
-import type {User} from '../entity/User';
+import type {User} from '../entity/user';
 import {ConnectionService} from './connectionService';
 import {ConnectionState} from './connectionState';
 import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';

@@ -21,10 +21,10 @@ import {fireEvent, render} from '@testing-library/react';
 
 import {CALL_TYPE, VIDEO_STATE} from '@wireapp/avs';
 
-import {Call} from '../../repositories/calling/Call';
-import {Participant} from '../../repositories/calling/Participant';
-import {Conversation} from '../../repositories/entity/Conversation';
-import {User} from '../../repositories/entity/User';
+import {Call} from '../../repositories/calling/call';
+import {Participant} from '../../repositories/calling/participant';
+import {Conversation} from '../../repositories/entity/conversation';
+import {User} from '../../repositories/entity/user';
 import {backgroundEffectsStore} from '../../repositories/media/useBackgroundEffectsStore';
 import {
   createRootContextValueForTest,

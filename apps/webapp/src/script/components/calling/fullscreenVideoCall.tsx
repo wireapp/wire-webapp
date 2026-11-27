@@ -43,23 +43,23 @@ import {VideoBackgroundSettings} from './videoControls/videoBackgroundSettings/v
 import {VideoControls} from './videoControls/videoControls';
 
 import {DefaultConversationRoleName} from '../../apiClient/conversation/conversationRole';
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {useActiveWindowMatchMedia} from '../../hooks/useActiveWindowMatchMedia';
 import {useToggleState} from '../../hooks/useToggleState';
 import {useApplicationContext} from '../../page/rootProvider';
-import type {Call} from '../../repositories/calling/Call';
-import {CallingRepository} from '../../repositories/calling/CallingRepository';
-import {CallingViewMode, CallState, MuteState} from '../../repositories/calling/CallState';
-import {Participant} from '../../repositories/calling/Participant';
+import type {Call} from '../../repositories/calling/call';
+import {CallingRepository} from '../../repositories/calling/callingRepository';
+import {CallingViewMode, CallState, MuteState} from '../../repositories/calling/callState';
+import {Participant} from '../../repositories/calling/participant';
 import type {Grid} from '../../repositories/calling/videoGridHandler';
-import type {Conversation} from '../../repositories/entity/Conversation';
+import type {Conversation} from '../../repositories/entity/conversation';
 import {detectCapabilities} from '../../repositories/media/backgroundEffects';
-import {MediaDevicesHandler} from '../../repositories/media/MediaDevicesHandler';
+import {MediaDevicesHandler} from '../../repositories/media/mediaDevicesHandler';
 import {BackgroundEffectsQuality, useBackgroundEffectsStore} from '../../repositories/media/useBackgroundEffectsStore';
-import type {BackgroundEffectSelection} from '../../repositories/media/VideoBackgroundEffects';
-import {BUILTIN_BACKGROUNDS} from '../../repositories/media/VideoBackgroundEffects';
+import type {BackgroundEffectSelection} from '../../repositories/media/videoBackgroundEffects';
+import {BUILTIN_BACKGROUNDS} from '../../repositories/media/videoBackgroundEffects';
 import {PropertiesRepository} from '../../repositories/properties/propertiesRepository';
-import {TeamState} from '../../repositories/team/TeamState';
+import {TeamState} from '../../repositories/team/teamState';
 import {CloseDetachedWindowIcon} from '../../uiKit/dataDisplay/icon/closeDetachedWindowIcon';
 import {OpenDetachedWindowIcon} from '../../uiKit/dataDisplay/icon/openDetachedWindowIcon';
 import {Checkbox, CheckboxLabel} from '../../uiKit/inputs/checkbox/checkbox';
@@ -77,7 +77,7 @@ import {WebAppEvents} from '../../webAppEvents';
 import {useAppNotification} from '../appNotification/appNotification';
 import {ConversationClassifiedBar} from '../classifiedBar/classifiedBar';
 import * as Icon from '../icon';
-import {ModalComponent} from '../Modals/ModalComponent';
+import {ModalComponent} from '../modals/modalComponent';
 
 export interface FullscreenVideoCallProps {
   activeCallViewTab: string;

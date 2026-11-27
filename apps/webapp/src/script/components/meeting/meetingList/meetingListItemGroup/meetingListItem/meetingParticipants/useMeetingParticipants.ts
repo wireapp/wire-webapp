@@ -24,8 +24,8 @@ import {container} from 'tsyringe';
 import {getMeetingParticipantsForDisplay} from './getMeetingParticipantsForDisplay';
 
 import type {QualifiedId} from '../../../../../../apiClient/user/qualifiedId';
-import type {Conversation} from '../../../../../../repositories/entity/Conversation';
-import type {User} from '../../../../../../repositories/entity/User';
+import type {Conversation} from '../../../../../../repositories/entity/conversation';
+import type {User} from '../../../../../../repositories/entity/user';
 import {UserState} from '../../../../../../repositories/user/userState';
 import {useKoSubscribableChildren} from '../../../../../../util/componentUtil';
 import {matchQualifiedIds} from '../../../../../../util/qualifiedId';

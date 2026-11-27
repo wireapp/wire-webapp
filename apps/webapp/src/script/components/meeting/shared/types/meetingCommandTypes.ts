@@ -20,7 +20,7 @@
 import type {Maybe} from 'true-myth';
 
 import type {QualifiedId} from '../../../../apiClient/user/qualifiedId';
-import type {User} from '../../../../repositories/entity/User';
+import type {User} from '../../../../repositories/entity/user';
 import type {ScheduleMeetingRecurrenceOption} from '../../scheduleMeetingModal/scheduleMeetingTypes';
 
 export type MeetNowMeetingCommand = {

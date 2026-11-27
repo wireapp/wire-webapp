@@ -21,12 +21,12 @@ import {CONVERSATION_TYPE} from '../../../../apiClient/conversation/conversation
 import {CONVERSATION_PROTOCOL} from '../../../../apiClient/team/feature/featureList.types';
 import {result, task} from 'true-myth';
 
-import {MixedConversation} from '../../../../repositories/conversation/ConversationSelectors';
-import {Conversation} from '../../../../repositories/entity/Conversation';
-import {User} from '../../../../repositories/entity/User';
+import {MixedConversation} from '../../../../repositories/conversation/conversationSelectors';
+import {Conversation} from '../../../../repositories/entity/conversation';
+import {User} from '../../../../repositories/entity/user';
 import {Core} from '../../../../service/coreSingleton';
 import {requireValueForTest} from '../../../../page/testSupport/rootContextTestSupport';
-import {TestFactory} from '../../../../../../test/helper/TestFactory';
+import {TestFactory} from '../../../../../../test/helper/testFactory';
 import {createUuid} from '../../../../util/uuid';
 
 import {joinUnestablishedMixedConversations} from '.';
