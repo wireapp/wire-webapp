@@ -25,7 +25,7 @@ import {CONVERSATION_PROTOCOL} from '../../../../apiClient/team/feature/featureL
 import {MessageSendingState, type SendResult} from '../../../../core/conversation';
 import {MessageTimer} from '../../../../core/conversation/messageTimer/messageTimer';
 import {StatusType} from '../../../../message/statusType';
-import type {Kind, KindHandle, OperationState, OperationView, PerformOutcome} from '../../../../outbox';
+import type {AttemptOutcome, Kind, KindHandle, OperationState, OperationView} from '../../../../outbox';
 import {createOutboxTestKit, type OutboxTestKit} from '../../../../outbox/testing/createOutboxTestKit';
 import {serverTimeHandler} from '../../../../time/serverTimeHandler';
 import {createCoreTestFixture} from '../../../../util/test/createCoreTestFixture';
@@ -102,7 +102,7 @@ export type OutboxRepository = {
     name: Name,
     payload: KindNames[Name],
     signal?: AbortSignal,
-  ) => Promise<PerformOutcome>;
+  ) => Promise<AttemptOutcome>;
   changed: <Name extends keyof KindNames>(
     name: Name,
     payload: KindNames[Name],
@@ -211,7 +211,7 @@ export function createOutboxRepository(): OutboxRepository {
   const registered = new Map(
     register.mock.calls.map(([kind], index) => {
       const outcome = register.mock.results[index].value;
-      return [kind.name, {kind, handle: outcome.type === 'kind-registered' ? outcome.handle : undefined}];
+      return [kind.name, {kind, handle: outcome.outcome === 'kind-registered' ? outcome.handle : undefined}];
     }),
   );
   const kindNamed = (name: string): any => {
@@ -287,7 +287,17 @@ export function createOutboxRepository(): OutboxRepository {
     payload: Payload,
     overrides: Partial<OperationView<Payload>>,
   ): OperationView<Payload> {
-    return {id: 'operation-1', kind: name, payload, queuedAt: 0, state: 'in-progress', attempts: 1, ...overrides};
+    return {
+      id: 'operation-1',
+      kind: name,
+      payload,
+      correlation: {state: 'uncorrelated'},
+      lane: {state: 'no-lane'},
+      queuedAt: 0,
+      state: 'in-progress',
+      attempts: 1,
+      ...overrides,
+    };
   }
 
   return {
@@ -324,7 +334,7 @@ export function createOutboxRepository(): OutboxRepository {
       degradedConversation.verification_state(ConversationVerificationState.DEGRADED);
     },
     perform: (name, payload, signal = new AbortController().signal) => {
-      return kindNamed(name).perform(viewOf(name, payload, {}), signal);
+      return kindNamed(name).attempt(viewOf(name, payload, {}), signal);
     },
     changed: async (name, payload, state, queuedAt = 0) => {
       kindNamed(name).onChanged?.(viewOf(name, payload, {state, queuedAt}));

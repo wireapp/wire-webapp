@@ -28,9 +28,9 @@ import {MessageTimer} from '../../core/conversation/messageTimer/messageTimer';
 import {QuoteEntity} from '../../message/quoteEntity';
 import {StatusType} from '../../message/statusType';
 import {createOutbox, type Outbox, type OperationSnapshot} from '../../outbox';
-import {createFakeClock, type FakeClock} from '../../outbox/testing/createFakeClock';
-import {createInMemoryOutboxStore, type InMemoryOutboxStore} from '../../outbox/testing/createInMemoryOutboxStore';
-import {createStoredSnapshot} from '../../outbox/testing/createOutboxTestKit';
+import type {FakeClock} from '../../outbox/testing/createFakeClock';
+import type {InMemoryOutboxStore} from '../../outbox/testing/createInMemoryOutboxStore';
+import {createStoredSnapshot, createTestDependencies} from '../../outbox/testing/createOutboxTestKit';
 import {serverTimeHandler} from '../../time/serverTimeHandler';
 import {createCoreTestFixture} from '../../util/test/createCoreTestFixture';
 import {translateForTest} from '../../util/test/translateForTest';
@@ -97,15 +97,9 @@ function buildParts(maxOperations?: number): Parts {
   const audioRepository = new AudioRepository();
   jest.spyOn(audioRepository, 'play').mockResolvedValue(undefined as never);
   const send = jest.fn();
-  const clock = createFakeClock();
   const invoker = createFireAndForgetInvoker({reportError: jest.fn()});
-  const store = createInMemoryOutboxStore();
-  const outbox = createOutbox({
-    store,
-    getServerTime: clock.getServerTime,
-    logger: {info: jest.fn(), warn: jest.fn(), error: jest.fn()},
-    configuration: {maxOperations},
-  });
+  const {dependencies, store, clock} = createTestDependencies({maxOperations});
+  const outbox = createOutbox(dependencies);
 
   const repository = new MessageRepository(
     () => {
@@ -178,8 +172,8 @@ function buildParts(maxOperations?: number): Parts {
 }
 
 async function startOutbox({clock, outbox}: Parts): Promise<void> {
-  const outcome = await outbox.start();
-  expect(outcome.type).toBe('outbox-started');
+  const startResult = await outbox.start();
+  expect(startResult.outcome).toBe('outbox-started');
   await clock.settle();
 }
 
@@ -198,7 +192,6 @@ describe('MessageRepository routing sends through the outbox', () => {
   });
 
   afterEach(() => {
-    parts.clock.dispose();
     amplify.unsubscribeAll(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE);
     amplify.unsubscribeAll(WebAppEvents.NOTIFICATION.REMOVE_READ);
   });
@@ -233,7 +226,7 @@ describe('MessageRepository routing sends through the outbox', () => {
         expect.objectContaining({
           kind: 'message',
           state: 'queued',
-          orderingKey: CONVERSATION_ID.id,
+          lane: {state: 'in-lane', laneKey: CONVERSATION_ID.id},
           payload: expect.objectContaining({
             type: 'text',
             text: 'hello',
@@ -242,7 +235,10 @@ describe('MessageRepository routing sends through the outbox', () => {
           }),
         }),
       );
-      expect(snapshot.correlationKey).toBe((snapshot.payload as {messageId: string}).messageId);
+      expect(snapshot.correlation).toEqual({
+        state: 'correlated',
+        correlationKey: (snapshot.payload as {messageId: string}).messageId,
+      });
       expect(parts.order).toEqual(['append:operation-queued', 'inject']);
       expect(parts.send).not.toHaveBeenCalled();
     });
@@ -297,7 +293,6 @@ describe('MessageRepository routing sends through the outbox', () => {
     });
 
     it('shows the message as failed when the outbox is full', async () => {
-      parts.clock.dispose();
       parts = buildParts(0);
       await startOutbox(parts);
 
@@ -325,15 +320,15 @@ describe('MessageRepository routing sends through the outbox', () => {
             kind: 'message',
             id: 'operation-1',
             seq: 3,
-            trigger: 'operation-dead-lettered',
-            correlationKey: 'message-1',
-            orderingKey: CONVERSATION_ID.id,
+            trigger: 'attempt-dead-lettered',
+            correlation: {state: 'correlated', correlationKey: 'message-1'},
+            lane: {state: 'in-lane', laneKey: CONVERSATION_ID.id},
             payload,
             state: 'dead-lettered',
             attempts,
             queuedSeq: 7,
             queuedAt: 1_000_000 - 5000,
-            validUntil: 1_000_000 - 1,
+            expiry: {state: 'expires-at', serverTime: 1_000_000 - 1},
           }),
         );
       }
@@ -364,7 +359,7 @@ describe('MessageRepository routing sends through the outbox', () => {
             state: 'queued',
             attempts: 0,
             queuedSeq: 7,
-            validUntil: parts.clock.getServerTime() + TIME_IN_MILLIS.WEEK,
+            expiry: {state: 'expires-at', serverTime: parts.clock.getServerTime() + TIME_IN_MILLIS.WEEK},
             payload: {...failedPayload, mayBeDelivered: true},
           }),
         );
@@ -413,7 +408,7 @@ describe('MessageRepository routing sends through the outbox', () => {
         expect(onlySnapshot(parts.store)).toEqual(
           expect.objectContaining({
             trigger: 'operation-queued',
-            correlationKey: 'message-1',
+            correlation: {state: 'correlated', correlationKey: 'message-1'},
             attempts: 0,
             payload: expect.objectContaining({messageId: 'message-1', text: 'hello'}),
           }),
@@ -458,12 +453,15 @@ describe('MessageRepository routing sends through the outbox', () => {
         expect.objectContaining({
           kind: 'message',
           state: 'queued',
-          orderingKey: CONVERSATION_ID.id,
-          performTimeoutMilliseconds: 10 * 60 * 1000,
+          lane: {state: 'in-lane', laneKey: CONVERSATION_ID.id},
+          limits: {attemptTimeout: {state: 'times-out-after', milliseconds: 10 * 60 * 1000}},
           payload: {type: 'asset', conversationId: CONVERSATION_ID, messageId: expect.any(String), asImage: false},
         }),
       );
-      expect(snapshot.correlationKey).toBe((snapshot.payload as {messageId: string}).messageId);
+      expect(snapshot.correlation).toEqual({
+        state: 'correlated',
+        correlationKey: (snapshot.payload as {messageId: string}).messageId,
+      });
       expect(parts.order).toEqual(['append:operation-queued', 'inject', 'updateEvent']);
       expect(parts.updateEvent).toHaveBeenCalledWith('primary-key', {fileData: file});
       expect((parts.storedMessage as any).fileData).toHaveBeenCalledWith(file);
@@ -525,15 +523,15 @@ describe('MessageRepository routing sends through the outbox', () => {
             kind: 'message',
             id: 'operation-1',
             seq: 3,
-            trigger: 'operation-dead-lettered',
-            correlationKey: 'asset-1',
-            orderingKey: CONVERSATION_ID.id,
+            trigger: 'attempt-dead-lettered',
+            correlation: {state: 'correlated', correlationKey: 'asset-1'},
+            lane: {state: 'in-lane', laneKey: CONVERSATION_ID.id},
             payload: failedPayload,
             state: 'dead-lettered',
             attempts,
             queuedSeq: 7,
             queuedAt: 1_000_000 - 5000,
-            validUntil: 1_000_000 - 1,
+            expiry: {state: 'expires-at', serverTime: 1_000_000 - 1},
           }),
         );
       }
@@ -691,9 +689,9 @@ describe('MessageRepository routing sends through the outbox', () => {
         expect.objectContaining({
           kind: 'ping',
           state: 'queued',
-          orderingKey: CONVERSATION_ID.id,
-          correlationKey: result.id,
-          validUntil: parts.clock.getServerTime() + 60_000,
+          lane: {state: 'in-lane', laneKey: CONVERSATION_ID.id},
+          correlation: {state: 'correlated', correlationKey: result.id},
+          expiry: {state: 'expires-at', serverTime: parts.clock.getServerTime() + 60_000},
           payload: {conversationId: CONVERSATION_ID, messageId: result.id},
         }),
       );
@@ -724,10 +722,9 @@ describe('MessageRepository routing sends through the outbox', () => {
       });
       await parts.repository.sendPing(parts.conversation);
 
-      const lane = parts.outbox.lane(CONVERSATION_ID.id);
-      expect(lane).toEqual(expect.objectContaining({type: 'lane-found'}));
-      // `size` counts the operations behind the first one
-      expect((lane as {lane: {size: number}}).lane.size).toBe(1);
+      const laneResult = parts.outbox.lane(CONVERSATION_ID.id);
+      expect(laneResult).toEqual(expect.objectContaining({outcome: 'lane-found'}));
+      expect((laneResult as {lane: {operations: unknown[]}}).lane.operations).toHaveLength(2);
     });
   });
 
@@ -869,8 +866,8 @@ describe('MessageRepository routing sends through the outbox', () => {
           id: 'operation-1',
           seq: 1,
           trigger: 'operation-queued',
-          correlationKey: 'message-1',
-          orderingKey: CONVERSATION_ID.id,
+          correlation: {state: 'correlated', correlationKey: 'message-1'},
+          lane: {state: 'in-lane', laneKey: CONVERSATION_ID.id},
           payload: {
             type: 'text',
             conversationId: CONVERSATION_ID,
@@ -881,7 +878,7 @@ describe('MessageRepository routing sends through the outbox', () => {
           state: 'queued',
           queuedSeq: 1,
           queuedAt: 1_000_000 - 5000,
-          validUntil: 1_000_000 + TIME_IN_MILLIS.WEEK,
+          expiry: {state: 'expires-at', serverTime: 1_000_000 + TIME_IN_MILLIS.WEEK},
         }),
       );
       await startRunning();
@@ -922,8 +919,11 @@ describe('MessageRepository routing sends through the outbox', () => {
         expect.objectContaining({
           kind: 'receipt',
           state: 'queued',
-          correlationKey: `receipt:${CONVERSATION_ID.id}:${Confirmation.Type.DELIVERED}:received-1`,
-          orderingKey: `${CONVERSATION_ID.id}#receipts`,
+          correlation: {
+            state: 'correlated',
+            correlationKey: `receipt:${CONVERSATION_ID.id}:${Confirmation.Type.DELIVERED}:received-1`,
+          },
+          lane: {state: 'in-lane', laneKey: `${CONVERSATION_ID.id}#receipts`},
           payload: {
             type: 'confirmation',
             conversationId: CONVERSATION_ID,
@@ -971,8 +971,8 @@ describe('MessageRepository routing sends through the outbox', () => {
         expect.objectContaining({
           kind: 'receipt',
           trigger: 'operation-versioned',
-          correlationKey: `last-read:${CONVERSATION_ID.id}`,
-          orderingKey: `${CONVERSATION_ID.id}#receipts`,
+          correlation: {state: 'correlated', correlationKey: `last-read:${CONVERSATION_ID.id}`},
+          lane: {state: 'in-lane', laneKey: `${CONVERSATION_ID.id}#receipts`},
           payload: {type: 'last-read', conversationId: CONVERSATION_ID, timestamp: 2000},
         }),
       );
@@ -989,8 +989,8 @@ describe('MessageRepository routing sends through the outbox', () => {
       expect(parts.conversation.cleared_timestamp()).toBe(5000);
       expect(onlySnapshot(parts.store)).toEqual(
         expect.objectContaining({
-          correlationKey: `cleared:${CONVERSATION_ID.id}`,
-          orderingKey: `${CONVERSATION_ID.id}#receipts`,
+          correlation: {state: 'correlated', correlationKey: `cleared:${CONVERSATION_ID.id}`},
+          lane: {state: 'in-lane', laneKey: `${CONVERSATION_ID.id}#receipts`},
           payload: {type: 'cleared', conversationId: CONVERSATION_ID, timestamp: 5000},
         }),
       );
@@ -1012,8 +1012,8 @@ describe('MessageRepository routing sends through the outbox', () => {
 
       expect(onlySnapshot(parts.store)).toEqual(
         expect.objectContaining({
-          correlationKey: 'data-transfer',
-          orderingKey: 'self#receipts',
+          correlation: {state: 'correlated', correlationKey: 'data-transfer'},
+          lane: {state: 'in-lane', laneKey: 'self#receipts'},
           payload: {type: 'data-transfer', countlyId: 'countly-1'},
         }),
       );
@@ -1155,7 +1155,6 @@ describe('MessageRepository without an outbox keeps sending directly', () => {
     await (repository as any).updateMessageAsSent(parts.conversation, 'message-1', '2026-01-01T00:00:05.000Z');
 
     expect(parts.updateEvent.mock.calls[0][1]).not.toHaveProperty('written_time');
-    parts.clock.dispose();
   });
 
   it('uploads a file as before, holding the page open for the whole send and showing the process queue', async () => {
@@ -1198,6 +1197,5 @@ describe('MessageRepository without an outbox keeps sending directly', () => {
     expect(listeners).toHaveLength(1);
     expect(assetRepository.addToProcessQueue).toHaveBeenCalledTimes(1);
     expect(sendRemote).toHaveBeenCalledTimes(1);
-    parts.clock.dispose();
   });
 });

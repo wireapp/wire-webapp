@@ -54,11 +54,11 @@ import {
   textPayload,
 } from './outbox/testing/payloadFactories';
 
-const succeeded = {type: 'attempt-succeeded'};
-const failed = {type: 'attempt-failed'};
-const dropped = {type: 'operation-dropped'};
-const deadLettered = {type: 'operation-dead-lettered'};
-const held = {type: 'operation-held'};
+const succeeded = {outcome: 'attempt-succeeded'};
+const failed = {outcome: 'attempt-failed'};
+const dropped = {outcome: 'attempt-dropped'};
+const deadLettered = {outcome: 'attempt-dead-lettered'};
+const held = {outcome: 'attempt-held'};
 
 const notDelivered: [string, unknown][] = [
   ['a decline', declinedResult()],
@@ -75,7 +75,6 @@ describe('the message kinds of MessageRepository', () => {
   });
 
   afterEach(() => {
-    parts.kit.dispose();
     amplify.unsubscribeAll(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE);
   });
 
@@ -95,7 +94,7 @@ describe('the message kinds of MessageRepository', () => {
         whenGivenUp: 'dead-letter',
         laneWhenGivenUp: 'follows',
         expiresAfterMilliseconds: TIME_IN_MILLIS.WEEK,
-        performTimeoutMilliseconds: 2 * TIME_IN_MILLIS.MINUTE,
+        attemptTimeoutMilliseconds: 2 * TIME_IN_MILLIS.MINUTE,
       });
     });
 
@@ -410,6 +409,8 @@ describe('the message kinds of MessageRepository', () => {
           id: 'operation-1',
           kind: 'message',
           payload: textPayload(),
+          correlation: {state: 'uncorrelated'},
+          lane: {state: 'no-lane'},
           queuedAt: 0,
           state: 'queued',
           attempts: 0,
@@ -556,7 +557,7 @@ describe('the message kinds of MessageRepository', () => {
         whenGivenUp: 'drop',
         laneWhenGivenUp: 'continues',
         expiresAfterMilliseconds: TIME_IN_MILLIS.WEEK,
-        performTimeoutMilliseconds: 2 * TIME_IN_MILLIS.MINUTE,
+        attemptTimeoutMilliseconds: 2 * TIME_IN_MILLIS.MINUTE,
       });
     });
 
@@ -664,7 +665,7 @@ describe('the message kinds of MessageRepository', () => {
         whenGivenUp: 'drop',
         laneWhenGivenUp: 'continues',
         expiresAfterMilliseconds: TIME_IN_MILLIS.MINUTE,
-        performTimeoutMilliseconds: 10 * TIME_IN_MILLIS.SECOND,
+        attemptTimeoutMilliseconds: 10 * TIME_IN_MILLIS.SECOND,
       });
     });
 
@@ -767,7 +768,7 @@ describe('the message kinds of MessageRepository', () => {
         whenGivenUp: 'drop',
         laneWhenGivenUp: 'continues',
         expiresAfterMilliseconds: TIME_IN_MILLIS.WEEK,
-        performTimeoutMilliseconds: TIME_IN_MILLIS.MINUTE,
+        attemptTimeoutMilliseconds: TIME_IN_MILLIS.MINUTE,
       });
     });
 

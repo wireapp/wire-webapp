@@ -88,7 +88,6 @@ describe('the message kinds through the outbox', () => {
   });
 
   afterEach(() => {
-    parts.kit.dispose();
     amplify.unsubscribeAll(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE);
   });
 
@@ -114,7 +113,7 @@ describe('the message kinds through the outbox', () => {
     await parts.handles.message.enqueue({
       payload,
       correlationKey: messageCorrelationKey(payload),
-      orderingKey: laneOfMessages(conversationId),
+      laneKey: laneOfMessages(conversationId),
     });
     await parts.kit.clock.settle();
   }
@@ -124,7 +123,7 @@ describe('the message kinds through the outbox', () => {
     await parts.handles.message.enqueue({
       payload,
       correlationKey: messageCorrelationKey(payload),
-      orderingKey: laneOfMessages(CONVERSATION_ID),
+      laneKey: laneOfMessages(CONVERSATION_ID),
     });
     await parts.kit.clock.settle();
   }
@@ -134,7 +133,7 @@ describe('the message kinds through the outbox', () => {
     await parts.handles['message-change'].enqueue({
       payload,
       correlationKey: messageCorrelationKey(payload),
-      orderingKey: laneOfChanges(CONVERSATION_ID),
+      laneKey: laneOfChanges(CONVERSATION_ID),
     });
     await parts.kit.clock.settle();
   }
@@ -143,7 +142,7 @@ describe('the message kinds through the outbox', () => {
     await parts.handles.receipt.enqueue({
       payload,
       correlationKey: receiptCorrelationKey(payload),
-      orderingKey: laneOfReceipts(payload),
+      laneKey: laneOfReceipts(payload),
     });
     await parts.kit.clock.settle();
   }
@@ -152,13 +151,14 @@ describe('the message kinds through the outbox', () => {
     await parts.handles.ping.enqueue({
       payload: pingPayload({messageId}),
       correlationKey: messageId,
-      orderingKey: laneOfMessages(CONVERSATION_ID),
+      laneKey: laneOfMessages(CONVERSATION_ID),
     });
     await parts.kit.clock.settle();
   }
 
   function stateOf(correlationKey: string): string | undefined {
-    return parts.kit.findOperation(correlationKey)?.state;
+    const findResult = parts.kit.outbox.findByCorrelationKey(correlationKey);
+    return findResult.outcome === 'operation-found' ? findResult.operation.state : undefined;
   }
 
   describe('order', () => {
@@ -174,7 +174,7 @@ describe('the message kinds through the outbox', () => {
       expect(sentTextIds()).toEqual(['a', 'b', 'c']);
       await sends[2].succeed();
 
-      expect(parts.kit.lanesOf()).toEqual([]);
+      expect(parts.kit.outbox.lanes()).toEqual({outcome: 'lanes-listed', lanes: []});
     });
 
     it('sends the messages of different conversations independently', async () => {
@@ -316,7 +316,7 @@ describe('the message kinds through the outbox', () => {
 
       await sends[0].fail(rejection);
 
-      expect(parts.kit.findOperation('ping')).toBeUndefined();
+      expect(parts.kit.outbox.findByCorrelationKey('ping').outcome).toBe('operation-not-found');
       expect(parts.deleteMessage).toHaveBeenCalledWith(parts.conversation, 'ping');
     });
   });
@@ -368,14 +368,14 @@ describe('the message kinds through the outbox', () => {
 
       parts.records.set('a', sendingRecord());
       const payload = textPayload({messageId: 'a'});
-      const outcome = await parts.handles.message.enqueue({
+      const enqueueResult = await parts.handles.message.enqueue({
         payload,
         correlationKey: 'a',
-        orderingKey: laneOfMessages(CONVERSATION_ID),
+        laneKey: laneOfMessages(CONVERSATION_ID),
       });
       await parts.kit.clock.settle();
 
-      expect(outcome.type).toBe('operation-versioned');
+      expect(enqueueResult.outcome).toBe('operation-versioned');
       expect(sentTextIds()).toEqual(['a']);
     });
 
@@ -385,7 +385,7 @@ describe('the message kinds through the outbox', () => {
       parts.conversation.verification_state(ConversationVerificationState.UNVERIFIED);
 
       const payload = textPayload({messageId: 'a'});
-      await parts.handles.message.enqueue({payload, correlationKey: 'a', orderingKey: laneOfMessages(CONVERSATION_ID)});
+      await parts.handles.message.enqueue({payload, correlationKey: 'a', laneKey: laneOfMessages(CONVERSATION_ID)});
       await parts.kit.clock.settle();
 
       expect(sends).toHaveLength(0);

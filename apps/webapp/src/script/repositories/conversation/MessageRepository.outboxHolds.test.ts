@@ -90,7 +90,7 @@ function changeOf(payload: MessageChangePayload) {
     return handles['message-change'].enqueue({
       payload,
       correlationKey: messageCorrelationKey(payload),
-      orderingKey: laneOfChanges(CONVERSATION_ID),
+      laneKey: laneOfChanges(CONVERSATION_ID),
     });
   };
 }
@@ -100,7 +100,7 @@ function inLaneOfMessages(payload: MessagePayload) {
     return handles.message.enqueue({
       payload,
       correlationKey: messageCorrelationKey(payload),
-      orderingKey: laneOfMessages(CONVERSATION_ID),
+      laneKey: laneOfMessages(CONVERSATION_ID),
     });
   };
 }
@@ -110,7 +110,7 @@ function receiptOf(payload: ReceiptPayload) {
     return handles.receipt.enqueue({
       payload,
       correlationKey: receiptCorrelationKey(payload),
-      orderingKey: laneOfReceipts(payload),
+      laneKey: laneOfReceipts(payload),
     });
   };
 }
@@ -145,7 +145,7 @@ const variants: Variant[] = [
       return handles.ping.enqueue({
         payload: pingPayload(),
         correlationKey: 'ping-1',
-        orderingKey: laneOfMessages(CONVERSATION_ID),
+        laneKey: laneOfMessages(CONVERSATION_ID),
       });
     },
     key: 'ping-1',
@@ -212,7 +212,6 @@ describe('the holds of MessageRepository', () => {
   });
 
   afterEach(() => {
-    parts.kit.dispose();
     amplify.unsubscribeAll(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE);
   });
 
@@ -222,7 +221,8 @@ describe('the holds of MessageRepository', () => {
   }
 
   function stateOf(correlationKey: string): string | undefined {
-    return parts.kit.findOperation(correlationKey)?.state;
+    const findResult = parts.kit.outbox.findByCorrelationKey(correlationKey);
+    return findResult.outcome === 'operation-found' ? findResult.operation.state : undefined;
   }
 
   function editingOf(messageId: string): ContentMessage {
@@ -330,7 +330,7 @@ describe('the holds of MessageRepository', () => {
       await parts.handles.message.enqueue({
         payload: textPayload({messageId: 'message-2', conversationId: {id: 'conversation-2', domain: 'wire.test'}}),
         correlationKey: 'message-2',
-        orderingKey: 'conversation-2',
+        laneKey: 'conversation-2',
       });
       await parts.kit.clock.settle();
     });
@@ -388,7 +388,7 @@ describe('the holds of MessageRepository', () => {
   });
 
   describe('holds that outlive a session', () => {
-    function seedOnHold(kind: string, payload: unknown, correlationKey: string, orderingKey: string): void {
+    function seedOnHold(kind: string, payload: unknown, correlationKey: string, laneKey: string): void {
       parts.kit.store.seed(
         createStoredSnapshot({
           kind,
@@ -396,8 +396,8 @@ describe('the holds of MessageRepository', () => {
           trigger: 'operation-held',
           state: 'on-hold',
           payload,
-          correlationKey,
-          orderingKey,
+          correlation: {state: 'correlated', correlationKey},
+          lane: {state: 'in-lane', laneKey},
         }),
       );
     }

@@ -27,7 +27,7 @@ import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.ty
 import {MessageSendingState} from '../../core/conversation';
 import {MessageTimer} from '../../core/conversation/messageTimer/messageTimer';
 import {StatusType} from '../../message/statusType';
-import type {Kind, Outbox, PerformOutcome} from '../../outbox';
+import type {AttemptOutcome, Kind, Outbox} from '../../outbox';
 import {serverTimeHandler} from '../../time/serverTimeHandler';
 import {createCoreTestFixture} from '../../util/test/createCoreTestFixture';
 import {translateForTest} from '../../util/test/translateForTest';
@@ -122,7 +122,7 @@ function createOutboxSpy(): OutboxSpy {
     pause: jest.fn(),
     resume: jest.fn(),
     register: jest.fn(() => {
-      return {type: 'kind-registered', handle: {}};
+      return {outcome: 'kind-registered', handle: {}};
     }),
   } as unknown as OutboxSpy;
 }
@@ -135,7 +135,7 @@ describe('MessageRepository reviewing restored holds', () => {
   function createLanesOutbox(): {outbox: OutboxSpy; lanes: jest.Mock} {
     const outbox = createOutboxSpy();
     const lanes = jest.fn(() => {
-      return {type: 'lanes-listed', lanes: []};
+      return {outcome: 'lanes-listed', lanes: []};
     });
     Object.assign(outbox, {lanes});
     return {outbox, lanes};
@@ -178,7 +178,7 @@ describe('MessageRepository outbox registration', () => {
     expect(registeredNames).toEqual(['message', 'ping', 'receipt', 'message-change']);
   });
 
-  it.each([{type: 'kind-name-taken', kind: 'message'} as const, {type: 'outbox-already-started'} as const])(
+  it.each([{outcome: 'kind-name-taken', kind: 'message'} as const, {outcome: 'outbox-already-started'} as const])(
     'throws when the outbox answers %p, because the wiring is wrong',
     answer => {
       const outbox = createOutboxSpy();
@@ -256,9 +256,18 @@ describe('MessageRepository as the port of the message kinds', () => {
     return {...parts, messageKind, storedMessage, updateEvent};
   }
 
-  function perform(messageKind: Kind<MessagePayload>, payload: MessagePayload): Promise<PerformOutcome> {
-    return messageKind.perform(
-      {id: 'operation', kind: 'message', payload, queuedAt: 0, state: 'in-progress', attempts: 1},
+  function perform(messageKind: Kind<MessagePayload>, payload: MessagePayload): Promise<AttemptOutcome> {
+    return messageKind.attempt(
+      {
+        id: 'operation',
+        kind: 'message',
+        payload,
+        correlation: {state: 'uncorrelated'},
+        lane: {state: 'no-lane'},
+        queuedAt: 0,
+        state: 'in-progress',
+        attempts: 1,
+      },
       new AbortController().signal,
     );
   }
@@ -271,7 +280,7 @@ describe('MessageRepository as the port of the message kinds', () => {
       state: MessageSendingState.OUTGOING_SENT,
     });
 
-    await expect(perform(messageKind, textPayload)).resolves.toEqual({type: 'attempt-succeeded'});
+    await expect(perform(messageKind, textPayload)).resolves.toEqual({outcome: 'attempt-succeeded'});
 
     expect(send).toHaveBeenCalledTimes(1);
     expect(send.mock.calls[0][0].payload.messageId).toBe('message-1');
@@ -342,7 +351,7 @@ describe('MessageRepository as the port of the message kinds', () => {
     const {messageKind, send, storedMessage, updateEvent} = setup();
     send.mockRejectedValue(new BackendError('removed', BackendErrorLabel.CLIENT_ERROR, 403));
 
-    await expect(perform(messageKind, textPayload)).resolves.toEqual({type: 'operation-dead-lettered'});
+    await expect(perform(messageKind, textPayload)).resolves.toEqual({outcome: 'attempt-dead-lettered'});
 
     expect(storedMessage.status).toHaveBeenCalledWith(StatusType.FAILED);
     expect(updateEvent).toHaveBeenCalledWith('primary-key', {status: StatusType.FAILED, failed_reason: 'removed'});
@@ -352,7 +361,7 @@ describe('MessageRepository as the port of the message kinds', () => {
     const {messageKind, send, storedMessage, updateEvent} = setup();
     send.mockRejectedValue(new BackendError('remote', BackendErrorLabel.FEDERATION_REMOTE_ERROR, 533 as never));
 
-    await expect(perform(messageKind, textPayload)).resolves.toEqual({type: 'operation-dead-lettered'});
+    await expect(perform(messageKind, textPayload)).resolves.toEqual({outcome: 'attempt-dead-lettered'});
 
     expect(storedMessage.status).toHaveBeenCalledWith(StatusType.FEDERATION_ERROR);
     expect(updateEvent).toHaveBeenCalledWith('primary-key', {
@@ -365,7 +374,7 @@ describe('MessageRepository as the port of the message kinds', () => {
     const {messageKind, send, updateEvent} = setup();
     send.mockRejectedValue(new NetworkError('offline'));
 
-    await expect(perform(messageKind, textPayload)).resolves.toEqual({type: 'attempt-failed'});
+    await expect(perform(messageKind, textPayload)).resolves.toEqual({outcome: 'attempt-failed'});
 
     expect(updateEvent).not.toHaveBeenCalled();
   });
@@ -380,6 +389,8 @@ describe('MessageRepository as the port of the message kinds', () => {
       id: 'operation',
       kind: 'message',
       payload: textPayload,
+      correlation: {state: 'uncorrelated'},
+      lane: {state: 'no-lane'},
       queuedAt: 0,
       state: 'dropped',
       attempts: 1,
@@ -397,6 +408,8 @@ describe('MessageRepository as the port of the message kinds', () => {
         id: 'operation',
         kind: 'message',
         payload: textPayload,
+        correlation: {state: 'uncorrelated'},
+        lane: {state: 'no-lane'},
         queuedAt: 0,
         state: 'in-progress',
         attempts: 1,
@@ -436,7 +449,7 @@ describe('MessageRepository as the port of the message kinds', () => {
 
     await expect(
       perform(messageKind, {...textPayload, conversationId: {id: 'unknown', domain: 'wire.test'}}),
-    ).resolves.toEqual({type: 'operation-dropped'});
+    ).resolves.toEqual({outcome: 'attempt-dropped'});
 
     expect(send).not.toHaveBeenCalled();
   });

@@ -25,9 +25,9 @@ import {MessageSendingState} from '../../core/conversation';
 import {MessageTimer} from '../../core/conversation/messageTimer/messageTimer';
 import {StatusType} from '../../message/statusType';
 import {createOutbox, type OperationSnapshot, type Outbox} from '../../outbox';
-import {createFakeClock, type FakeClock} from '../../outbox/testing/createFakeClock';
-import {createInMemoryOutboxStore, type InMemoryOutboxStore} from '../../outbox/testing/createInMemoryOutboxStore';
-import {createStoredSnapshot} from '../../outbox/testing/createOutboxTestKit';
+import type {FakeClock} from '../../outbox/testing/createFakeClock';
+import type {InMemoryOutboxStore} from '../../outbox/testing/createInMemoryOutboxStore';
+import {createStoredSnapshot, createTestDependencies} from '../../outbox/testing/createOutboxTestKit';
 import {serverTimeHandler} from '../../time/serverTimeHandler';
 import {createCoreTestFixture} from '../../util/test/createCoreTestFixture';
 import {translateForTest} from '../../util/test/translateForTest';
@@ -98,14 +98,9 @@ function buildParts(): Parts {
   const audioRepository = new AudioRepository();
   jest.spyOn(audioRepository, 'play').mockResolvedValue(undefined as never);
   const send = jest.fn();
-  const clock = createFakeClock();
   const invoker = createFireAndForgetInvoker({reportError: jest.fn()});
-  const store = createInMemoryOutboxStore();
-  const outbox = createOutbox({
-    store,
-    getServerTime: clock.getServerTime,
-    logger: {info: jest.fn(), warn: jest.fn(), error: jest.fn()},
-  });
+  const {dependencies, store, clock} = createTestDependencies();
+  const outbox = createOutbox(dependencies);
 
   const repository = new MessageRepository(
     () => {
@@ -178,8 +173,8 @@ function buildParts(): Parts {
 }
 
 async function startOutbox({clock, outbox}: Parts): Promise<void> {
-  const outcome = await outbox.start();
-  expect(outcome.type).toBe('outbox-started');
+  const startResult = await outbox.start();
+  expect(startResult.outcome).toBe('outbox-started');
   await clock.settle();
 }
 
@@ -191,7 +186,7 @@ function snapshotOf(store: InMemoryOutboxStore, correlationKey: string): Operati
       return store.history(id).at(-1) as OperationSnapshot;
     })
     .find(snapshot => {
-      return snapshot.correlationKey === correlationKey;
+      return snapshot.correlation.state === 'correlated' && snapshot.correlation.correlationKey === correlationKey;
     });
 }
 
@@ -204,8 +199,8 @@ function seedMessage(
     createStoredSnapshot({
       kind: 'message',
       id: `operation-${messageId}`,
-      correlationKey: messageId,
-      orderingKey: CONVERSATION_ID.id,
+      correlation: {state: 'correlated', correlationKey: messageId},
+      lane: {state: 'in-lane', laneKey: CONVERSATION_ID.id},
       payload: {
         type: 'text',
         conversationId: CONVERSATION_ID,
@@ -214,7 +209,7 @@ function seedMessage(
         mentions: [],
         mayBeDelivered,
       },
-      validUntil: 1_000_000 + TIME_IN_MILLIS.WEEK,
+      expiry: {state: 'expires-at', serverTime: 1_000_000 + TIME_IN_MILLIS.WEEK},
       ...snapshot,
     }),
   );
@@ -238,7 +233,6 @@ describe('MessageRepository routes changes through the outbox', () => {
   });
 
   afterEach(() => {
-    parts.clock.dispose();
     amplify.unsubscribeAll(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE);
     amplify.unsubscribeAll(WebAppEvents.CONVERSATION.MESSAGE.EDIT);
   });
@@ -259,7 +253,7 @@ describe('MessageRepository routes changes through the outbox', () => {
         expect.objectContaining({
           kind: 'message',
           state: 'queued',
-          orderingKey: CONVERSATION_ID.id,
+          lane: {state: 'in-lane', laneKey: CONVERSATION_ID.id},
           payload: {
             type: 'reaction',
             conversationId: CONVERSATION_ID,
@@ -287,7 +281,8 @@ describe('MessageRepository routes changes through the outbox', () => {
       );
       expect(
         parts.store.operationIds().filter(id => {
-          return parts.store.history(id).at(-1)?.correlationKey === 'message-1:reaction';
+          const correlation = parts.store.history(id).at(-1)?.correlation;
+          return correlation?.state === 'correlated' && correlation.correlationKey === 'message-1:reaction';
         }),
       ).toHaveLength(1);
     });
@@ -313,7 +308,11 @@ describe('MessageRepository routes changes through the outbox', () => {
       await react(sent, '👍');
 
       expect(snapshotOf(parts.store, 'sent-1:reaction')).toEqual(
-        expect.objectContaining({kind: 'message-change', orderingKey: CHANGES_LANE, state: 'queued'}),
+        expect.objectContaining({
+          kind: 'message-change',
+          lane: {state: 'in-lane', laneKey: CHANGES_LANE},
+          state: 'queued',
+        }),
       );
     });
 
@@ -323,8 +322,8 @@ describe('MessageRepository routes changes through the outbox', () => {
         createStoredSnapshot({
           kind: 'message',
           id: 'operation-reaction',
-          correlationKey: 'message-1:reaction',
-          orderingKey: CONVERSATION_ID.id,
+          correlation: {state: 'correlated', correlationKey: 'message-1:reaction'},
+          lane: {state: 'in-lane', laneKey: CONVERSATION_ID.id},
           payload: {
             type: 'reaction',
             conversationId: CONVERSATION_ID,
@@ -332,12 +331,17 @@ describe('MessageRepository routes changes through the outbox', () => {
             reactions: '👍',
           },
           queuedSeq: 2,
-          validUntil: 1_000_000 + TIME_IN_MILLIS.WEEK,
+          trigger: 'operation-held',
+          state: 'on-hold',
+          expiry: {state: 'expires-at', serverTime: 1_000_000 + TIME_IN_MILLIS.WEEK},
         }),
       );
       await startOutbox(parts);
-      // The message itself is gone from the outbox, but its reaction is not
-      await parts.outbox.drop('message-1');
+      // The message itself is gone from the outbox once it went out, but its held reaction is not
+      parts.outbox.resume();
+      await parts.clock.settle();
+      expect(parts.outbox.findByCorrelationKey('message-1').outcome).toBe('operation-not-found');
+      parts.outbox.pause();
 
       await parts.repository.toggleReaction(
         parts.conversation,
@@ -441,7 +445,7 @@ describe('MessageRepository routes changes through the outbox', () => {
       expect(snapshotOf(parts.store, 'message-1:edit')).toEqual(
         expect.objectContaining({
           kind: 'message',
-          orderingKey: CONVERSATION_ID.id,
+          lane: {state: 'in-lane', laneKey: CONVERSATION_ID.id},
           payload: expect.objectContaining({
             type: 'edit',
             originalMessageId: 'message-1',
@@ -461,7 +465,7 @@ describe('MessageRepository routes changes through the outbox', () => {
       await parts.clock.settle();
 
       expect(snapshotOf(parts.store, 'sent-1:edit')).toEqual(
-        expect.objectContaining({kind: 'message-change', orderingKey: CHANGES_LANE}),
+        expect.objectContaining({kind: 'message-change', lane: {state: 'in-lane', laneKey: CHANGES_LANE}}),
       );
       expect(parts.inject).toHaveBeenCalledTimes(1);
     });
@@ -573,7 +577,7 @@ describe('MessageRepository routes changes through the outbox', () => {
       await parts.clock.settle();
 
       expect(parts.sendToBackend).toHaveBeenCalledTimes(2);
-      expect(parts.outbox.findByCorrelationKey('sent-1:hide').type).toBe('operation-not-found');
+      expect(parts.outbox.findByCorrelationKey('sent-1:hide').outcome).toBe('operation-not-found');
     });
   });
 
@@ -588,8 +592,8 @@ describe('MessageRepository routes changes through the outbox', () => {
         createStoredSnapshot({
           kind: 'message',
           id: 'operation-reaction',
-          correlationKey: 'message-1:reaction',
-          orderingKey: CONVERSATION_ID.id,
+          correlation: {state: 'correlated', correlationKey: 'message-1:reaction'},
+          lane: {state: 'in-lane', laneKey: CONVERSATION_ID.id},
           queuedSeq: 2,
           payload: {
             type: 'reaction',
@@ -597,7 +601,7 @@ describe('MessageRepository routes changes through the outbox', () => {
             targetMessageId: 'message-1',
             reactions: '👍',
           },
-          validUntil: 1_000_000 + TIME_IN_MILLIS.WEEK,
+          expiry: {state: 'expires-at', serverTime: 1_000_000 + TIME_IN_MILLIS.WEEK},
         }),
       );
       await startOutbox(parts);
@@ -606,8 +610,8 @@ describe('MessageRepository routes changes through the outbox', () => {
       parts.outbox.resume();
       await parts.clock.settle();
 
-      expect(parts.outbox.findByCorrelationKey('message-1').type).toBe('operation-not-found');
-      expect(parts.outbox.findByCorrelationKey('message-1:reaction').type).toBe('operation-not-found');
+      expect(parts.outbox.findByCorrelationKey('message-1').outcome).toBe('operation-not-found');
+      expect(parts.outbox.findByCorrelationKey('message-1:reaction').outcome).toBe('operation-not-found');
       expect(parts.deleteEvent).toHaveBeenCalledWith(CONVERSATION_ID.id, 'message-1');
       expect(parts.sendToBackend).not.toHaveBeenCalled();
       expect(
@@ -625,8 +629,27 @@ describe('MessageRepository routes changes through the outbox', () => {
       parts.outbox.resume();
       await parts.clock.settle();
 
-      expect(parts.outbox.findByCorrelationKey('message-1').type).toBe('operation-not-found');
+      expect(parts.outbox.findByCorrelationKey('message-1').outcome).toBe('operation-not-found');
       expect(parts.sendToBackend).not.toHaveBeenCalled();
+      expect(parts.deleteEvent).toHaveBeenCalledWith(CONVERSATION_ID.id, 'message-1');
+    });
+
+    it('a message with a later message in its conversation keeps the later one queued', async () => {
+      seedMessage(parts, {messageId: 'message-1'});
+      seedMessage(parts, {messageId: 'message-2', queuedSeq: 2});
+      await startOutbox(parts);
+
+      await deleteForEveryone(createMessage(parts, 'message-1'));
+
+      const laterResult = parts.outbox.findByCorrelationKey('message-2');
+      expect(laterResult).toEqual(
+        expect.objectContaining({outcome: 'operation-found', operation: expect.objectContaining({state: 'queued'})}),
+      );
+      // The message stays queued and the deletion follows it, so that it is sent and then deleted.
+      expect(parts.outbox.findByCorrelationKey('message-1').outcome).toBe('operation-found');
+      expect(snapshotOf(parts.store, 'message-1:delete')).toEqual(
+        expect.objectContaining({kind: 'message', lane: {state: 'in-lane', laneKey: CONVERSATION_ID.id}}),
+      );
       expect(parts.deleteEvent).toHaveBeenCalledWith(CONVERSATION_ID.id, 'message-1');
     });
 
@@ -636,11 +659,11 @@ describe('MessageRepository routes changes through the outbox', () => {
 
       await deleteForEveryone(createMessage(parts, 'message-1'));
 
-      expect(parts.outbox.findByCorrelationKey('message-1').type).toBe('operation-not-found');
+      expect(parts.outbox.findByCorrelationKey('message-1').outcome).toBe('operation-not-found');
       expect(snapshotOf(parts.store, 'message-1:delete')).toEqual(
         expect.objectContaining({
           kind: 'message-change',
-          orderingKey: CHANGES_LANE,
+          lane: {state: 'in-lane', laneKey: CHANGES_LANE},
           payload: expect.objectContaining({type: 'delete', targetMessageId: 'message-1'}),
         }),
       );
@@ -653,9 +676,9 @@ describe('MessageRepository routes changes through the outbox', () => {
 
       await parts.repository.deleteMessage(parts.conversation, createMessage(parts, 'message-1'));
 
-      expect(parts.outbox.findByCorrelationKey('message-1').type).toBe('operation-not-found');
+      expect(parts.outbox.findByCorrelationKey('message-1').outcome).toBe('operation-not-found');
       expect(snapshotOf(parts.store, 'message-1:hide')).toEqual(
-        expect.objectContaining({kind: 'message-change', orderingKey: CHANGES_LANE}),
+        expect.objectContaining({kind: 'message-change', lane: {state: 'in-lane', laneKey: CHANGES_LANE}}),
       );
     });
 
@@ -680,7 +703,11 @@ describe('MessageRepository routes changes through the outbox', () => {
 
       expect(snapshotOf(parts.store, 'message-1')?.state).toBe('in-progress');
       expect(snapshotOf(parts.store, 'message-1:delete')).toEqual(
-        expect.objectContaining({kind: 'message', orderingKey: CONVERSATION_ID.id, state: 'queued'}),
+        expect.objectContaining({
+          kind: 'message',
+          lane: {state: 'in-lane', laneKey: CONVERSATION_ID.id},
+          state: 'queued',
+        }),
       );
       expect(parts.deleteEvent).toHaveBeenCalledTimes(1);
 
@@ -689,7 +716,7 @@ describe('MessageRepository routes changes through the outbox', () => {
 
       expect(parts.sendToBackend).toHaveBeenCalledTimes(2);
       expect(parts.sendToBackend.mock.calls[1][2]).toEqual(expect.objectContaining({skipInjection: true}));
-      expect(parts.outbox.findByCorrelationKey('message-1:delete').type).toBe('operation-not-found');
+      expect(parts.outbox.findByCorrelationKey('message-1:delete').outcome).toBe('operation-not-found');
       // The message was not shown again
       expect(parts.inject).not.toHaveBeenCalled();
     });
@@ -719,7 +746,7 @@ describe('MessageRepository routes changes through the outbox', () => {
       finishSending();
       await parts.clock.settle();
 
-      expect(parts.outbox.findByCorrelationKey('message-1').type).toBe('operation-not-found');
+      expect(parts.outbox.findByCorrelationKey('message-1').outcome).toBe('operation-not-found');
       expect(parts.updateEvent).not.toHaveBeenCalled();
       expect(parts.inject).not.toHaveBeenCalled();
     });
@@ -730,7 +757,7 @@ describe('MessageRepository routes changes through the outbox', () => {
       await deleteForEveryone(createMessage(parts, 'sent-1', 'text', StatusType.SENT));
 
       expect(snapshotOf(parts.store, 'sent-1:delete')).toEqual(
-        expect.objectContaining({kind: 'message-change', orderingKey: CHANGES_LANE}),
+        expect.objectContaining({kind: 'message-change', lane: {state: 'in-lane', laneKey: CHANGES_LANE}}),
       );
       expect(parts.deleteEvent).toHaveBeenCalledWith(CONVERSATION_ID.id, 'sent-1');
     });
@@ -741,7 +768,7 @@ describe('MessageRepository routes changes through the outbox', () => {
       await parts.repository.deleteMessage(parts.conversation, createMessage(parts, 'sent-1', 'text', StatusType.SENT));
 
       expect(snapshotOf(parts.store, 'sent-1:hide')).toEqual(
-        expect.objectContaining({kind: 'message-change', orderingKey: CHANGES_LANE}),
+        expect.objectContaining({kind: 'message-change', lane: {state: 'in-lane', laneKey: CHANGES_LANE}}),
       );
       expect(parts.deleteEvent).toHaveBeenCalledWith(CONVERSATION_ID.id, 'sent-1');
     });
